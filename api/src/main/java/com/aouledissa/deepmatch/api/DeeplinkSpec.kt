@@ -9,26 +9,22 @@ data class DeeplinkSpec(
     val scheme: String,
     val host: String,
     val pathParams: Set<Param>,
-    val queryParams: Set<Param.TemplateParam>,
+    val queryParams: Set<Param>,
     val fragment: String?,
 )
 
 @Serializable
-sealed class Param {
-    @SerialName("definedParam")
-    @Serializable
-    data class DefinedParam(val key: String) : Param() {
-        override fun toString(): String {
-            return "DefinedParam(key = \"$key\")"
-        }
-    }
-
-    @SerialName("templateParam")
-    @Serializable
-    data class TemplateParam(val key: String, val type: ParamType) : Param() {
-        override fun toString(): String {
-            return "TemplateParam(key = \"$key\", type = ${ParamType::class.simpleName}.${type.name})"
-        }
+data class Param(
+    val name: String,
+    val type: ParamType? = null
+) {
+    override fun toString(): String {
+        return "Param2(name = \"$name\", type = ${
+            when (this.type) {
+                null -> null
+                else -> "${ParamType::class.simpleName}.${type.name}"
+            }
+        })"
     }
 }
 

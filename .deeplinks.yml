@@ -4,23 +4,19 @@ deeplinkSpecs:
     scheme: "myapp"
     host: "example.com"
     pathParams:
-      - !<definedParam>
-        key: profile
-      - !<templateParam>
-        key: id
+      - name: profile
+      - name: id
         type: numeric
     queryParams:
-      - key: ref
+      - name: ref
         type: alphanumeric
     fragment: section
-  #    example: "myapp://example.com/user/123?ref=share#section"
 
   - name: Product Detail
     description: "Opens a product detail page"
     scheme: "myapp"
     host: "shop.example.com"
-#    pathParams:
-#      - name: productId
-#        type: Int
-#        required: true
-#    example: "myapp://shop.example.com/product/42"
+    pathParams:
+      - name: product
+        type: alphanumeric
+    fragment: reviews

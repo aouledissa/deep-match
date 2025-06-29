@@ -14,12 +14,11 @@ internal data class DeeplinkConfig(
     val scheme: String,
     val host: String,
     val pathParams: List<Param>? = null,
-    val queryParams: List<Param.TemplateParam>? = null,
+    val queryParams: List<Param>? = null,
     val fragment: String? = null
 ) {
 
     fun containsTemplateParams(): Boolean {
-        return pathParams?.any { it is Param.TemplateParam } == true
-                || queryParams.isNullOrEmpty().not()
+        return pathParams?.any { it.type != null } == true || queryParams.isNullOrEmpty().not()
     }
 }

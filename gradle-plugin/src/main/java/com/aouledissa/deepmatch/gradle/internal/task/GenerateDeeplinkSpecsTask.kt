@@ -18,6 +18,7 @@ import com.squareup.kotlinpoet.ParameterSpec
 import com.squareup.kotlinpoet.PropertySpec
 import com.squareup.kotlinpoet.TypeSpec
 import org.gradle.api.DefaultTask
+import org.gradle.api.GradleException
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.Property
@@ -53,6 +54,8 @@ internal abstract class GenerateDeeplinkSpecsTask : DefaultTask() {
         val deeplinkConfigs = deserializeSpecs(specsFile)
 
         deeplinkConfigs.forEach { config ->
+            assertValidQueryParams(config)
+
             val fileName = config.name.toCamelCase().plus("DeeplinkSpecs").capitalize()
             val deeplinkProperty = generateDeeplinkSpecProperty(
                 name = config.name.toCamelCase().capitalize(),
@@ -69,18 +72,11 @@ internal abstract class GenerateDeeplinkSpecsTask : DefaultTask() {
             }
 
             FileSpec.builder(packageName, fileName)
+                .addImport(Param::class.qualifiedName.orEmpty(), "")
                 .apply {
-                    if (config.pathParams?.any { it is Param.DefinedParam } == true) {
-                        addImport(Param.DefinedParam::class.qualifiedName.orEmpty(), "")
-                    }
-                    if (config.pathParams?.any { it is Param.TemplateParam } == true) {
-                        addImport(Param.TemplateParam::class.qualifiedName.orEmpty(), "")
-                    }
                     if (config.containsTemplateParams()) {
                         addImport(ParamType::class.qualifiedName.orEmpty(), "")
                     }
-                }
-                .apply {
                     deeplinkParamsType?.let { addType(it) }
                 }
                 .addProperty(deeplinkProperty)
@@ -103,10 +99,8 @@ internal abstract class GenerateDeeplinkSpecsTask : DefaultTask() {
             DeeplinkSpec::class.java.packageName,
             DeeplinkSpec::class.java.simpleName
         )
-        val pathParams =
-            config.pathParams?.joinToString(separator = ", ") { it.toString() }.orEmpty()
-        val queryParams =
-            config.queryParams?.joinToString(separator = ", ") { it.toString() }.orEmpty()
+        val pathParams = config.pathParams?.joinToString(separator = ", ").orEmpty()
+        val queryParams = config.queryParams?.joinToString(separator = ", ").orEmpty()
         val deeplinkExample = generateDeeplinkExample(config)
 
         return PropertySpec.builder(name, deeplinkSpecClass)
@@ -137,15 +131,11 @@ internal abstract class GenerateDeeplinkSpecsTask : DefaultTask() {
         append("://")
         append(config.host)
         config.pathParams?.map {
-            when (it) {
-                is Param.DefinedParam -> "/${it.key}"
-                is Param.TemplateParam -> {
-                    when (it.type) {
-                        ParamType.NUMERIC -> "/1234"
-                        ParamType.ALPHANUMERIC -> "/alpha_numeric"
-                        ParamType.STRING -> "characters_only"
-                    }
-                }
+            when (it.type) {
+                ParamType.NUMERIC -> "/1234"
+                ParamType.ALPHANUMERIC -> "/loremipsum1234"
+                ParamType.STRING -> "/loremipsum"
+                else -> "/${it.name}"
             }
         }?.forEach {
             append(it)
@@ -157,11 +147,12 @@ internal abstract class GenerateDeeplinkSpecsTask : DefaultTask() {
                     ParamType.NUMERIC -> "1234"
                     ParamType.ALPHANUMERIC -> "loremipsum1234"
                     ParamType.STRING -> "loremipsum"
+                    else -> ""
                 }
                 if (index > 0) {
                     append("&")
                 }
-                append("${param.key}=${value}")
+                append("${param.name}=${value}")
             }
         }
         config.fragment?.let {
@@ -178,18 +169,17 @@ internal abstract class GenerateDeeplinkSpecsTask : DefaultTask() {
             DeeplinkParams::class.java.simpleName
         )
 
-        val pathParams = config.pathParams?.filterIsInstance<Param.TemplateParam>()
-            ?.map {
-                ParameterSpec.builder(
-                    it.key.toCamelCase(),
-                    it.type.getType()
-                ).build()
-            }
-
-        val queryParams = config.queryParams?.map {
+        val pathParams = config.pathParams?.filter { it.type != null }?.map {
             ParameterSpec.builder(
-                it.key.toCamelCase(),
-                it.type.getType()
+                it.name.toCamelCase(),
+                it.type!!.getType()
+            ).build()
+        }
+
+        val queryParams = config.queryParams?.filter { it.type != null }?.map {
+            ParameterSpec.builder(
+                it.name.toCamelCase(),
+                it.type!!.getType()
             ).build()
         }
 
@@ -237,5 +227,13 @@ internal abstract class GenerateDeeplinkSpecsTask : DefaultTask() {
                     )
                 }
             }
+    }
+
+    private fun assertValidQueryParams(config: DeeplinkConfig) {
+        config.queryParams?.let { queryParams ->
+            if (queryParams.all { it.type != null }.not()) {
+                throw GradleException("DeepMatch: All queryParams should define a type: [numeric, alphanumeric, string]")
+            }
+        }
     }
 }
