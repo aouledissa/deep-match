@@ -3,17 +3,17 @@ deeplinkSpecs:
     description: "Opens the user profile screen"
     scheme: "myapp"
     host: "example.com"
-#    pathParams:
-#      - name: userId
-#        type: NUMERIC
-#        required: true
-#    queryParams:
-#      - name: ref
-#        type: ALPHANUMERIC
-#        required: false
-#    fragment:
-#      name: "section"
-#    example: "myapp://example.com/user/123?ref=share#section"
+    pathParams:
+      - !<definedParam>
+        key: profile
+      - !<templateParam>
+        key: id
+        type: numeric
+    queryParams:
+      - key: ref
+        type: alphanumeric
+    fragment: section
+  #    example: "myapp://example.com/user/123?ref=share#section"
 
   - name: Product Detail
     description: "Opens a product detail page"

@@ -1,5 +1,6 @@
 package com.aouledissa.deepmatch.gradle.internal.model
 
+import com.aouledissa.deepmatch.api.Param
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -12,4 +13,13 @@ internal data class DeeplinkConfig(
     val name: String,
     val scheme: String,
     val host: String,
-)
+    val pathParams: List<Param>? = null,
+    val queryParams: List<Param.TemplateParam>? = null,
+    val fragment: String? = null
+) {
+
+    fun containsTemplateParams(): Boolean {
+        return pathParams?.any { it is Param.TemplateParam } == true
+                || queryParams.isNullOrEmpty().not()
+    }
+}
