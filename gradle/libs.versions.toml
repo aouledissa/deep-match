@@ -10,8 +10,12 @@ activityCompose = "1.8.0"
 composeBom = "2024.09.00"
 appcompat = "1.6.1"
 material = "1.10.0"
-jetbrainsKotlinJvm = "2.0.21"
+jetbrainsKotlinJvm = "2.2.0"
 deepmatchVersion = "0.1.0"
+ktxSerializationVersion = "1.9.0"
+ktxSerializationPlugin = "2.2.0"
+kamlVersion = "0.83.0"
+kotlinPoetVersion = "2.2.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -31,6 +35,10 @@ androidx-material3 = { group = "androidx.compose.material3", name = "material3" 
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 android-gradle-api = { group = "com.android.tools.build", name = "gradle", version.ref = "agp" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
+kotlin-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "ktxSerializationVersion" }
+kaml = { group = "com.charleskorn.kaml", name = "kaml", version.ref = "kamlVersion" }
+squareup-kotlinpoet = { group = "com.squareup", name = "kotlinpoet", version.ref = "kotlinPoetVersion" }
+deepmatch-api = { group = "com.aouledissa.deepmatch", name = "api", version.ref = "deepmatchVersion" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
@@ -41,6 +49,7 @@ jetbrains-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "jetbrai
 gradle-plugin = { id = "java-gradle-plugin" }
 java-library = { id = "java-library" }
 maven-publish = { id = "maven-publish" }
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "ktxSerializationPlugin" }
 # DeepMatch
-deepmatch-plugin = { id="com.aouledissa.deepmatch.gradle", version.ref="deepmatchVersion"}
+deepmatch-plugin = { id = "com.aouledissa.deepmatch.gradle", version.ref = "deepmatchVersion" }
 

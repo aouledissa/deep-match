@@ -4,13 +4,8 @@ plugins {
     alias(libs.plugins.java.library)
     alias(libs.plugins.jetbrains.kotlin.jvm)
     alias(libs.plugins.kotlin.serialization)
-    alias(libs.plugins.gradle.plugin)
     alias(libs.plugins.maven.publish)
 }
-
-group = findProperty("group_name") as String
-version = findProperty("deepmatch_version") as String
-
 java {
     sourceCompatibility = JavaVersion.VERSION_11
     targetCompatibility = JavaVersion.VERSION_11
@@ -22,18 +17,16 @@ kotlin {
 }
 
 dependencies {
-    implementation(project(":api"))
-    implementation(libs.android.gradle.api)
     implementation(libs.kotlin.serialization.json)
-    implementation(libs.squareup.kotlinpoet)
-    implementation(libs.kaml)
 }
 
-gradlePlugin {
-    plugins {
-        create("DeepMatchPlugin") {
-            id = "com.aouledissa.deepmatch.gradle"
-            implementationClass = "com.aouledissa.deepmatch.gradle.DeepMatchPlugin"
+publishing {
+    publications {
+        register<MavenPublication>("DeepMatchApi") {
+            from(components["java"])
+            groupId = findProperty("group_name") as String
+            artifactId = "api"
+            version = findProperty("deepmatch_version") as String
         }
     }
 }

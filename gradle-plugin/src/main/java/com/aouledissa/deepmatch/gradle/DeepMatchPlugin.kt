@@ -9,7 +9,8 @@ import org.gradle.api.Project
 class DeepMatchPlugin : Plugin<Project> {
 
     override fun apply(target: Project) {
-        val config = target.extensions.create("deepMatch", DeepMatchPluginConfig::class.java)
+        val config =
+            target.extensions.create(DeepMatchPluginConfig.NAME, DeepMatchPluginConfig::class.java)
 
         when {
             target.plugins.hasPlugin(AppPlugin::class.java)

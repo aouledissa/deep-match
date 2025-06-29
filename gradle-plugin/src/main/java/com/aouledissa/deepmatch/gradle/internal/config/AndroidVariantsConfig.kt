@@ -4,6 +4,7 @@ import com.android.build.api.variant.AndroidComponentsExtension
 import com.aouledissa.deepmatch.gradle.DeepMatchPluginConfig
 import com.aouledissa.deepmatch.gradle.internal.capitalize
 import com.aouledissa.deepmatch.gradle.internal.task.GenerateDeeplinkSpecsTask
+import org.gradle.api.GradleException
 import org.gradle.api.Project
 
 internal fun configureAndroidVariants(project: Project, config: DeepMatchPluginConfig) {
@@ -14,15 +15,15 @@ internal fun configureAndroidVariants(project: Project, config: DeepMatchPluginC
     }
     val specsFile = project.layout.projectDirectory.file(specsFilePath)
 
-    project.logger.error("> DeepMatch: specs file at: $specsFile")
     when {
         specsFile.asFile.exists().not() -> {
-            project.logger.error("> DeepMatch: Could not parse specs file! Make sure you profile the path using the deepMatch gradle closure in you build file or provide the default config file \".deeplinks.yml\" directly in the root directory.")
+            throw GradleException("DeepMatch: Could not parse specs file! Make sure a path is specified using the deepMatch gradle closure in you build file or provide the default config file \".deeplinks.yml\" directly in the root directory.")
         }
 
         else -> {
             android.onVariants { variant ->
                 val variantName = variant.name.capitalize()
+                val variantPackageName = variant.namespace
 
                 /**
                  * Prepare and registers variant specific deeplinks specs codegen task.
@@ -32,6 +33,7 @@ internal fun configureAndroidVariants(project: Project, config: DeepMatchPluginC
                     GenerateDeeplinkSpecsTask::class.java
                 ) {
                     it.specsFileProperty.set(specsFile)
+                    it.packageNameProperty.set(variantPackageName)
                 }
 
                 /**

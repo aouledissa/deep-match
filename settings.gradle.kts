@@ -25,3 +25,4 @@ rootProject.name = "DeepMatch"
 include(":gradle-plugin")
 include(":processor")
 include(":sample")
+include(":api")
