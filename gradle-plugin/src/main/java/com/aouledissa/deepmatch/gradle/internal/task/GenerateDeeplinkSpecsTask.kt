@@ -164,7 +164,7 @@ internal abstract class GenerateDeeplinkSpecsTask : DefaultTask() {
         name: String,
         config: DeeplinkConfig,
     ): TypeSpec.Builder {
-        val deeplinkParamSuperClass = ClassName(
+        val deeplinkParamSuperInterface = ClassName(
             DeeplinkParams::class.java.packageName,
             DeeplinkParams::class.java.simpleName
         )
@@ -193,7 +193,7 @@ internal abstract class GenerateDeeplinkSpecsTask : DefaultTask() {
         return TypeSpec.classBuilder(name)
             .addModifiers(KModifier.PUBLIC)
             .addModifiers(KModifier.DATA)
-            .superclass(deeplinkParamSuperClass)
+            .addSuperinterface(deeplinkParamSuperInterface)
             .primaryConstructor(
                 FunSpec.constructorBuilder()
                     .apply {
