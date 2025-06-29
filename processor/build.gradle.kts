@@ -3,6 +3,7 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.maven.publish)
 }
 
 kotlin {
@@ -35,14 +36,31 @@ android {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
+    publishing {
+        singleVariant("release")
+    }
 }
 
 dependencies {
 
+    api(project(":api"))
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+}
+
+publishing {
+    publications {
+        afterEvaluate {
+            create<MavenPublication>("release") {
+                from(components["release"])
+                groupId = findProperty("group_name") as String
+                version = findProperty("deepmatch_version") as String
+                artifactId = "processor"
+            }
+        }
+    }
 }

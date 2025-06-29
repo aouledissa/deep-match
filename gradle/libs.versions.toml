@@ -1,15 +1,15 @@
 [versions]
 agp = "8.11.0"
-kotlin = "2.0.21"
-coreKtx = "1.10.1"
+kotlin = "2.2.0"
+coreKtx = "1.16.0"
 junit = "4.13.2"
-junitVersion = "1.1.5"
-espressoCore = "3.5.1"
-lifecycleRuntimeKtx = "2.6.1"
-activityCompose = "1.8.0"
-composeBom = "2024.09.00"
-appcompat = "1.6.1"
-material = "1.10.0"
+junitVersion = "1.2.1"
+espressoCore = "3.6.1"
+lifecycleRuntimeKtx = "2.9.1"
+activityCompose = "1.10.1"
+composeBom = "2025.06.01"
+appcompat = "1.7.1"
+material = "1.12.0"
 jetbrainsKotlinJvm = "2.2.0"
 deepmatchVersion = "0.1.0"
 ktxSerializationVersion = "1.9.0"
@@ -38,7 +38,7 @@ material = { group = "com.google.android.material", name = "material", version.r
 kotlin-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "ktxSerializationVersion" }
 kaml = { group = "com.charleskorn.kaml", name = "kaml", version.ref = "kamlVersion" }
 squareup-kotlinpoet = { group = "com.squareup", name = "kotlinpoet", version.ref = "kotlinPoetVersion" }
-deepmatch-api = { group = "com.aouledissa.deepmatch", name = "api", version.ref = "deepmatchVersion" }
+deepmatch-processor = { group = "com.aouledissa.deepmatch", name = "processor", version.ref = "deepmatchVersion" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
