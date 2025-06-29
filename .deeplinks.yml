@@ -1,0 +1,26 @@
+deeplinks:
+  - name: user profile
+    description: "Opens the user profile screen"
+    scheme: "myapp"
+    host: "example.com"
+    pathParams:
+      - name: userId
+        type: NUMERIC
+        required: true
+    queryParams:
+      - name: ref
+        type: ALPHANUMERIC
+        required: false
+    fragment:
+      name: "section"
+    example: "myapp://example.com/user/123?ref=share#section"
+
+  - name: ProductDetail
+    description: "Opens a product detail page"
+    scheme: "myapp"
+    host: "shop.example.com"
+    pathParams:
+      - name: productId
+        type: Int
+        required: true
+    example: "myapp://shop.example.com/product/42"
