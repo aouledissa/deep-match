@@ -19,7 +19,7 @@ data class Param(
     val type: ParamType? = null
 ) {
     override fun toString(): String {
-        return "Param2(name = \"$name\", type = ${
+        return "Param(name = \"$name\", type = ${
             when (this.type) {
                 null -> null
                 else -> "${ParamType::class.simpleName}.${type.name}"
