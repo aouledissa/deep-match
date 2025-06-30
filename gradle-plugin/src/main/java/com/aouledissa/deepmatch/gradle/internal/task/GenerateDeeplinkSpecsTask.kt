@@ -57,11 +57,6 @@ internal abstract class GenerateDeeplinkSpecsTask : DefaultTask() {
             assertValidQueryParams(config)
 
             val fileName = config.name.toCamelCase().plus("DeeplinkSpecs").capitalize()
-            val deeplinkProperty = generateDeeplinkSpecProperty(
-                name = config.name.toCamelCase().capitalize(),
-                config = config
-            ).build()
-
             val deeplinkParamsType = when {
                 config.containsTemplateParams() -> generateDeeplinkParamType(
                     name = config.name.toCamelCase().plus("Params").capitalize(),
@@ -70,6 +65,12 @@ internal abstract class GenerateDeeplinkSpecsTask : DefaultTask() {
 
                 else -> null
             }
+            val deeplinkProperty = generateDeeplinkSpecProperty(
+                name = config.name.toCamelCase().capitalize(),
+                config = config,
+                packageName = packageName,
+                parametersClass = deeplinkParamsType?.name
+            ).build()
 
             FileSpec.builder(packageName, fileName)
                 .addImport(Param::class.qualifiedName.orEmpty(), "")
@@ -94,6 +95,8 @@ internal abstract class GenerateDeeplinkSpecsTask : DefaultTask() {
     private fun generateDeeplinkSpecProperty(
         name: String,
         config: DeeplinkConfig,
+        packageName: String,
+        parametersClass: String?,
     ): PropertySpec.Builder {
         val deeplinkSpecClass = ClassName(
             DeeplinkSpec::class.java.packageName,
@@ -101,6 +104,7 @@ internal abstract class GenerateDeeplinkSpecsTask : DefaultTask() {
         )
         val pathParams = config.pathParams?.joinToString(separator = ", ").orEmpty()
         val queryParams = config.queryParams?.joinToString(separator = ", ").orEmpty()
+        val parametersClass = parametersClass?.let { ClassName(packageName, it) }
         val deeplinkExample = generateDeeplinkExample(config)
 
         return PropertySpec.builder(name, deeplinkSpecClass)
@@ -120,6 +124,7 @@ internal abstract class GenerateDeeplinkSpecsTask : DefaultTask() {
                 pathParams = setOf(${pathParams}),
                 queryParams = setOf(${queryParams}),
                 fragment = ${config.fragment?.let { "\"$it\"" } ?: "null"},
+                parametersClass = ${parametersClass?.simpleName?.plus("::class")}
                 )
                 """.trimIndent(),
                 deeplinkSpecClass,

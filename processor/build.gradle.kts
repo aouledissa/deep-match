@@ -44,6 +44,7 @@ android {
 dependencies {
 
     api(project(":api"))
+    implementation(kotlin("reflect"))
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.material)
