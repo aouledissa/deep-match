@@ -1,6 +1,8 @@
 deeplinkSpecs:
   - name: user profile
     description: "Opens the user profile screen"
+    activity: com.aouledissa.deepmatch.sample.MainActivity
+    autoVerify: true
     scheme: "myapp"
     host: "example.com"
     pathParams:
@@ -14,6 +16,7 @@ deeplinkSpecs:
 
   - name: Product Detail
     description: "Opens a product detail page"
+    activity: com.aouledissa.deepmatch.sample.MainActivity
     scheme: "myapp"
     host: "shop.example.com"
     pathParams:

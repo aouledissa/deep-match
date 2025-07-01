@@ -1,5 +1,9 @@
 package com.aouledissa.deepmatch.gradle.internal
 
+import com.aouledissa.deepmatch.gradle.internal.model.DeeplinkConfig
+import com.aouledissa.deepmatch.gradle.internal.model.Specs
+import com.charleskorn.kaml.Yaml
+import java.io.File
 import java.util.Locale
 
 /**
@@ -44,4 +48,9 @@ internal fun String.toCamelCase(): String {
                 else -> "" // Handle empty strings resulting from multiple delimiters
             }
         }.joinToString("")
+}
+
+internal fun Yaml.deserializeDeeplinkConfigs(file: File): List<DeeplinkConfig> {
+    val content = file.readText()
+    return decodeFromString(Specs.serializer(), content).deeplinkSpecs
 }

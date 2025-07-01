@@ -27,6 +27,7 @@ dependencies {
     implementation(libs.kotlin.serialization.json)
     implementation(libs.squareup.kotlinpoet)
     implementation(libs.kaml)
+    implementation(libs.xmlUtil.serialization)
 }
 
 gradlePlugin {

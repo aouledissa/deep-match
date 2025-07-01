@@ -13,6 +13,10 @@ kotlin {
     }
 }
 
+deepMatch {
+    generateManifestFiles = true
+}
+
 android {
     namespace = "com.aouledissa.deepmatch.sample"
     compileSdk = 36

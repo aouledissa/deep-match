@@ -16,6 +16,7 @@ ktxSerializationVersion = "1.9.0"
 ktxSerializationPlugin = "2.2.0"
 kamlVersion = "0.83.0"
 kotlinPoetVersion = "2.2.0"
+xmlUtilSerializationVersion = "0.91.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -38,6 +39,7 @@ material = { group = "com.google.android.material", name = "material", version.r
 kotlin-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "ktxSerializationVersion" }
 kaml = { group = "com.charleskorn.kaml", name = "kaml", version.ref = "kamlVersion" }
 squareup-kotlinpoet = { group = "com.squareup", name = "kotlinpoet", version.ref = "kotlinPoetVersion" }
+xmlUtil-serialization = { group = "io.github.pdvrieze.xmlutil", name = "serialization", version.ref = "xmlUtilSerializationVersion" }
 deepmatch-processor = { group = "com.aouledissa.deepmatch", name = "processor", version.ref = "deepmatchVersion" }
 
 [plugins]

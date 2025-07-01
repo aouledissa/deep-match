@@ -3,6 +3,7 @@ package com.aouledissa.deepmatch.gradle.internal.config
 import com.android.build.api.variant.AndroidComponentsExtension
 import com.aouledissa.deepmatch.gradle.DeepMatchPluginConfig
 import com.aouledissa.deepmatch.gradle.internal.capitalize
+import com.aouledissa.deepmatch.gradle.internal.task.GenerateDeeplinkManifestFile
 import com.aouledissa.deepmatch.gradle.internal.task.GenerateDeeplinkSpecsTask
 import org.gradle.api.GradleException
 import org.gradle.api.Project
@@ -44,6 +45,25 @@ internal fun configureAndroidVariants(project: Project, config: DeepMatchPluginC
                     generateVariantDeeplinkSpecsTask,
                     GenerateDeeplinkSpecsTask::outputDir
                 )
+
+                if (config.generateManifestFiles.isPresent) {
+                    val generateVariantManifestFile = project.tasks.register(
+                        "generate${variantName.capitalize()}DeeplinksManifest",
+                        GenerateDeeplinkManifestFile::class.java
+                    ) {
+                        it.specFileProperty.set(specsFile)
+                        it.variantApiLevelProperty.set(variant.minSdk.apiLevel)
+                    }
+
+                    /**
+                     * This api will automatically add the sources to the variant's main manifests
+                     * source set, and also make the variant manifest processing depend on this task.
+                     */
+                    variant.sources.manifests.addGeneratedManifestFile(
+                        generateVariantManifestFile,
+                        GenerateDeeplinkManifestFile::outputFile
+                    )
+                }
             }
         }
     }

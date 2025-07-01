@@ -5,8 +5,8 @@ import com.aouledissa.deepmatch.api.DeeplinkSpec
 import com.aouledissa.deepmatch.api.Param
 import com.aouledissa.deepmatch.api.ParamType
 import com.aouledissa.deepmatch.gradle.internal.capitalize
+import com.aouledissa.deepmatch.gradle.internal.deserializeDeeplinkConfigs
 import com.aouledissa.deepmatch.gradle.internal.model.DeeplinkConfig
-import com.aouledissa.deepmatch.gradle.internal.model.Specs
 import com.aouledissa.deepmatch.gradle.internal.toCamelCase
 import com.charleskorn.kaml.Yaml
 import com.charleskorn.kaml.YamlConfiguration
@@ -26,7 +26,6 @@ import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.TaskAction
-import java.io.File
 
 internal abstract class GenerateDeeplinkSpecsTask : DefaultTask() {
 
@@ -51,7 +50,7 @@ internal abstract class GenerateDeeplinkSpecsTask : DefaultTask() {
         logger.quiet("> DeepMatch: processing specs file in ${specsFile.path}")
 
         val packageName = "${packageNameProperty.get()}.deeplinks"
-        val deeplinkConfigs = deserializeSpecs(specsFile)
+        val deeplinkConfigs = yamlSerializer.deserializeDeeplinkConfigs(specsFile)
 
         deeplinkConfigs.forEach { config ->
             assertValidQueryParams(config)
@@ -85,11 +84,6 @@ internal abstract class GenerateDeeplinkSpecsTask : DefaultTask() {
 
             logger.quiet("> DeepMatch: generated Deeplink spec at : ${packageName}.${fileName}")
         }
-    }
-
-    private fun deserializeSpecs(file: File): List<DeeplinkConfig> {
-        val content = file.readText()
-        return yamlSerializer.decodeFromString(Specs.serializer(), content).deeplinkSpecs
     }
 
     private fun generateDeeplinkSpecProperty(

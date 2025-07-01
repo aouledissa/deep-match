@@ -11,6 +11,9 @@ internal data class Specs(
 @Serializable
 internal data class DeeplinkConfig(
     val name: String,
+    val activity: String,
+    val categories: List<IntentFilterCategory> = listOf(IntentFilterCategory.DEFAULT),
+    val autoVerify: Boolean? = false,
     val scheme: String,
     val host: String,
     val pathParams: List<Param>? = null,
