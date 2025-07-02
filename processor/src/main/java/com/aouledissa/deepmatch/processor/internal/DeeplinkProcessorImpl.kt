@@ -1,5 +1,6 @@
 package com.aouledissa.deepmatch.processor.internal
 
+import android.app.Activity
 import android.net.Uri
 import com.aouledissa.deepmatch.api.DeeplinkParams
 import com.aouledissa.deepmatch.api.DeeplinkSpec
@@ -15,14 +16,14 @@ internal class DeeplinkProcessorImpl(
     private val coroutineScope: CoroutineScope,
 ) : DeeplinkProcessor {
 
-    override fun match(deeplink: Uri) {
+    override fun match(deeplink: Uri, activity: Activity) {
         coroutineScope.launch {
             val spec = registry.keys.find { it.matcher.matches(deeplink.decoded()) }
             spec?.let {
                 val handler = registry[spec] as? DeeplinkHandler<DeeplinkParams>
                 val params = buildDeeplinkParams(spec, deeplink)
                 withContext(Dispatchers.Main) {
-                    handler?.handle(params = params)
+                    handler?.handle(activity = activity, params = params)
                 }
             }
         }

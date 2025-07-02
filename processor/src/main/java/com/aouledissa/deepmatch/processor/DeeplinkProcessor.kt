@@ -1,5 +1,6 @@
 package com.aouledissa.deepmatch.processor
 
+import android.app.Activity
 import android.net.Uri
 import com.aouledissa.deepmatch.api.DeeplinkParams
 import com.aouledissa.deepmatch.api.DeeplinkSpec
@@ -9,7 +10,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 
 interface DeeplinkProcessor {
-    fun match(deeplink: Uri)
+    fun match(deeplink: Uri, activity: Activity)
 
     class Builder {
         private val registry: HashMap<DeeplinkSpec, DeeplinkHandler<out DeeplinkParams>> =

@@ -52,7 +52,7 @@ internal fun configureAndroidVariants(project: Project, config: DeepMatchPluginC
                         GenerateDeeplinkManifestFile::class.java
                     ) {
                         it.specFileProperty.set(specsFile)
-                        it.variantApiLevelProperty.set(variant.minSdk.apiLevel)
+                        it.outputFile.set(project.layout.buildDirectory.file("generated/manifests/${variant.name}"))
                     }
 
                     /**
@@ -63,6 +63,10 @@ internal fun configureAndroidVariants(project: Project, config: DeepMatchPluginC
                         generateVariantManifestFile,
                         GenerateDeeplinkManifestFile::outputFile
                     )
+
+//                    variant.artifacts.use(generateVariantManifestFile)
+//                        .wiredWith(GenerateDeeplinkManifestFile::outputFile)
+//                        .toCreate(SingleArtifact.MERGED_MANIFEST)
                 }
             }
         }

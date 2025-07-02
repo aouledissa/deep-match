@@ -59,5 +59,5 @@ internal data class Data(
     @SerialName("android:pathPattern")
     val pathPattern: String?,
     @SerialName("android:fragment")
-    val fragment: String
+    val fragment: String?
 )

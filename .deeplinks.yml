@@ -1,25 +1,22 @@
 deeplinkSpecs:
-  - name: user profile
-    description: "Opens the user profile screen"
+  - name: "open series"
+    description: "Opens series details page"
     activity: com.aouledissa.deepmatch.sample.MainActivity
     autoVerify: true
-    scheme: "myapp"
-    host: "example.com"
+    scheme: "https"
+    host: "joyn.de"
     pathParams:
-      - name: profile
-      - name: id
-        type: numeric
-    queryParams:
-      - name: ref
+      - name: series
+      - name: seriesId
         type: alphanumeric
-    fragment: section
 
-  - name: Product Detail
-    description: "Opens a product detail page"
+  - name: "open movies"
+    description: "Opens movies details page"
     activity: com.aouledissa.deepmatch.sample.MainActivity
-    scheme: "myapp"
-    host: "shop.example.com"
+    autoVerify: true
+    scheme: "https"
+    host: "joyn.de"
     pathParams:
-      - name: product
+      - name: filme
+      - name: movieId
         type: alphanumeric
-    fragment: reviews

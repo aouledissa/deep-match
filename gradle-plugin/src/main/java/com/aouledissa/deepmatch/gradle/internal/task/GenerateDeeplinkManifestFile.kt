@@ -15,8 +15,6 @@ import com.charleskorn.kaml.YamlConfiguration
 import nl.adaptivity.xmlutil.serialization.XML
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.RegularFileProperty
-import org.gradle.api.provider.Property
-import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
@@ -25,9 +23,6 @@ abstract class GenerateDeeplinkManifestFile : DefaultTask() {
 
     @get:InputFile
     abstract val specFileProperty: RegularFileProperty
-
-    @get:Input
-    abstract val variantApiLevelProperty: Property<Int>
 
     @get:OutputFile
     abstract val outputFile: RegularFileProperty
@@ -38,7 +33,6 @@ abstract class GenerateDeeplinkManifestFile : DefaultTask() {
     @TaskAction
     fun generateDeeplinkManifest() {
         val specsFile = specFileProperty.asFile.get()
-        val apiLevel = variantApiLevelProperty.get()
 
         logger.quiet("> DeepMatch: generating Android manifest file for deeplink specs in ${specsFile.path}")
 
@@ -58,7 +52,7 @@ abstract class GenerateDeeplinkManifestFile : DefaultTask() {
                             scheme = config.scheme,
                             host = config.host,
                             pathPattern = buildPathPattern(config.pathParams.orEmpty()),
-                            fragment = config.fragment.orEmpty()
+                            fragment = config.fragment
                         )
                     )
                 }

@@ -54,18 +54,18 @@ internal abstract class GenerateDeeplinkSpecsTask : DefaultTask() {
 
         deeplinkConfigs.forEach { config ->
             assertValidQueryParams(config)
-
-            val fileName = config.name.toCamelCase().plus("DeeplinkSpecs").capitalize()
+            val deeplinkName = config.name.toCamelCase().plus("Deeplink")
+            val fileName = deeplinkName.plus("Specs").capitalize()
             val deeplinkParamsType = when {
                 config.containsTemplateParams() -> generateDeeplinkParamType(
-                    name = config.name.toCamelCase().plus("Params").capitalize(),
+                    name = deeplinkName.plus("Params").capitalize(),
                     config = config
                 ).build()
 
                 else -> null
             }
             val deeplinkProperty = generateDeeplinkSpecProperty(
-                name = config.name.toCamelCase().capitalize(),
+                name = deeplinkName.plus("Specs").capitalize(),
                 config = config,
                 packageName = packageName,
                 parametersClass = deeplinkParamsType?.name

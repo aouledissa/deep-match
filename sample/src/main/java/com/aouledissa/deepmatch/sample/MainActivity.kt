@@ -11,11 +11,28 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
+import com.aouledissa.deepmatch.processor.DeeplinkProcessor
+import com.aouledissa.deepmatch.sample.deeplinks.OpenMoviesDeeplinkSpecs
+import com.aouledissa.deepmatch.sample.deeplinks.OpenSeriesDeeplinkSpecs
 import com.aouledissa.deepmatch.sample.ui.theme.SampleTheme
 
 class MainActivity : ComponentActivity() {
+    val processor = DeeplinkProcessor.Builder()
+        .register(
+            OpenSeriesDeeplinkSpecs,
+            OpenSeriesDeeplinkHandler
+        )
+        .register(
+            OpenMoviesDeeplinkSpecs,
+            OpenMoviesDeeplinkHandler
+        )
+        .build()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        intent.data?.let {
+            processor.match(deeplink = it, activity = this)
+        }
         enableEdgeToEdge()
         setContent {
             SampleTheme {
