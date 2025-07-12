@@ -25,8 +25,8 @@ publishing {
         register<MavenPublication>("DeepMatchApi") {
             from(components["java"])
             groupId = findProperty("group_name") as String
-            artifactId = "api"
             version = findProperty("deepmatch_version") as String
+            artifactId = "api"
         }
     }
 }
