@@ -60,7 +60,7 @@ publishing {
                 from(components["release"])
                 groupId = findProperty("group_name") as String
                 version = findProperty("deepmatch_version") as String
-                artifactId = "processor"
+                artifactId = "processor-android"
             }
         }
     }

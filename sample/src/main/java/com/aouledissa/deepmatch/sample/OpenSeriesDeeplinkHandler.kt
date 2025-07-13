@@ -10,6 +10,10 @@ object OpenSeriesDeeplinkHandler : DeeplinkHandler<OpenSeriesDeeplinkParams> {
         activity: Activity,
         params: OpenSeriesDeeplinkParams?
     ) {
-        Toast.makeText(activity, "user profile deeplink received!", Toast.LENGTH_SHORT).show()
+        Toast.makeText(
+            activity,
+            "requesting series with id: ${params?.seriesId}",
+            Toast.LENGTH_SHORT
+        ).show()
     }
 }

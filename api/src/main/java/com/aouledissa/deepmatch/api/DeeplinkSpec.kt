@@ -38,7 +38,7 @@ data class DeeplinkSpec(
 
 private val alphaNumericRegex = "[a-zA-Z0-9._~-]+".toRegex()
 private val numericRegex = "[0-9]+".toRegex()
-private val stringRegex = "[a-zA-Z]+".toRegex()
+private val stringRegex = "[a-zA-Z._~-]+".toRegex()
 
 @Serializable
 data class Param(
