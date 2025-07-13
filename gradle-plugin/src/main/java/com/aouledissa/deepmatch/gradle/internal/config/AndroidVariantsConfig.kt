@@ -6,7 +6,6 @@ import com.aouledissa.deepmatch.gradle.DeepMatchPluginConfig
 import com.aouledissa.deepmatch.gradle.internal.capitalize
 import com.aouledissa.deepmatch.gradle.internal.task.GenerateDeeplinkManifestFile
 import com.aouledissa.deepmatch.gradle.internal.task.GenerateDeeplinkSpecsTask
-import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.file.RegularFile
 
@@ -66,16 +65,9 @@ private fun getSpecsFile(project: Project, variant: Variant): RegularFile {
     return when {
         variantSpecsFile.asFile.exists() -> variantSpecsFile
         defaultSpecsFile.asFile.exists() -> defaultSpecsFile
-        else -> {
-            val errorMessage = """
-                DeepMatch Configuration Error: Failed to find the '.deeplinks.yml' deeplink specification file.
-                To resolve this, create a '.deeplinks.yml' file in ONE of the following locations (checked in this order):
-                  - For variant-specific configuration: ${project.projectDir.absolutePath}/src/${variant.name}/.deeplinks.yml
-                  - For a global fallback: ${project.projectDir.absolutePath}/.deeplinks.yml
-
-                No '.deeplinks.yml' was found for the '${variant.name}' build variant in its source directory or at the project root.
-            """.trimIndent()
-            throw GradleException(errorMessage)
-        }
+        else -> throw MissingSpecsFileException(
+            path = project.projectDir.absolutePath,
+            variantName = variant.name
+        )
     }
 }

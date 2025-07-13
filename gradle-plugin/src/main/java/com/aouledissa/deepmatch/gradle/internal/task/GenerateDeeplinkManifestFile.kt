@@ -19,7 +19,7 @@ import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 
-abstract class GenerateDeeplinkManifestFile : DefaultTask() {
+internal abstract class GenerateDeeplinkManifestFile : DefaultTask() {
 
     @get:InputFile
     abstract val specFileProperty: RegularFileProperty
