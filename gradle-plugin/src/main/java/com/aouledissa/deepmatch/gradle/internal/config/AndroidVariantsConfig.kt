@@ -14,46 +14,82 @@ internal fun configureAndroidVariants(project: Project, config: DeepMatchPluginC
 
     android.onVariants { variant ->
         val specsFile = getSpecsFile(project = project, variant = variant)
-        val variantName = variant.name.capitalize()
-        val variantPackageName = variant.namespace
 
-        /**
-         * Prepare and registers variant specific deeplinks specs codegen task.
-         */
-        val generateVariantDeeplinkSpecsTask = project.tasks.register(
-            "generate${variantName}DeeplinkSpecs",
-            GenerateDeeplinkSpecsTask::class.java
+        registerDeeplinkSpecsSourcesTask(
+            project = project,
+            variant = variant,
+            specsFile = specsFile
+        )
+
+        registerDeeplinkManifestTask(
+            project = project,
+            variant = variant,
+            specsFile = specsFile,
+            generateManifestFiles = config.generateManifestFiles.getOrElse(false)
+        )
+    }
+}
+
+private fun registerDeeplinkSpecsSourcesTask(
+    project: Project,
+    variant: Variant,
+    specsFile: RegularFile
+) {
+    val variantName = variant.name.capitalize()
+    val variantPackageName = variant.namespace
+
+    /**
+     * Prepare and registers variant specific deeplinks specs codegen task.
+     */
+    val generateVariantDeeplinkSpecsTask = project.tasks.register(
+        "generate${variantName}DeeplinkSpecs",
+        GenerateDeeplinkSpecsTask::class.java
+    ) {
+        it.specsFileProperty.set(specsFile)
+        it.packageNameProperty.set(variantPackageName)
+    }
+
+    /**
+     * This api will automatically add the sources to the variant's main sourceSet,
+     * and also make the variant build pipeline depend on this task.
+     */
+    variant.sources.java?.addGeneratedSourceDirectory(
+        generateVariantDeeplinkSpecsTask,
+        GenerateDeeplinkSpecsTask::outputDir
+    )
+}
+
+private fun registerDeeplinkManifestTask(
+    generateManifestFiles: Boolean,
+    project: Project,
+    variant: Variant,
+    specsFile: RegularFile
+) {
+    val variantName = variant.name.capitalize()
+    val taskName = "generate${variantName}DeeplinksManifest"
+    if (generateManifestFiles) {
+        val generateVariantManifestFile = project.tasks.register(
+            taskName,
+            GenerateDeeplinkManifestFile::class.java
         ) {
-            it.specsFileProperty.set(specsFile)
-            it.packageNameProperty.set(variantPackageName)
+            it.specFileProperty.set(specsFile)
+            it.outputFile.set(project.layout.buildDirectory.file("generated/manifests/${variantName}"))
         }
 
         /**
-         * This api will automatically add the sources to the variant's main sourceSet,
-         * and also make the variant build pipeline depend on this task.
+         * This api will automatically add the sources to the variant's main manifests
+         * source set, and also make the variant manifest processing depend on this task.
          */
-        variant.sources.java?.addGeneratedSourceDirectory(
-            generateVariantDeeplinkSpecsTask,
-            GenerateDeeplinkSpecsTask::outputDir
+        variant.sources.manifests.addGeneratedManifestFile(
+            generateVariantManifestFile,
+            GenerateDeeplinkManifestFile::outputFile
         )
-
-        if (config.generateManifestFiles.isPresent) {
-            val generateVariantManifestFile = project.tasks.register(
-                "generate${variantName.capitalize()}DeeplinksManifest",
-                GenerateDeeplinkManifestFile::class.java
-            ) {
-                it.specFileProperty.set(specsFile)
-                it.outputFile.set(project.layout.buildDirectory.file("generated/manifests/${variant.name}"))
-            }
-
-            /**
-             * This api will automatically add the sources to the variant's main manifests
-             * source set, and also make the variant manifest processing depend on this task.
-             */
-            variant.sources.manifests.addGeneratedManifestFile(
-                generateVariantManifestFile,
-                GenerateDeeplinkManifestFile::outputFile
-            )
+    } else {
+        val fileToDelete = project.layout.buildDirectory.dir("generated/manifests/$taskName")
+            .get().asFile
+        if (fileToDelete.exists()) {
+            project.logger.quiet("> DeepMatch: cleaning up ${fileToDelete.path}")
+            fileToDelete.deleteRecursively()
         }
     }
 }
