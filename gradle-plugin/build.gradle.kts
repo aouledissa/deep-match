@@ -33,7 +33,7 @@ dependencies {
 gradlePlugin {
     plugins {
         create("DeepMatchPlugin") {
-            id = "com.aouledissa.deepmatch.gradle"
+            id = "com.aouledissa.deepmatch.android"
             implementationClass = "com.aouledissa.deepmatch.gradle.DeepMatchPlugin"
         }
     }
