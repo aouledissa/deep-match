@@ -60,7 +60,8 @@ dependencies {
     implementation(libs.androidx.ui)
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
-    implementation(libs.deepmatch.processor)
+//    implementation(libs.deepmatch.processor)
+    implementation(project(":processor"))
     implementation(platform(libs.androidx.compose.bom))
 
     debugImplementation(libs.androidx.ui.tooling)

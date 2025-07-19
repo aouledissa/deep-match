@@ -4,6 +4,7 @@ import com.aouledissa.deepmatch.api.DeeplinkParams
 import com.aouledissa.deepmatch.api.DeeplinkSpec
 import com.aouledissa.deepmatch.api.Param
 import com.aouledissa.deepmatch.api.ParamType
+import com.aouledissa.deepmatch.gradle.LOG_TAG
 import com.aouledissa.deepmatch.gradle.internal.capitalize
 import com.aouledissa.deepmatch.gradle.internal.deserializeDeeplinkConfigs
 import com.aouledissa.deepmatch.gradle.internal.model.DeeplinkConfig
@@ -47,7 +48,7 @@ internal abstract class GenerateDeeplinkSpecsTask : DefaultTask() {
 
         outputFile.deleteRecursively()
 
-        logger.quiet("> DeepMatch: processing specs file in ${specsFile.path}")
+        logger.quiet("$LOG_TAG processing specs file in ${specsFile.path}")
 
         val packageName = "${packageNameProperty.get()}.deeplinks"
         val deeplinkConfigs = yamlSerializer.deserializeDeeplinkConfigs(specsFile)
@@ -82,7 +83,7 @@ internal abstract class GenerateDeeplinkSpecsTask : DefaultTask() {
                 .addProperty(deeplinkProperty)
                 .build().writeTo(outputFile)
 
-            logger.quiet("> DeepMatch: generated Deeplink spec at : ${packageName}.${fileName}")
+            logger.quiet("$LOG_TAG generated Deeplink spec at : ${packageName}.${fileName}")
         }
     }
 
@@ -96,6 +97,8 @@ internal abstract class GenerateDeeplinkSpecsTask : DefaultTask() {
             DeeplinkSpec::class.java.packageName,
             DeeplinkSpec::class.java.simpleName
         )
+        // TODO: is empty host case handled?
+        val hosts = config.host.joinToString(separator = ", ") { "\"$it\"" }
         val pathParams = config.pathParams?.joinToString(separator = ", ").orEmpty()
         val queryParams = config.queryParams?.joinToString(separator = ", ").orEmpty()
         val parametersClass = parametersClass?.let { ClassName(packageName, it) }
@@ -114,9 +117,9 @@ internal abstract class GenerateDeeplinkSpecsTask : DefaultTask() {
                 """
                 %T(
                 scheme = "${config.scheme}",
-                host = "${config.host}",
-                pathParams = setOf(${pathParams}),
-                queryParams = setOf(${queryParams}),
+                host = setOf($hosts),
+                pathParams = setOf($pathParams),
+                queryParams = setOf($queryParams),
                 fragment = ${config.fragment?.let { "\"$it\"" } ?: "null"},
                 parametersClass = ${parametersClass?.simpleName?.plus("::class")}
                 )

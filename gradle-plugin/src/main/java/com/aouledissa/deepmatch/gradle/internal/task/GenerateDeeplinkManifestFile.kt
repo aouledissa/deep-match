@@ -1,15 +1,19 @@
 package com.aouledissa.deepmatch.gradle.internal.task
 
 import com.aouledissa.deepmatch.api.Param
+import com.aouledissa.deepmatch.gradle.LOG_TAG
 import com.aouledissa.deepmatch.gradle.internal.deserializeDeeplinkConfigs
 import com.aouledissa.deepmatch.gradle.internal.model.Action
 import com.aouledissa.deepmatch.gradle.internal.model.AndroidActivity
 import com.aouledissa.deepmatch.gradle.internal.model.AndroidApplication
 import com.aouledissa.deepmatch.gradle.internal.model.AndroidManifest
 import com.aouledissa.deepmatch.gradle.internal.model.Category
-import com.aouledissa.deepmatch.gradle.internal.model.Data
+import com.aouledissa.deepmatch.gradle.internal.model.Fragment
+import com.aouledissa.deepmatch.gradle.internal.model.Host
 import com.aouledissa.deepmatch.gradle.internal.model.IntentFilter
 import com.aouledissa.deepmatch.gradle.internal.model.IntentFilterCategory
+import com.aouledissa.deepmatch.gradle.internal.model.PathPattern
+import com.aouledissa.deepmatch.gradle.internal.model.Scheme
 import com.charleskorn.kaml.Yaml
 import com.charleskorn.kaml.YamlConfiguration
 import nl.adaptivity.xmlutil.serialization.XML
@@ -34,7 +38,7 @@ internal abstract class GenerateDeeplinkManifestFile : DefaultTask() {
     fun generateDeeplinkManifest() {
         val specsFile = specFileProperty.asFile.get()
 
-        logger.quiet("> DeepMatch: generating Android manifest file for deeplink specs in ${specsFile.path}")
+        logger.quiet("$LOG_TAG generating Android manifest file for deeplink specs in ${specsFile.path}")
 
         val deeplinkConfigs = yamlSerializer.deserializeDeeplinkConfigs(specsFile)
         val activities = deeplinkConfigs.groupBy { it.activity }.map { activity ->
@@ -48,12 +52,10 @@ internal abstract class GenerateDeeplinkManifestFile : DefaultTask() {
                             categories = config.categories,
                             autoVerify = config.autoVerify == true
                         ).toList(),
-                        data = Data(
-                            scheme = config.scheme,
-                            host = config.host,
-                            pathPattern = buildPathPattern(config.pathParams.orEmpty()),
-                            fragment = config.fragment
-                        )
+                        scheme = Scheme(name = config.scheme),
+                        hosts = config.host.map { Host(name = it) },
+                        pathPattern = buildPathPattern(config.pathParams.orEmpty()),
+                        fragment = config.fragment?.let { Fragment(name = it) }
                     )
                 }
             )
@@ -80,16 +82,18 @@ internal abstract class GenerateDeeplinkManifestFile : DefaultTask() {
             .toSet()
     }
 
-    private fun buildPathPattern(pathParams: List<Param>): String? {
+    private fun buildPathPattern(pathParams: List<Param>): PathPattern? {
         return when {
             pathParams.isEmpty() -> null
-            pathParams.all { it.type == null } -> pathParams.joinToString(
-                prefix = "/",
-                separator = "/"
-            ) { it.name }
+            pathParams.all { it.type == null } -> PathPattern(
+                pattern = pathParams.joinToString(
+                    prefix = "/",
+                    separator = "/"
+                ) { it.name }
+            )
 
-            else -> {
-                pathParams.joinToString(
+            else -> PathPattern(
+                pattern = pathParams.joinToString(
                     prefix = "/",
                     separator = "/"
                 ) { param ->
@@ -98,8 +102,7 @@ internal abstract class GenerateDeeplinkManifestFile : DefaultTask() {
                     } else {
                         ".*"
                     }
-                }
-            }
+                })
         }
     }
 }

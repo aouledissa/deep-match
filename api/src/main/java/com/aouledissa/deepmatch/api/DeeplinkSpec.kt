@@ -7,7 +7,7 @@ import kotlin.reflect.KClass
 @Serializable
 data class DeeplinkSpec(
     val scheme: String,
-    val host: List<String>,
+    val host: Set<String>,
     val pathParams: Set<Param>,
     val queryParams: Set<Param>,
     val fragment: String?,
@@ -31,11 +31,15 @@ data class DeeplinkSpec(
 
     private fun buildPathPattern(): String {
         return pathParams.joinToString(separator = "/") { param ->
-            val segment = when (param.type) {
+            when (param.type) {
                 null -> Regex.escape(param.name)
                 else -> param.type.regex.pattern
             }
-            "/$segment"
+        }.let {
+            when (pathParams.size) {
+                0 -> ""
+                else -> "/$it"
+            }
         }
     }
 

@@ -55,5 +55,5 @@ java-library = { id = "java-library" }
 maven-publish = { id = "maven-publish" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "ktxSerializationPlugin" }
 # DeepMatch
-deepmatch-plugin = { id = "com.aouledissa.deepmatch.android", version.ref = "deepmatchVersion" }
+deepmatch-plugin = { id = "com.aouledissa.deepmatch.plugin.android", version.ref = "deepmatchVersion" }
 

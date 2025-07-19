@@ -3,6 +3,7 @@ package com.aouledissa.deepmatch.gradle.internal.config
 import com.android.build.api.variant.AndroidComponentsExtension
 import com.android.build.api.variant.Variant
 import com.aouledissa.deepmatch.gradle.DeepMatchPluginConfig
+import com.aouledissa.deepmatch.gradle.LOG_TAG
 import com.aouledissa.deepmatch.gradle.internal.capitalize
 import com.aouledissa.deepmatch.gradle.internal.task.GenerateDeeplinkManifestFile
 import com.aouledissa.deepmatch.gradle.internal.task.GenerateDeeplinkSpecsTask
@@ -88,7 +89,7 @@ private fun registerDeeplinkManifestTask(
         val fileToDelete = project.layout.buildDirectory.dir("generated/manifests/$taskName")
             .get().asFile
         if (fileToDelete.exists()) {
-            project.logger.quiet("> DeepMatch: cleaning up ${fileToDelete.path}")
+            project.logger.quiet("$LOG_TAG cleaning up ${fileToDelete.path}")
             fileToDelete.deleteRecursively()
         }
     }

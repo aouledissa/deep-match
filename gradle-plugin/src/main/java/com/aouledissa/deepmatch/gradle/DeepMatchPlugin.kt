@@ -6,6 +6,8 @@ import com.aouledissa.deepmatch.gradle.internal.config.configureAndroidVariants
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 
+internal const val LOG_TAG = "> DeepMatch:"
+
 class DeepMatchPlugin : Plugin<Project> {
 
     override fun apply(target: Project) {

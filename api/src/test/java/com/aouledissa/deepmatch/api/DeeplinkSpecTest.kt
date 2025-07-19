@@ -17,7 +17,7 @@ class DeeplinkSpecTest {
         // when
         sut = DeeplinkSpec(
             scheme = scheme,
-            host = listOf(host),
+            host = setOf(host),
             pathParams = emptySet(),
             queryParams = emptySet(),
             fragment = null,
@@ -35,7 +35,7 @@ class DeeplinkSpecTest {
         val scheme = "https"
         val host1 = "test.com"
         val host2 = "prod.com"
-        val hosts = listOf(host1, host2)
+        val hosts = setOf(host1, host2)
         val expectedPattern = "$scheme://(${Regex.escape(host1)}|${Regex.escape(host2)})".toRegex()
 
         // when
@@ -61,7 +61,7 @@ class DeeplinkSpecTest {
         // when
         sut = DeeplinkSpec(
             scheme = "https",
-            host = listOf("test.com"),
+            host = setOf("test.com"),
             pathParams = setOf(pathParam),
             queryParams = emptySet(),
             fragment = null,
@@ -79,12 +79,12 @@ class DeeplinkSpecTest {
         val pathParam1 = Param(name = "profile")
         val pathParam2 = Param(name = "bio")
         val params = setOf(pathParam1, pathParam2)
-        val expectedPattern = params.joinToString(separator = "/") { "/${Regex.escape(it.name)}" }
+        val expectedPattern = params.joinToString(separator = "/") { Regex.escape(it.name) }
 
         // when
         sut = DeeplinkSpec(
             scheme = "https",
-            host = listOf("test.com"),
+            host = setOf("test.com"),
             pathParams = params,
             queryParams = emptySet(),
             fragment = null,
@@ -104,7 +104,7 @@ class DeeplinkSpecTest {
         // when
         sut = DeeplinkSpec(
             scheme = "https",
-            host = listOf("test.com"),
+            host = setOf("test.com"),
             pathParams = setOf(pathParam),
             queryParams = emptySet(),
             fragment = null,
@@ -126,7 +126,7 @@ class DeeplinkSpecTest {
         // when
         sut = DeeplinkSpec(
             scheme = "https",
-            host = listOf("test.com"),
+            host = setOf("test.com"),
             pathParams = setOf(),
             queryParams = setOf(queryParam),
             fragment = null,
@@ -154,7 +154,7 @@ class DeeplinkSpecTest {
         // when
         sut = DeeplinkSpec(
             scheme = "https",
-            host = listOf("test.com"),
+            host = setOf("test.com"),
             pathParams = setOf(),
             queryParams = queries,
             fragment = null,
@@ -178,7 +178,7 @@ class DeeplinkSpecTest {
         // when
         sut = DeeplinkSpec(
             scheme = "https",
-            host = listOf("test.com"),
+            host = setOf("test.com"),
             pathParams = setOf(),
             queryParams = queries,
             fragment = null,
@@ -199,7 +199,7 @@ class DeeplinkSpecTest {
         // when
         sut = DeeplinkSpec(
             scheme = "https",
-            host = listOf("test.com"),
+            host = setOf("test.com"),
             pathParams = emptySet(),
             queryParams = emptySet(),
             fragment = fragment,
@@ -218,7 +218,7 @@ class DeeplinkSpecTest {
         // when
         sut = DeeplinkSpec(
             scheme = "https",
-            host = listOf("test.com"),
+            host = setOf("test.com"),
             pathParams = emptySet(),
             queryParams = emptySet(),
             fragment = null,

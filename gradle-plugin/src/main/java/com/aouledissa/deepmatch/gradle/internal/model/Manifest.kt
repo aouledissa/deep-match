@@ -32,7 +32,10 @@ internal data class IntentFilter(
     val autoVerify: Boolean?,
     val action: List<Action>,
     val category: List<Category>,
-    val data: Data
+    val scheme: Scheme,
+    val hosts: List<Host>,
+    val pathPattern: PathPattern?,
+    val fragment: Fragment?
 )
 
 @Serializable
@@ -49,15 +52,30 @@ internal data class Category(
     val name: String,
 )
 
+@SerialName("data")
+@Serializable
+internal data class Scheme(
+    @SerialName("android:scheme")
+    val name: String
+)
+
 @Serializable
 @SerialName("data")
-internal data class Data(
-    @SerialName("android:scheme")
-    val scheme: String,
+internal data class Host(
     @SerialName("android:host")
-    val host: String,
+    val name: String
+)
+
+@Serializable
+@SerialName("data")
+internal data class PathPattern(
     @SerialName("android:pathPattern")
-    val pathPattern: String?,
+    val pattern: String
+)
+
+@Serializable
+@SerialName("data")
+internal data class Fragment(
     @SerialName("android:fragment")
-    val fragment: String?
+    val name: String
 )

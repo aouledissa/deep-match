@@ -4,7 +4,7 @@ deeplinkSpecs:
     activity: com.aouledissa.deepmatch.sample.MainActivity
     autoVerify: true
     scheme: "https"
-    host: "joyn.de"
+    host: ["joyn.de", "joyn.at"]
     pathParams:
       - name: series
       - name: seriesId
@@ -15,8 +15,16 @@ deeplinkSpecs:
     activity: com.aouledissa.deepmatch.sample.MainActivity
     autoVerify: true
     scheme: "https"
-    host: "joyn.de"
+    host: ["joyn.de", "joyn.at"]
     pathParams:
       - name: filme
       - name: movieId
         type: alphanumeric
+    fragment: "trailer-tab"
+
+  - name: "open app"
+    description: "Opens application with a deeplink"
+    activity: com.aouledissa.deepmatch.sample.MainActivity
+    autoVerify: true
+    scheme: "https"
+    host: ["joyn.de"]
