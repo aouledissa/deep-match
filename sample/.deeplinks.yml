@@ -3,7 +3,7 @@ deeplinkSpecs:
     description: "Opens series details page"
     activity: com.aouledissa.deepmatch.sample.MainActivity
     autoVerify: true
-    scheme: "https"
+    scheme: [https, app]
     host: ["joyn.de", "joyn.at"]
     pathParams:
       - name: series
@@ -14,7 +14,7 @@ deeplinkSpecs:
     description: "Opens movies details page"
     activity: com.aouledissa.deepmatch.sample.MainActivity
     autoVerify: true
-    scheme: "https"
+    scheme: [https]
     host: ["joyn.de", "joyn.at"]
     pathParams:
       - name: filme
@@ -26,5 +26,5 @@ deeplinkSpecs:
     description: "Opens application with a deeplink"
     activity: com.aouledissa.deepmatch.sample.MainActivity
     autoVerify: true
-    scheme: "https"
+    scheme: [https]
     host: ["joyn.de"]

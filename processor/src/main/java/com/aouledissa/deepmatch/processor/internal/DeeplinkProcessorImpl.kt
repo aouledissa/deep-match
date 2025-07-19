@@ -31,9 +31,10 @@ internal class DeeplinkProcessorImpl(
 
     private fun Uri.decoded(): String {
         val decodedPathSegments = pathSegments.joinToString("/")
+            .let { if (pathSegments.isNullOrEmpty().not()) "/$it" else it }
         val decodedQuery = query?.let { "?$it" }.orEmpty()
         val decodedFragment = fragment?.let { "#$it" }.orEmpty()
-        return "$scheme://$host/$decodedPathSegments$decodedQuery$decodedFragment"
+        return "$scheme://$host$decodedPathSegments$decodedQuery$decodedFragment"
     }
 
     private fun buildDeeplinkParams(
@@ -59,7 +60,7 @@ internal class DeeplinkProcessorImpl(
         }
 
         // extract fragment
-        spec.fragment?.let { params["fragment"] = it }
+        spec.fragment?.let { params["fragment"] = fragment }
 
         return spec.parametersClass?.let {
             DeeplinkParamsAutoFactory.tryCreate(spec.parametersClass, params)

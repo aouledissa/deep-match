@@ -97,6 +97,7 @@ internal abstract class GenerateDeeplinkSpecsTask : DefaultTask() {
             DeeplinkSpec::class.java.packageName,
             DeeplinkSpec::class.java.simpleName
         )
+        val schemes = config.scheme.joinToString(separator = ", ") { "\"$it\"" }
         // TODO: is empty host case handled?
         val hosts = config.host.joinToString(separator = ", ") { "\"$it\"" }
         val pathParams = config.pathParams?.joinToString(separator = ", ").orEmpty()
@@ -116,7 +117,7 @@ internal abstract class GenerateDeeplinkSpecsTask : DefaultTask() {
             .initializer(
                 """
                 %T(
-                scheme = "${config.scheme}",
+                scheme = setOf($schemes),
                 host = setOf($hosts),
                 pathParams = setOf($pathParams),
                 queryParams = setOf($queryParams),
@@ -128,6 +129,7 @@ internal abstract class GenerateDeeplinkSpecsTask : DefaultTask() {
             )
     }
 
+    // TODO: generate all possible examples
     private fun generateDeeplinkExample(config: DeeplinkConfig) = buildString {
         append(config.scheme)
         append("://")

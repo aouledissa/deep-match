@@ -32,7 +32,7 @@ internal data class IntentFilter(
     val autoVerify: Boolean?,
     val action: List<Action>,
     val category: List<Category>,
-    val scheme: Scheme,
+    val scheme: List<Scheme>,
     val hosts: List<Host>,
     val pathPattern: PathPattern?,
     val fragment: Fragment?

@@ -14,7 +14,7 @@ internal data class DeeplinkConfig(
     val activity: String,
     val categories: List<IntentFilterCategory> = listOf(IntentFilterCategory.DEFAULT),
     val autoVerify: Boolean? = false,
-    val scheme: String,
+    val scheme: List<String>,
     val host: List<String>,
     val pathParams: List<Param>? = null,
     val queryParams: List<Param>? = null,

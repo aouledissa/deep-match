@@ -6,7 +6,7 @@ import kotlin.reflect.KClass
 
 @Serializable
 data class DeeplinkSpec(
-    val scheme: String,
+    val scheme: Set<String>,
     val host: Set<String>,
     val pathParams: Set<Param>,
     val queryParams: Set<Param>,
@@ -16,12 +16,18 @@ data class DeeplinkSpec(
     val matcher: Regex by lazy { buildMatcher() }
 
     private fun buildMatcher(): Regex {
+        val schemePattern = buildSchemePattern()
         val hostPattern = buildHostPattern()
         val pathPattern = buildPathPattern()
         val queryPattern = buildQueryPattern()
         val fragmentPattern = buildFragmentPattern()
 
-        return "$scheme://$hostPattern$pathPattern$queryPattern$fragmentPattern".toRegex()
+        return "$schemePattern://$hostPattern$pathPattern$queryPattern$fragmentPattern".toRegex()
+    }
+
+    private fun buildSchemePattern(): String {
+        return scheme.joinToString(separator = "|") { Regex.escape(it) }
+            .let { if (scheme.size > 1) "($it)" else it }
     }
 
     private fun buildHostPattern(): String {

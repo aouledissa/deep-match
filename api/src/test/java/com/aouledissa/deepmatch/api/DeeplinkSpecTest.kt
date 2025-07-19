@@ -12,11 +12,11 @@ class DeeplinkSpecTest {
         // given
         val scheme = "https"
         val host = "test.com"
-        val expectedPattern = "$scheme://${Regex.escape(host)}".toRegex()
+        val expectedPattern = "${Regex.escape(scheme)}://${Regex.escape(host)}".toRegex()
 
         // when
         sut = DeeplinkSpec(
-            scheme = scheme,
+            scheme = setOf(scheme),
             host = setOf(host),
             pathParams = emptySet(),
             queryParams = emptySet(),
@@ -30,17 +30,40 @@ class DeeplinkSpecTest {
     }
 
     @Test
+    fun `deeplink pattern includes multiple schemes`() {
+        // given
+        val scheme1 = "https"
+        val scheme2 = "app"
+        val expectedPattern = "(${Regex.escape(scheme1)}|${Regex.escape(scheme2)})".toRegex()
+
+        // when
+        sut = DeeplinkSpec(
+            scheme = setOf(scheme1, scheme2),
+            host = setOf("test.com"),
+            pathParams = emptySet(),
+            queryParams = emptySet(),
+            fragment = null,
+            parametersClass = null
+        )
+        val deeplinkMatcher = sut.matcher
+
+        // then
+        assertThat(deeplinkMatcher.pattern).contains(expectedPattern.pattern)
+    }
+
+    @Test
     fun `deeplink pattern includes multiple hosts`() {
         // given
         val scheme = "https"
         val host1 = "test.com"
         val host2 = "prod.com"
         val hosts = setOf(host1, host2)
-        val expectedPattern = "$scheme://(${Regex.escape(host1)}|${Regex.escape(host2)})".toRegex()
+        val expectedPattern =
+            "${Regex.escape(scheme)}://(${Regex.escape(host1)}|${Regex.escape(host2)})".toRegex()
 
         // when
         sut = DeeplinkSpec(
-            scheme = scheme,
+            scheme = setOf(scheme),
             host = hosts,
             pathParams = emptySet(),
             queryParams = emptySet(),
@@ -60,7 +83,7 @@ class DeeplinkSpecTest {
 
         // when
         sut = DeeplinkSpec(
-            scheme = "https",
+            scheme = setOf("https"),
             host = setOf("test.com"),
             pathParams = setOf(pathParam),
             queryParams = emptySet(),
@@ -83,7 +106,7 @@ class DeeplinkSpecTest {
 
         // when
         sut = DeeplinkSpec(
-            scheme = "https",
+            scheme = setOf("https"),
             host = setOf("test.com"),
             pathParams = params,
             queryParams = emptySet(),
@@ -103,7 +126,7 @@ class DeeplinkSpecTest {
 
         // when
         sut = DeeplinkSpec(
-            scheme = "https",
+            scheme = setOf("https"),
             host = setOf("test.com"),
             pathParams = setOf(pathParam),
             queryParams = emptySet(),
@@ -125,7 +148,7 @@ class DeeplinkSpecTest {
 
         // when
         sut = DeeplinkSpec(
-            scheme = "https",
+            scheme = setOf("https"),
             host = setOf("test.com"),
             pathParams = setOf(),
             queryParams = setOf(queryParam),
@@ -153,7 +176,7 @@ class DeeplinkSpecTest {
 
         // when
         sut = DeeplinkSpec(
-            scheme = "https",
+            scheme = setOf("https"),
             host = setOf("test.com"),
             pathParams = setOf(),
             queryParams = queries,
@@ -177,7 +200,7 @@ class DeeplinkSpecTest {
 
         // when
         sut = DeeplinkSpec(
-            scheme = "https",
+            scheme = setOf("https"),
             host = setOf("test.com"),
             pathParams = setOf(),
             queryParams = queries,
@@ -198,7 +221,7 @@ class DeeplinkSpecTest {
 
         // when
         sut = DeeplinkSpec(
-            scheme = "https",
+            scheme = setOf("https"),
             host = setOf("test.com"),
             pathParams = emptySet(),
             queryParams = emptySet(),
@@ -217,7 +240,7 @@ class DeeplinkSpecTest {
 
         // when
         sut = DeeplinkSpec(
-            scheme = "https",
+            scheme = setOf("https"),
             host = setOf("test.com"),
             pathParams = emptySet(),
             queryParams = emptySet(),

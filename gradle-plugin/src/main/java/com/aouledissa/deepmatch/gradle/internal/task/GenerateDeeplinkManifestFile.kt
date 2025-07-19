@@ -52,7 +52,7 @@ internal abstract class GenerateDeeplinkManifestFile : DefaultTask() {
                             categories = config.categories,
                             autoVerify = config.autoVerify == true
                         ).toList(),
-                        scheme = Scheme(name = config.scheme),
+                        scheme = config.scheme.map { Scheme(name = it) },
                         hosts = config.host.map { Host(name = it) },
                         pathPattern = buildPathPattern(config.pathParams.orEmpty()),
                         fragment = config.fragment?.let { Fragment(name = it) }
