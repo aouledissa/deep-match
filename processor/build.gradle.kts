@@ -58,8 +58,8 @@ publishing {
         afterEvaluate {
             create<MavenPublication>("release") {
                 from(components["release"])
-                groupId = findProperty("group_name") as String
-                version = findProperty("deepmatch_version") as String
+                groupId = findProperty("groupName") as String
+                version = findProperty("commonVersion") as String
                 artifactId = "processor-android"
             }
         }

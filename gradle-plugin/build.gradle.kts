@@ -8,8 +8,8 @@ plugins {
     alias(libs.plugins.maven.publish)
 }
 
-group = findProperty("group_name") as String
-version = findProperty("deepmatch_version") as String
+group = findProperty("groupName") as String
+version = findProperty("commonVersion") as String
 
 java {
     sourceCompatibility = JavaVersion.VERSION_11
