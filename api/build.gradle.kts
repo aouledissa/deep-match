@@ -18,6 +18,8 @@ kotlin {
 
 dependencies {
     implementation(libs.kotlin.serialization.json)
+    testImplementation(libs.junit)
+    testImplementation(libs.google.truth)
 }
 
 publishing {

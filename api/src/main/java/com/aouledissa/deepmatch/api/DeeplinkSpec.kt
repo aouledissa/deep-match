@@ -7,7 +7,7 @@ import kotlin.reflect.KClass
 @Serializable
 data class DeeplinkSpec(
     val scheme: String,
-    val host: String,
+    val host: List<String>,
     val pathParams: Set<Param>,
     val queryParams: Set<Param>,
     val fragment: String?,
@@ -16,23 +16,43 @@ data class DeeplinkSpec(
     val matcher: Regex by lazy { buildMatcher() }
 
     private fun buildMatcher(): Regex {
-        val pathSegments = pathParams.joinToString("/") { param ->
-            when (param.type) {
-                null -> param.name
+        val hostPattern = buildHostPattern()
+        val pathPattern = buildPathPattern()
+        val queryPattern = buildQueryPattern()
+        val fragmentPattern = buildFragmentPattern()
+
+        return "$scheme://$hostPattern$pathPattern$queryPattern$fragmentPattern".toRegex()
+    }
+
+    private fun buildHostPattern(): String {
+        return host.joinToString(separator = "|") { Regex.escape(it) }
+            .let { if (host.size > 1) "($it)" else it }
+    }
+
+    private fun buildPathPattern(): String {
+        return pathParams.joinToString(separator = "/") { param ->
+            val segment = when (param.type) {
+                null -> Regex.escape(param.name)
                 else -> param.type.regex.pattern
             }
-        }.apply { Regex.escape(this) }
-        val query = when {
+            "/$segment"
+        }
+    }
+
+    private fun buildQueryPattern(): String {
+        return when {
             queryParams.isEmpty() -> ""
             else -> {
                 queryParams.filter { it.type != null }
                     .joinToString(prefix = Regex.escape("?"), separator = "&") {
-                        "${it.name}=${it.type!!.regex.pattern}"
+                        "${Regex.escape(it.name)}=${it.type!!.regex.pattern}"
                     }
             }
-        }.apply { Regex.escape(this) }
-        val fragment = fragment?.let { Regex.escape("#$it") }.orEmpty()
-        return "$scheme://${Regex.escape(host)}/$pathSegments$query$fragment".toRegex()
+        }
+    }
+
+    private fun buildFragmentPattern(): String {
+        return fragment?.let { Regex.escape("#$it") }.orEmpty()
     }
 }
 
