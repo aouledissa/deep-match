@@ -3,15 +3,15 @@
 DeepMatch is an Android deep-linking toolkit designed to offset deeplink validation & handling using:
 
 - A Gradle plugin that turns a `.deeplinks.yml` specification into Kotlin sources and optional manifest entries.
-- A lightweight runtime (`processor`) that matches URIs against the generated specs and routes them to strongly-typed handlers.
+- A lightweight runtime (`deepmatch-processor`) that matches URIs against the generated specs and routes them to strongly-typed handlers.
 
 The plugin keeps deep links in sync across build-time metadata, generated code, and runtime handling so teams can treat the YAML file as their single source of truth.
 
 ## Modules
 
-- `gradle-plugin` – Gradle plugin (`com.aouledissa.deepmatch.plugin.android`) that parses specs, generates Kotlin sources, and (optionally) produces manifest entries for each variant.
-- `processor` – Android library that provides `DeeplinkProcessor` and handler abstractions for runtime matching.
-- `api` – Shared model classes (`DeeplinkSpec`, `Param`, `ParamType`, `DeeplinkParams`).
+- `deepmatch-plugin` – Gradle plugin (`com.aouledissa.deepmatch.plugin.android`) that parses specs, generates Kotlin sources, and (optionally) produces manifest entries for each variant.
+- `deepmatch-processor` – Android library that provides `DeeplinkProcessor` and handler abstractions for runtime matching.
+- `deepmatch-api` – Shared model classes (`DeeplinkSpec`, `Param`, `ParamType`, `DeeplinkParams`).
 
 ## Quick Start
 
@@ -66,12 +66,12 @@ See `docs/gradle_plugin.md` and `docs/config_file.md` for detailed configuration
 ## Testing
 
 ```bash
-./gradlew gradle-plugin:publishToMavenLocal       # Publish plugin/runtime artifacts required by the build
+./gradlew deepmatch-plugin:publishToMavenLocal       # Publish plugin/runtime artifacts required by the build
 ./gradlew test                      # JVM unit tests for all modules
 ./gradlew connectedDebugAndroidTest # Instrumentation tests (requires emulator/device)
 ```
 
-Instrumentation tests live under `processor/src/androidTest` and exercise the runtime against real `Activity` instances.
+Instrumentation tests live under `deepmatch-processor/src/androidTest` and exercise the runtime against real `Activity` instances.
 
 ## Documentation
 

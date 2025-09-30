@@ -22,7 +22,7 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "DeepMatch"
-include(":gradle-plugin")
-include(":processor")
+include(":deepmatch-plugin")
+include(":deepmatch-processor")
 include(":sample")
-include(":api")
+include(":deepmatch-api")

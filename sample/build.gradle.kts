@@ -53,7 +53,7 @@ android {
 
 dependencies {
 
-    implementation(project(":processor"))
+    implementation(project(":deepmatch-processor"))
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)

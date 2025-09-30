@@ -22,7 +22,7 @@ kotlin {
 }
 
 dependencies {
-    implementation(project(":api"))
+    implementation(project(":deepmatch-api"))
     implementation(libs.android.gradle.api)
     implementation(libs.kotlin.serialization.json)
     implementation(libs.squareup.kotlinpoet)
@@ -33,7 +33,7 @@ dependencies {
 gradlePlugin {
     plugins {
         create("DeepMatchPlugin") {
-            id = "com.aouledissa.deepmatch.plugin.android"
+            id = "com.aouledissa.deepmatch.gradle"
             implementationClass = "com.aouledissa.deepmatch.gradle.DeepMatchPlugin"
         }
     }

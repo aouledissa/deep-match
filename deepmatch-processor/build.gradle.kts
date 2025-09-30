@@ -52,15 +52,15 @@ android {
 
 dependencies {
 
-    api(project(":api"))
+    api(project(":deepmatch-api"))
     implementation(kotlin("reflect"))
     implementation(libs.androidx.core.ktx)
     testImplementation(libs.junit)
     testImplementation(libs.google.truth)
     testImplementation(libs.mockk.core)
     testImplementation(libs.kotlin.coroutines.test)
-    testApi(testFixtures(project(":api")))
-    testFixturesImplementation(testFixtures(project(":api")))
+    testApi(testFixtures(project(":deepmatch-api")))
+    testFixturesImplementation(testFixtures(project(":deepmatch-api")))
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(libs.androidx.test.core)
