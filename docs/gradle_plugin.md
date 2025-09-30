@@ -79,6 +79,14 @@ Inspect the generated output with:
 
 ### Testing & CI
 
-Unit tests cover the plugin internals and runtime processor (`./gradlew test`). Instrumentation tests live in `processor/src/androidTest` and can be run via `./gradlew connectedDebugAndroidTest`.
+Publish the plugin to your local Maven cache before running tests:
+
+```bash
+./gradlew publishToMavenLocal
+./gradlew test
+./gradlew connectedDebugAndroidTest
+```
+
+Unit tests cover the plugin internals and runtime processor. Instrumentation tests live in `processor/src/androidTest` and validate deeplink handling on a device/emulator.
 
 The repository’s GitHub Action (`.github/workflows/ci.yml`) runs both suites on pull requests, helping prevent merges when deeplink behavior regresses. Configure branch protections to require the **CI** workflow before merging.

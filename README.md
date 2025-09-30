@@ -63,6 +63,14 @@ The plugin keeps deep links in sync across build-time metadata, generated code, 
 
 See `docs/gradle_plugin.md` and `docs/config_file.md` for detailed configuration options and generated output.
 
+## Testing
+
+```bash
+./gradlew gradle-plugin:publishToMavenLocal       # Publish plugin/runtime artifacts required by the build
+./gradlew test                      # JVM unit tests for all modules
+./gradlew connectedDebugAndroidTest # Instrumentation tests (requires emulator/device)
+```
+
 Instrumentation tests live under `processor/src/androidTest` and exercise the runtime against real `Activity` instances.
 
 ## Documentation
