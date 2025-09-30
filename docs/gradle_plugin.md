@@ -33,3 +33,52 @@ The primary responsibilities and capabilities of the `deepmatch-gradle-plugin` a
 *   **Consistency:** Ensures that your manifest and the runtime parsing logic are always in sync with your declared specifications.
 *   **Improved Maintainability:** Adding, removing, or modifying deep links is as simple as editing the YAML file and rebuilding.
 *   **Build-Time Checks (Implicit):** While not a full validation suite, the parsing step can catch basic syntax errors in your YAML file early in the build process.
+
+### Getting Started
+
+1. Apply the plugin alongside your usual Android and Kotlin plugins:
+
+    ```kotlin
+    plugins {
+        id("com.android.application")
+        id("org.jetbrains.kotlin.android")
+        id("com.aouledissa.deepmatch.plugin.android") version "0.1.0"
+    }
+    ```
+
+2. Configure the extension in the same module:
+
+    ```kotlin
+    deepMatch {
+        generateManifestFiles = true
+    }
+    ```
+
+3. Add a `.deeplinks.yml` file at the module root (or under `src/<variant>/.deeplinks.yml`). See `docs/config_file.md` for the full schema.
+
+During the build the plugin generates Kotlin sources under `build/generated/` and, when enabled, a manifest snippet under `build/generated/manifests/<variant>/AndroidManifest.xml`.
+
+### Generated Artifacts
+
+- `*DeeplinkSpecs.kt` — exposes a `DeeplinkSpec` property per configuration entry.
+- `*DeeplinkParams.kt` — optional data class emitted when a deeplink defines typed template, query, or fragment parameters.
+- Generated manifest file — contains `<intent-filter>` definitions that Gradle merges into the final manifest.
+
+### Available Tasks
+
+Each Android variant gets two dedicated tasks:
+
+- `generate<Variant>DeeplinkSpecs` — parses YAML and produces Kotlin sources.
+- `generate<Variant>DeeplinksManifest` — writes the manifest file when `generateManifestFiles` is `true`.
+
+Inspect the generated output with:
+
+```bash
+./gradlew :app:generateDebugDeeplinkSpecs
+``` 
+
+### Testing & CI
+
+Unit tests cover the plugin internals and runtime processor (`./gradlew test`). Instrumentation tests live in `processor/src/androidTest` and can be run via `./gradlew connectedDebugAndroidTest`.
+
+The repository’s GitHub Action (`.github/workflows/ci.yml`) runs both suites on pull requests, helping prevent merges when deeplink behavior regresses. Configure branch protections to require the **CI** workflow before merging.

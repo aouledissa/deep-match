@@ -34,3 +34,54 @@ Each item in the `deeplinkSpecs` list is a deep link configuration object with t
         *   **`name`**: (Required, String) The name of the path parameter (e.g., `userId`, `itemId`). This is how you'll refer to it in your handler.
         *   **`type`**: (Optional, String) The expected data type of the parameter. If present, this hints at the expected format but the value is always passed as a String to the handler initially. You can use this for documentation or potential future validation features. (e.g., `string`, `integer`, `uuid`).
     *   Example:
+        ```yaml
+        pathParams:
+          - name: user
+          - name: userId
+            type: alphanumeric
+        ```
+
+*   **`queryParams`**: (Optional, List of Param objects)
+    *   Mirrors the structure of `pathParams` but for query string parameters.
+    *   Query params should declare a `type` so the generated regex and parameter class enforce the expected format.
+    *   Example:
+        ```yaml
+        queryParams:
+          - name: ref
+            type: string
+          - name: page
+            type: numeric
+        ```
+
+*   **`fragment`**: (Optional, String)
+    *   Adds a fragment requirement (`#details`). When provided, the generated parameter class exposes it as a property.
+
+*   **`description`**: (Optional, String)
+    *   Free-form text to describe the deeplink’s purpose. Currently informational only.
+
+### Complete Example
+
+```yaml
+deeplinkSpecs:
+  - name: "open profile"
+    description: "Navigate to a user profile page"
+    activity: com.example.app.MainActivity
+    autoVerify: true
+    categories: [DEFAULT, BROWSABLE]
+    scheme: [https, app]
+    host: ["example.com"]
+    pathParams:
+      - name: users
+      - name: userId
+        type: alphanumeric
+    queryParams:
+      - name: ref
+        type: string
+    fragment: "details"
+```
+
+### Tips
+
+- Keep `name` values unique per spec to simplify handler identification.
+- Regenerate sources (`./gradlew generate<Variant>DeeplinkSpecs`) whenever you modify the YAML schema.
+- If `generateManifestFiles` is disabled, remember to replicate the `<intent-filter>` changes manually in your main manifest.
