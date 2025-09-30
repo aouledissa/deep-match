@@ -22,7 +22,7 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "DeepMatch"
+include(":deepmatch-api")
 include(":deepmatch-plugin")
 include(":deepmatch-processor")
-include(":sample")
-include(":deepmatch-api")
+include(":deepmatch-testing")

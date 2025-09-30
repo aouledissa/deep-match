@@ -29,7 +29,7 @@ publishing {
             from(components["java"])
             groupId = findProperty("groupName") as String
             version = findProperty("commonVersion") as String
-            artifactId = "api"
+            artifactId = "deepmatch-api"
         }
     }
 }

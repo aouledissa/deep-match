@@ -59,8 +59,7 @@ dependencies {
     testImplementation(libs.google.truth)
     testImplementation(libs.mockk.core)
     testImplementation(libs.kotlin.coroutines.test)
-    testApi(testFixtures(project(":deepmatch-api")))
-    testFixturesImplementation(testFixtures(project(":deepmatch-api")))
+    testImplementation(project(":deepmatch-testing"))
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(libs.androidx.test.core)
@@ -74,7 +73,7 @@ publishing {
                 from(components["release"])
                 groupId = findProperty("groupName") as String
                 version = findProperty("commonVersion") as String
-                artifactId = "processor-android"
+                artifactId = "deepmatch-processor"
             }
         }
     }

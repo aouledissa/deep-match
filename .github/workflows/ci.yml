@@ -35,14 +35,14 @@ jobs:
         uses: actions/cache@v4
         with:
           path: ~/.m2/repository/com/aouledissa/deepmatch
-          key: ${{ runner.os }}-deepmatch-plugin-${{ hashFiles('gradle-plugin/**','api/**','processor/**','build.gradle.kts','settings.gradle.kts','gradle/libs.versions.toml') }}
+          key: ${{ runner.os }}-deepmatch-plugin-${{ hashFiles('deepmatch-api/**','deepmatch-plugin/**','deepmatch-processor/**','build.gradle.kts','settings.gradle.kts','gradle/libs.versions.toml') }}
           restore-keys: |
             ${{ runner.os }}-deepmatch-plugin-
 
       - name: Publish DeepMatch artifacts to mavenLocal
         if: steps.deepmatch-plugin-cache.outputs.cache-hit != 'true'
         id: publish
-        run: ./gradlew gradle-plugin:publishToMavenLocal --no-daemon
+        run: ./gradlew publishToMavenLocal --no-daemon
 
       - name: Upload DeepMatch Maven artifacts
         if: steps.deepmatch-plugin-cache.outputs.cache-hit == 'true' || steps.publish.outcome == 'success'
