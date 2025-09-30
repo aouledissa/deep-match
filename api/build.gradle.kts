@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.jetbrains.kotlin.jvm)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.maven.publish)
+    alias(libs.plugins.java.testFixtures)
 }
 java {
     sourceCompatibility = JavaVersion.VERSION_11

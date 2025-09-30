@@ -1,23 +1,21 @@
 [versions]
-agp = "8.11.1"
-kotlin = "2.2.0"
-coreKtx = "1.16.0"
+agp = "8.13.0"
+kotlin = "2.2.20"
+coreKtx = "1.17.0"
 junit = "4.13.2"
-junitVersion = "1.2.1"
-espressoCore = "3.6.1"
-lifecycleRuntimeKtx = "2.9.1"
-activityCompose = "1.10.1"
-composeBom = "2025.06.01"
-appcompat = "1.7.1"
-material = "1.12.0"
-jetbrainsKotlinJvm = "2.2.0"
+junitVersion = "1.3.0"
+espressoCore = "3.7.0"
+lifecycleRuntimeKtx = "2.9.4"
+activityCompose = "1.11.0"
+composeBom = "2025.09.01"
 deepmatchVersion = "0.1.0"
 ktxSerializationVersion = "1.9.0"
-ktxSerializationPlugin = "2.2.0"
-kamlVersion = "0.83.0"
+kamlVersion = "0.97.0"
 kotlinPoetVersion = "2.2.0"
-xmlUtilSerializationVersion = "0.91.1"
-googleTruthVersion = "1.4.4"
+xmlUtilSerializationVersion = "0.91.2"
+googleTruthVersion = "1.4.5"
+mockkVersion = "1.14.5"
+kotlinCoroutineTestVersion = "1.10.2"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -34,26 +32,28 @@ androidx-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-toolin
 androidx-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
 androidx-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 androidx-material3 = { group = "androidx.compose.material3", name = "material3" }
-androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 android-gradle-api = { group = "com.android.tools.build", name = "gradle", version.ref = "agp" }
-material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 kotlin-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "ktxSerializationVersion" }
 kaml = { group = "com.charleskorn.kaml", name = "kaml", version.ref = "kamlVersion" }
 squareup-kotlinpoet = { group = "com.squareup", name = "kotlinpoet", version.ref = "kotlinPoetVersion" }
 xmlUtil-serialization = { group = "io.github.pdvrieze.xmlutil", name = "serialization", version.ref = "xmlUtilSerializationVersion" }
 deepmatch-processor = { group = "com.aouledissa.deepmatch", name = "processor-android", version.ref = "deepmatchVersion" }
 google-truth = { group = "com.google.truth", name = "truth", version.ref = "googleTruthVersion" }
+mockk-core = { group = "io.mockk", name = "mockk", version.ref = "mockkVersion" }
+kotlin-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "kotlinCoroutineTestVersion" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 android-library = { id = "com.android.library", version.ref = "agp" }
-jetbrains-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "jetbrainsKotlinJvm" }
+jetbrains-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 gradle-plugin = { id = "java-gradle-plugin" }
 java-library = { id = "java-library" }
+java-testFixtures = { id = "java-test-fixtures" }
 maven-publish = { id = "maven-publish" }
-kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "ktxSerializationPlugin" }
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+
 # DeepMatch
 deepmatch-plugin = { id = "com.aouledissa.deepmatch.plugin.android", version.ref = "deepmatchVersion" }
 

@@ -39,6 +39,15 @@ android {
     publishing {
         singleVariant("release")
     }
+
+    @Suppress("UnstableApiUsage")
+    testFixtures {
+        enable = true
+    }
+
+    testOptions {
+        unitTests.isReturnDefaultValues = true
+    }
 }
 
 dependencies {
@@ -46,9 +55,12 @@ dependencies {
     api(project(":api"))
     implementation(kotlin("reflect"))
     implementation(libs.androidx.core.ktx)
-    implementation(libs.androidx.appcompat)
-    implementation(libs.material)
     testImplementation(libs.junit)
+    testImplementation(libs.google.truth)
+    testImplementation(libs.mockk.core)
+    testImplementation(libs.kotlin.coroutines.test)
+    testApi(testFixtures(project(":api")))
+    testFixturesImplementation(testFixtures(project(":api")))
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
 }
