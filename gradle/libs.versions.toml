@@ -17,6 +17,7 @@ googleTruthVersion = "1.4.5"
 mockkVersion = "1.14.5"
 kotlinCoroutineTestVersion = "1.10.2"
 androidxTestCoreVersion = "1.7.0"
+robolectricVersion = "4.12.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -42,6 +43,7 @@ google-truth = { group = "com.google.truth", name = "truth", version.ref = "goog
 mockk-core = { group = "io.mockk", name = "mockk", version.ref = "mockkVersion" }
 kotlin-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "kotlinCoroutineTestVersion" }
 androidx-test-core = { group = "androidx.test", name = "core", version.ref = "androidxTestCoreVersion" }
+robolectric = { group = "org.robolectric", name = "robolectric", version.ref = "robolectricVersion" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

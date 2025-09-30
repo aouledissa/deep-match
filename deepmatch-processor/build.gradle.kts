@@ -59,11 +59,8 @@ dependencies {
     testImplementation(libs.google.truth)
     testImplementation(libs.mockk.core)
     testImplementation(libs.kotlin.coroutines.test)
+    testImplementation(libs.robolectric)
     testImplementation(project(":deepmatch-testing"))
-    androidTestImplementation(libs.androidx.junit)
-    androidTestImplementation(libs.androidx.espresso.core)
-    androidTestImplementation(libs.androidx.test.core)
-    androidTestImplementation(libs.google.truth)
 }
 
 publishing {
