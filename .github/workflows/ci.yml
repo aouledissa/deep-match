@@ -84,7 +84,7 @@ jobs:
 
   instrumentation-tests:
     name: Instrumentation tests
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
     needs:
       - build-artifacts
       - unit-tests
@@ -117,6 +117,6 @@ jobs:
         with:
           api-level: 33
           target: google_apis
-          arch: x86_64
-          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -no-snapshot
+          arch: arm64-v8a
+          emulator-options: -no-window -noaudio -no-boot-anim -no-snapshot -skip-adb-auth
           script: ./gradlew :deepmatch-processor:connectedDebugAndroidTest --no-daemon
