@@ -1,6 +1,6 @@
 ### Core Capabilities
 
-The primary responsibilities and capabilities of the `deepmatch-gradle-plugin` are:
+The primary responsibilities and capabilities of the DeepMatch Gradle plugin are:
 
 1.  **YAML Configuration Parsing:**
     *   The plugin automatically locates and reads your `.deeplinks.yml` file (by default, from the root of the module, e.g., `app/.deeplinks.yml`, but this is configurable).
@@ -14,7 +14,7 @@ The primary responsibilities and capabilities of the `deepmatch-gradle-plugin` a
 
 3.  **Code Generation (`DeeplinkSpecs`):**
     *   The plugin generates Kotlin source code, most notably a class named something like `[DeeplinkName]DeeplinkSpecs` (the exact name might vary based on the deeplink name in the `.yml` file).
-    *   The plugin also generate another kotlin source for the dynamic params in the configured deeplink. This means if any of your deeplink's **path parameters** is a pattern based or if the deeplink contains at least one **query parameter**, A parameter class will be generated.
+    *   The plugin also generates another Kotlin source for the dynamic params in the configured deeplink. This means if any of your deeplink's **path parameters** is pattern-based or if the deeplink contains at least one **query parameter**, a parameter class will be generated.
     *   This makes it easy to access these parameters later when matching and handling the deeplink. 
 
 4.  **Integration with Build Process:**
@@ -42,7 +42,7 @@ The primary responsibilities and capabilities of the `deepmatch-gradle-plugin` a
     plugins {
         id("com.android.application")
         id("org.jetbrains.kotlin.android")
-        id("com.aouledissa.deepmatch.plugin.android") version "0.1.0"
+        id("com.aouledissa.deepmatch.gradle") version "0.1.0"
     }
     ```
 
@@ -79,14 +79,9 @@ Inspect the generated output with:
 
 ### Testing & CI
 
-Publish the plugin to your local Maven cache before running tests:
-
 ```bash
-./gradlew publishToMavenLocal
-./gradlew test
-./gradlew connectedDebugAndroidTest
+./gradlew publishToMavenLocal  # Optional; handy when consuming the plugin from another project locally
+./gradlew test                 # Runs JVM tests for the plugin, runtime, and shared fixtures
 ```
 
-Unit tests cover the plugin internals and runtime processor. Instrumentation tests live in `deepmatch-processor/src/androidTest` and validate deeplink handling on a device/emulator.
-
-The repository’s GitHub Action (`.github/workflows/ci.yml`) runs both suites on pull requests, helping prevent merges when deeplink behavior regresses. Configure branch protections to require the **CI** workflow before merging.
+Runtime behaviour is validated with Robolectric-based tests in `deepmatch-processor/src/test`, backed by reusable fakes from the `deepmatch-testing` module. The GitHub Action workflow (`.github/workflows/ci.yml`) runs the same `test` task on every push and pull request; enable branch protection to require the **CI** workflow before merging.

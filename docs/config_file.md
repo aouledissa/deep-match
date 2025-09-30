@@ -20,19 +20,19 @@ Each item in the `deeplinkSpecs` list is a deep link configuration object with t
     *   If set to `true`, the `android:autoVerify="true"` attribute will be added to the generated `<intent-filter>`. This is necessary for Android App Links.
     *   Example: `autoVerify: true`
 
-*   **`scheme`**: (Required, String)
-    *   The scheme part of the URI.
-    *   Example: `myapp`, `http`, `https`
+*   **`scheme`**: (Required, List of Strings)
+    *   One or more URI schemes supported by the deeplink.
+    *   Example: `scheme: [myapp, https]`
 
-*   **`host`**: (Required, String)
-    *   The host part of the URI.
-    *   Example: `user`, `product.example.com`
+*   **`host`**: (Required, List of Strings)
+    *   One or more hosts (domains) that should resolve to this deeplink.
+    *   Example: `host: ["example.com", "m.example.com"]`
 
 *   **`pathParams`**: (Optional, List of Param objects)
-    *   Defines parameters that are part of the URI's path. Each item in the list is a `Param` object.
+    *   Defines ordered parameters that are part of the URI path. Each item in the list is a `Param` object.
     *   **Param Object Structure:**
         *   **`name`**: (Required, String) The name of the path parameter (e.g., `userId`, `itemId`). This is how you'll refer to it in your handler.
-        *   **`type`**: (Optional, String) The expected data type of the parameter. If present, this hints at the expected format but the value is always passed as a String to the handler initially. You can use this for documentation or potential future validation features. (e.g., `string`, `integer`, `uuid`).
+        *   **`type`**: (Optional, String) The expected data type of the parameter. When provided, the generated matcher validates the segment against the type’s regex and the runtime converts the value to the corresponding Kotlin type.
     *   Example:
         ```yaml
         pathParams:
@@ -43,7 +43,7 @@ Each item in the `deeplinkSpecs` list is a deep link configuration object with t
 
 *   **`queryParams`**: (Optional, List of Param objects)
     *   Mirrors the structure of `pathParams` but for query string parameters.
-    *   Query params should declare a `type` so the generated regex and parameter class enforce the expected format.
+    *   Query params should declare a `type` so the generated regex and parameter class enforce the expected format and type conversion.
     *   Example:
         ```yaml
         queryParams:
@@ -85,3 +85,4 @@ deeplinkSpecs:
 - Keep `name` values unique per spec to simplify handler identification.
 - Regenerate sources (`./gradlew generate<Variant>DeeplinkSpecs`) whenever you modify the YAML schema.
 - If `generateManifestFiles` is disabled, remember to replicate the `<intent-filter>` changes manually in your main manifest.
+- When a deeplink declares typed path, query, or fragment values, the plugin also creates a `<Name>DeeplinkParams` class so your handler receives strongly typed arguments.

@@ -1,17 +1,26 @@
 # DeepMatch
 
-DeepMatch is an Android deep-linking toolkit designed to offset deeplink validation & handling using:
+DeepMatch is an Android deep-linking toolkit that turns a `.deeplinks.yml` file into typed Kotlin
+code, optional manifest entries, and runtime routing logic. Point the plugin at your configuration
+and it will:
 
-- A Gradle plugin that turns a `.deeplinks.yml` specification into Kotlin sources and optional manifest entries.
-- A lightweight runtime (`deepmatch-processor`) that matches URIs against the generated specs and routes them to strongly-typed handlers.
+- Generate strongly-typed deeplink specs (plus parameter classes when the link declares template,
+  query, or fragment values).
+- Optionally emit manifest snippets so you never hand-write `<intent-filter>` entries again.
+- Provide a lightweight runtime (`deepmatch-processor`) that matches URIs against the generated
+  specs and dispatches to handlers.
 
-The plugin keeps deep links in sync across build-time metadata, generated code, and runtime handling so teams can treat the YAML file as their single source of truth.
+The YAML file becomes the single source of truth for everything deeplink-related.
 
 ## Modules
 
-- `deepmatch-plugin` – Gradle plugin (`com.aouledissa.deepmatch.plugin.android`) that parses specs, generates Kotlin sources, and (optionally) produces manifest entries for each variant.
-- `deepmatch-processor` – Android library that provides `DeeplinkProcessor` and handler abstractions for runtime matching.
+- `deepmatch-plugin` – Gradle plugin (`com.aouledissa.deepmatch.gradle`) that parses specs,
+  generates Kotlin sources, and (optionally) produces manifest entries for each variant.
+- `deepmatch-processor` – Android library that provides `DeeplinkProcessor` and handler abstractions
+  for runtime matching.
 - `deepmatch-api` – Shared model classes (`DeeplinkSpec`, `Param`, `ParamType`, `DeeplinkParams`).
+- `deepmatch-testing` – Shared test fixtures (fake handlers/processors and spec builders) used by
+  the runtime and plugin tests.
 
 ## Quick Start
 
@@ -21,7 +30,7 @@ The plugin keeps deep links in sync across build-time metadata, generated code, 
    plugins {
        id("com.android.application")
        id("org.jetbrains.kotlin.android")
-       id("com.aouledissa.deepmatch.plugin.android") version "<DEEP_MATCH_VERSION>"
+       id("com.aouledissa.deepmatch.gradle") version "<DEEPMATCH_VERSION>"
    }
 
    deepMatch {
@@ -29,9 +38,11 @@ The plugin keeps deep links in sync across build-time metadata, generated code, 
    }
    ```
 
-   Set `generateManifestFiles` to `false` if you prefer to manage `<intent-filter>` entries manually.
+   Set `generateManifestFiles` to `false` if you prefer to manage `<intent-filter>` entries
+   manually.
 
-2. **Describe your deeplinks** in `.deeplinks.yml` located at the module root or under `src/<variant>/.deeplinks.yml`:
+2. **Describe your deeplinks** in `.deeplinks.yml` located at the module root or under
+   `src/<variant>/.deeplinks.yml`:
 
    ```yaml
    deeplinkSpecs:
@@ -49,6 +60,9 @@ The plugin keeps deep links in sync across build-time metadata, generated code, 
        fragment: "details"
    ```
 
+   Both `scheme` and `host` accept multiple values; DeepMatch generates the appropriate regex
+   matcher to cover every combination.
+
 3. **Register the generated specs** with the runtime processor:
 
    ```kotlin
@@ -61,23 +75,27 @@ The plugin keeps deep links in sync across build-time metadata, generated code, 
    }
    ```
 
-See `docs/gradle_plugin.md` and `docs/config_file.md` for detailed configuration options and generated output.
+See `docs/gradle_plugin.md` and `docs/config_file.md` for detailed configuration options and
+generated output.
 
 ## Testing
 
 ```bash
-./gradlew deepmatch-plugin:publishToMavenLocal       # Publish plugin/runtime artifacts required by the build
-./gradlew test                      # JVM unit tests for all modules
-./gradlew connectedDebugAndroidTest # Instrumentation tests (requires emulator/device)
+./gradlew publishToMavenLocal  # (Optional) publish plugin + libraries to ~/.m2 for downstream testing
+./gradlew test                 # JVM unit tests for all modules (includes Robolectric coverage)
 ```
 
-Instrumentation tests live under `deepmatch-processor/src/androidTest` and exercise the runtime against real `Activity` instances.
+Runtime behaviour is exercised with Robolectric tests in `deepmatch-processor/src/test`. Shared
+fixtures (fake handlers, processors, and spec builders) live in the `deepmatch-testing` module and
+can be reused in downstream projects.
 
 ## Documentation
 
 - `docs/gradle_plugin.md` – Plugin capabilities, setup, and build integration details.
 - `docs/config_file.md` – YAML specification reference with examples.
+- `deepmatch-testing/src/main/kotlin` – Reusable fakes and fixtures for tests.
 
 ## Contributing
 
-Issues and pull requests are welcome. Please ensure the CI workflow passes locally (`./gradlew test` and `./gradlew connectedDebugAndroidTest`) before opening a PR.
+Issues and pull requests are welcome. Please ensure `./gradlew test` passes locally (plus any
+project-specific checks) before opening a PR.
