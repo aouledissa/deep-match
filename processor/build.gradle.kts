@@ -63,6 +63,8 @@ dependencies {
     testFixturesImplementation(testFixtures(project(":api")))
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+    androidTestImplementation(libs.androidx.test.core)
+    androidTestImplementation(libs.google.truth)
 }
 
 publishing {
