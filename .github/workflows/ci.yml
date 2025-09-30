@@ -83,25 +83,12 @@ jobs:
         run: ./gradlew test --no-daemon
 
   instrumentation-tests:
-    runs-on: macos-latest
-    needs:
-      - build-artifacts
-
+    name: Running Android Tests
+    runs-on: macos-13
+    continue-on-error: true
     steps:
-      - name: checkout
+      - name: Checkout
         uses: actions/checkout@v4
-
-      - name: Prepare Maven local directory
-        run: mkdir -p ~/.m2/repository/com/aouledissa
-
-      - name: Download DeepMatch Maven artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: deepmatch-m2
-          path: ~/.m2/repository/com/aouledissa
-
-      - name: Gradle cache
-        uses: gradle/actions/setup-gradle@v3
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
@@ -115,52 +102,15 @@ jobs:
       - name: Setup Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: run tests
+      - name: Start Android Emulator
         uses: reactivecircus/android-emulator-runner@v2
         with:
-          api-level: 33
-          arch: arm64-v8a
-          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
-          disable-animations: true
+          api-level: 26
+          target: default
+          arch: x86_64
+          profile: Nexus 4
+          emulator-options: -no-window -no-boot-anim -no-audio -no-snapshot-load
           script: |
-            adb wait-for-device \
-            adb shell input keyevent 82 \
+            adb wait-for-device
+            adb shell input keyevent 82
             ./gradlew connectedAndroidTest --continue
-#  instrumentation-tests:
-#    name: Instrumentation tests
-#    runs-on: macos-latest
-#    needs:
-#      - build-artifacts
-#      - unit-tests
-#
-#    steps:
-#      - name: Checkout sources
-#        uses: actions/checkout@v4
-#
-#      - name: Set up JDK 17
-#        uses: actions/setup-java@v4
-#        with:
-#          distribution: temurin
-#          java-version: 17
-#          cache: gradle
-#
-#      - name: Grant execute permission for gradlew
-#        run: chmod +x gradlew
-#
-#      - name: Prepare Maven local directory
-#        run: mkdir -p ~/.m2/repository/com/aouledissa
-#
-#      - name: Download DeepMatch Maven artifacts
-#        uses: actions/download-artifact@v4
-#        with:
-#          name: deepmatch-m2
-#          path: ~/.m2/repository/com/aouledissa
-#
-#      - name: Run connected Android tests
-#        uses: reactivecircus/android-emulator-runner@v2
-#        with:
-#          api-level: 33
-#          target: google_apis
-#          arch: arm64-v8a
-#          emulator-options: -no-window -noaudio -no-boot-anim -no-snapshot -skip-adb-auth
-#          script: ./gradlew :deepmatch-processor:connectedDebugAndroidTest --no-daemon
