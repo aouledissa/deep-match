@@ -1,0 +1,19 @@
+public final class com/aouledissa/deepmatch/api/DeeplinkSpecFixtures {
+	public static final field INSTANCE Lcom/aouledissa/deepmatch/api/DeeplinkSpecFixtures;
+	public final fun create (Ljava/util/Set;Ljava/util/Set;Ljava/util/Set;Ljava/util/Set;Ljava/lang/String;Lkotlin/reflect/KClass;)Lcom/aouledissa/deepmatch/api/DeeplinkSpec;
+	public static synthetic fun create$default (Lcom/aouledissa/deepmatch/api/DeeplinkSpecFixtures;Ljava/util/Set;Ljava/util/Set;Ljava/util/Set;Ljava/util/Set;Ljava/lang/String;Lkotlin/reflect/KClass;ILjava/lang/Object;)Lcom/aouledissa/deepmatch/api/DeeplinkSpec;
+}
+
+public final class com/aouledissa/deepmatch/processor/FakeDeeplinkHandler : com/aouledissa/deepmatch/processor/DeeplinkHandler {
+	public fun <init> ()V
+	public fun handle (Landroid/app/Activity;Lcom/aouledissa/deepmatch/api/DeeplinkParams;)V
+	public final fun isInvoked ()Z
+	public final fun isInvoked (I)Z
+	public final fun lastParams ()Lcom/aouledissa/deepmatch/api/DeeplinkParams;
+}
+
+public final class com/aouledissa/deepmatch/processor/FakeDeeplinkProcessor : com/aouledissa/deepmatch/processor/DeeplinkProcessor {
+	public fun <init> ()V
+	public fun match (Landroid/net/Uri;Landroid/app/Activity;)V
+}
+

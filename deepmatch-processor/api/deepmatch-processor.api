@@ -1,0 +1,14 @@
+public abstract interface class com/aouledissa/deepmatch/processor/DeeplinkHandler {
+	public abstract fun handle (Landroid/app/Activity;Lcom/aouledissa/deepmatch/api/DeeplinkParams;)V
+}
+
+public abstract interface class com/aouledissa/deepmatch/processor/DeeplinkProcessor {
+	public abstract fun match (Landroid/net/Uri;Landroid/app/Activity;)V
+}
+
+public final class com/aouledissa/deepmatch/processor/DeeplinkProcessor$Builder {
+	public fun <init> ()V
+	public final fun build ()Lcom/aouledissa/deepmatch/processor/DeeplinkProcessor;
+	public final fun register (Lcom/aouledissa/deepmatch/api/DeeplinkSpec;Lcom/aouledissa/deepmatch/processor/DeeplinkHandler;)Lcom/aouledissa/deepmatch/processor/DeeplinkProcessor$Builder;
+}
+

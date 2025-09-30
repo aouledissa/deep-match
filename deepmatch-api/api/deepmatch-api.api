@@ -1,0 +1,87 @@
+public abstract interface class com/aouledissa/deepmatch/api/DeeplinkParams {
+}
+
+public final class com/aouledissa/deepmatch/api/DeeplinkSpec {
+	public static final field Companion Lcom/aouledissa/deepmatch/api/DeeplinkSpec$Companion;
+	public fun <init> (Ljava/util/Set;Ljava/util/Set;Ljava/util/Set;Ljava/util/Set;Ljava/lang/String;Lkotlin/reflect/KClass;)V
+	public final fun component1 ()Ljava/util/Set;
+	public final fun component2 ()Ljava/util/Set;
+	public final fun component3 ()Ljava/util/Set;
+	public final fun component4 ()Ljava/util/Set;
+	public final fun component5 ()Ljava/lang/String;
+	public final fun component6 ()Lkotlin/reflect/KClass;
+	public final fun copy (Ljava/util/Set;Ljava/util/Set;Ljava/util/Set;Ljava/util/Set;Ljava/lang/String;Lkotlin/reflect/KClass;)Lcom/aouledissa/deepmatch/api/DeeplinkSpec;
+	public static synthetic fun copy$default (Lcom/aouledissa/deepmatch/api/DeeplinkSpec;Ljava/util/Set;Ljava/util/Set;Ljava/util/Set;Ljava/util/Set;Ljava/lang/String;Lkotlin/reflect/KClass;ILjava/lang/Object;)Lcom/aouledissa/deepmatch/api/DeeplinkSpec;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getFragment ()Ljava/lang/String;
+	public final fun getHost ()Ljava/util/Set;
+	public final fun getMatcher ()Lkotlin/text/Regex;
+	public final fun getParametersClass ()Lkotlin/reflect/KClass;
+	public final fun getPathParams ()Ljava/util/Set;
+	public final fun getQueryParams ()Ljava/util/Set;
+	public final fun getScheme ()Ljava/util/Set;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final synthetic class com/aouledissa/deepmatch/api/DeeplinkSpec$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lcom/aouledissa/deepmatch/api/DeeplinkSpec$$serializer;
+	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public final fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lcom/aouledissa/deepmatch/api/DeeplinkSpec;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public final fun serialize (Lkotlinx/serialization/encoding/Encoder;Lcom/aouledissa/deepmatch/api/DeeplinkSpec;)V
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
+public final class com/aouledissa/deepmatch/api/DeeplinkSpec$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public final class com/aouledissa/deepmatch/api/Param {
+	public static final field Companion Lcom/aouledissa/deepmatch/api/Param$Companion;
+	public fun <init> (Ljava/lang/String;Lcom/aouledissa/deepmatch/api/ParamType;)V
+	public synthetic fun <init> (Ljava/lang/String;Lcom/aouledissa/deepmatch/api/ParamType;ILkotlin/jvm/internal/DefaultConstructorMarker;)V
+	public final fun component1 ()Ljava/lang/String;
+	public final fun component2 ()Lcom/aouledissa/deepmatch/api/ParamType;
+	public final fun copy (Ljava/lang/String;Lcom/aouledissa/deepmatch/api/ParamType;)Lcom/aouledissa/deepmatch/api/Param;
+	public static synthetic fun copy$default (Lcom/aouledissa/deepmatch/api/Param;Ljava/lang/String;Lcom/aouledissa/deepmatch/api/ParamType;ILjava/lang/Object;)Lcom/aouledissa/deepmatch/api/Param;
+	public fun equals (Ljava/lang/Object;)Z
+	public final fun getName ()Ljava/lang/String;
+	public final fun getType ()Lcom/aouledissa/deepmatch/api/ParamType;
+	public fun hashCode ()I
+	public fun toString ()Ljava/lang/String;
+}
+
+public final synthetic class com/aouledissa/deepmatch/api/Param$$serializer : kotlinx/serialization/internal/GeneratedSerializer {
+	public static final field INSTANCE Lcom/aouledissa/deepmatch/api/Param$$serializer;
+	public final fun childSerializers ()[Lkotlinx/serialization/KSerializer;
+	public final fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Lcom/aouledissa/deepmatch/api/Param;
+	public synthetic fun deserialize (Lkotlinx/serialization/encoding/Decoder;)Ljava/lang/Object;
+	public final fun getDescriptor ()Lkotlinx/serialization/descriptors/SerialDescriptor;
+	public final fun serialize (Lkotlinx/serialization/encoding/Encoder;Lcom/aouledissa/deepmatch/api/Param;)V
+	public synthetic fun serialize (Lkotlinx/serialization/encoding/Encoder;Ljava/lang/Object;)V
+	public fun typeParametersSerializers ()[Lkotlinx/serialization/KSerializer;
+}
+
+public final class com/aouledissa/deepmatch/api/Param$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+
+public final class com/aouledissa/deepmatch/api/ParamType : java/lang/Enum {
+	public static final field ALPHANUMERIC Lcom/aouledissa/deepmatch/api/ParamType;
+	public static final field Companion Lcom/aouledissa/deepmatch/api/ParamType$Companion;
+	public static final field NUMERIC Lcom/aouledissa/deepmatch/api/ParamType;
+	public static final field STRING Lcom/aouledissa/deepmatch/api/ParamType;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public final fun getRegex ()Lkotlin/text/Regex;
+	public final fun getType ()Lkotlin/reflect/KClass;
+	public static fun valueOf (Ljava/lang/String;)Lcom/aouledissa/deepmatch/api/ParamType;
+	public static fun values ()[Lcom/aouledissa/deepmatch/api/ParamType;
+}
+
+public final class com/aouledissa/deepmatch/api/ParamType$Companion {
+	public final fun serializer ()Lkotlinx/serialization/KSerializer;
+}
+

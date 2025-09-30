@@ -1,9 +1,12 @@
+import com.aouledissa.deepmatch.convention.configureDeepMatchPom
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.maven.publish)
+    alias(libs.plugins.gradleup.nmcp)
+    signing
 }
 
 kotlin {
@@ -37,12 +40,10 @@ android {
         targetCompatibility = JavaVersion.VERSION_11
     }
     publishing {
-        singleVariant("release")
-    }
-
-    @Suppress("UnstableApiUsage")
-    testFixtures {
-        enable = true
+        singleVariant("release") {
+            withSourcesJar()
+            withJavadocJar()
+        }
     }
 
     testOptions {
@@ -65,13 +66,25 @@ dependencies {
 
 publishing {
     publications {
-        afterEvaluate {
-            create<MavenPublication>("release") {
+        register<MavenPublication>("deepMatchProcessor") {
+            artifactId = "deepmatch-processor"
+            project.afterEvaluate {
                 from(components["release"])
-                groupId = findProperty("groupName") as String
-                version = findProperty("commonVersion") as String
-                artifactId = "deepmatch-processor"
+            }
+            pom {
+                name.set("DeepMatch Processor")
+                description.set("Runtime processor that matches URIs against DeepMatch specifications")
+                configureDeepMatchPom()
             }
         }
     }
+}
+
+signing {
+    val signingKey: String? by project
+    val signingPassword: String? by project
+    if (signingKey != null) {
+        useInMemoryPgpKeys(signingKey, signingPassword)
+    }
+    sign(publishing.publications["deepMatchProcessor"])
 }

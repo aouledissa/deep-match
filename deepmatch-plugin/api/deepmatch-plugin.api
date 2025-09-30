@@ -1,0 +1,15 @@
+public final class com/aouledissa/deepmatch/gradle/DeepMatchPlugin : org/gradle/api/Plugin {
+	public fun <init> ()V
+	public synthetic fun apply (Ljava/lang/Object;)V
+	public fun apply (Lorg/gradle/api/Project;)V
+}
+
+public abstract class com/aouledissa/deepmatch/gradle/DeepMatchPluginConfig {
+	public static final field Companion Lcom/aouledissa/deepmatch/gradle/DeepMatchPluginConfig$Companion;
+	public fun <init> (Lorg/gradle/api/model/ObjectFactory;)V
+	public final fun getGenerateManifestFiles ()Lorg/gradle/api/provider/Property;
+}
+
+public final class com/aouledissa/deepmatch/gradle/DeepMatchPluginConfig$Companion {
+}
+
