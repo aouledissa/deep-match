@@ -8,9 +8,6 @@ plugins {
     alias(libs.plugins.maven.publish)
 }
 
-group = findProperty("groupName") as String
-version = findProperty("commonVersion") as String
-
 java {
     sourceCompatibility = JavaVersion.VERSION_11
     targetCompatibility = JavaVersion.VERSION_11
@@ -23,7 +20,7 @@ kotlin {
 
 dependencies {
     implementation(project(":deepmatch-api"))
-    implementation(libs.android.gradle.api)
+    compileOnly(libs.android.gradle.api)
     implementation(libs.kotlin.serialization.json)
     implementation(libs.squareup.kotlinpoet)
     implementation(libs.kaml)

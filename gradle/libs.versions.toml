@@ -35,7 +35,6 @@ android-library = { id = "com.android.library", version.ref = "agp" }
 jetbrains-kotlin-jvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 gradle-plugin = { id = "java-gradle-plugin" }
 java-library = { id = "java-library" }
-java-testFixtures = { id = "java-test-fixtures" }
 maven-publish = { id = "maven-publish" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 
