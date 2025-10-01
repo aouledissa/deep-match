@@ -10,8 +10,6 @@ runtime library matches incoming URIs and dispatches to strongly-typed handlers.
 - **deepmatch-processor** — Runtime router that maps URIs to handlers and builds parameter objects.
 - **deepmatch-api** — Shared spec/parameter data models used across plugin and runtime.
 - **deepmatch-testing** — Reusable fixtures that assist in unit testing DeepMatch integrations.
-- **sample-app** — Compose-powered demonstration that launches implicit deeplink intents and routes
-them through `DeeplinkProcessor`.
 
 ## Getting Started
 
