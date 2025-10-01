@@ -8,7 +8,6 @@ on:
 
 jobs:
   unit-tests:
-    needs: build-artifacts
     uses: ./.github/workflows/unit-tests.yml
 
   publish-artifacts:
