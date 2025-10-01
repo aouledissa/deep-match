@@ -42,7 +42,7 @@ jobs:
           mkdocs gh-deploy --force
 
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v1
+        uses: actions/upload-pages-artifact@v4
 
   deploy:
     environment:
