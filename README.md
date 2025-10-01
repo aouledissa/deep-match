@@ -101,6 +101,10 @@ can be reused in downstream projects.
   mkdocs serve
   ```
 
+  The `Docs` GitHub Action publishes the site automatically to GitHub Pages (branch `gh-pages`) on
+  every push to `main` and tagged release. Once Pages is enabled in the repository settings, the
+  documentation is available at `https://<owner>.github.io/DeepMatch/`.
+
 ## Contributing
 
 Issues and pull requests are welcome. Please ensure `./gradlew test` passes locally (plus any
