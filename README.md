@@ -1,3 +1,9 @@
+![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/aouledissa/deep-match/unit-tests.yml?branch=main)
+![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/aouledissa/deep-match/docs.yml?branch=main&label=docs)
+![Maven Central Version](https://img.shields.io/maven-central/v/com.aouledissa.deepmatch/deepmatch-processor)
+![Gradle Plugin Portal Version](https://img.shields.io/gradle-plugin-portal/v/com.aouledissa.deepmatch.gradle)
+
+
 # DeepMatch
 
 DeepMatch is an Android deep-linking toolkit that turns a `.deeplinks.yml` file into typed Kotlin
