@@ -9,3 +9,5 @@
 .cxx
 local.properties
 .kotlin
+sample-app/
+site/

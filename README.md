@@ -94,6 +94,12 @@ can be reused in downstream projects.
 - `docs/gradle_plugin.md` – Plugin capabilities, setup, and build integration details.
 - `docs/config_file.md` – YAML specification reference with examples.
 - `deepmatch-testing/src/main/kotlin` – Reusable fakes and fixtures for tests.
+- MkDocs site powered by Material theme. Serve locally with:
+
+  ```bash
+  pip install -r docs/requirements.txt
+  mkdocs serve
+  ```
 
 ## Contributing
 
