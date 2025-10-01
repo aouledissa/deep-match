@@ -4,6 +4,11 @@ import com.aouledissa.deepmatch.api.DeeplinkParams
 import kotlin.reflect.KClass
 import kotlin.reflect.full.primaryConstructor
 
+/**
+ * Utility responsible for instantiating generated [DeeplinkParams] classes via
+ * reflection. It converts the map collected by the processor into constructor
+ * arguments, performing basic type coercion where needed.
+ */
 internal object DeeplinkParamsAutoFactory {
 
     fun tryCreate(

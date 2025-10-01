@@ -5,7 +5,7 @@ plugins {
     alias(libs.plugins.jetbrains.kotlin.jvm)
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.gradle.plugin)
-    alias(libs.plugins.maven.publish)
+    alias(libs.plugins.gradle.publish)
 }
 
 java {
@@ -28,10 +28,15 @@ dependencies {
 }
 
 gradlePlugin {
+    website = "https://deepmatch.aouledissa.com"
+    vcsUrl = "https://github.com/aouledissa/deep-match"
     plugins {
         create("DeepMatchPlugin") {
             id = "com.aouledissa.deepmatch.gradle"
             implementationClass = "com.aouledissa.deepmatch.gradle.DeepMatchPlugin"
+            displayName = "DeepMatch Gradle Plugin"
+            description = "Codegen and specs parser for Deeplink auto handling Library: DeepMatch"
+            tags = listOf("android", "deeplink", "codegen", "deepmatch")
         }
     }
 }

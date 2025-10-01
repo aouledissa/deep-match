@@ -4,6 +4,12 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlin.reflect.KClass
 
+/**
+ * Immutable description of a deeplink shape generated from the YAML spec.
+ *
+ * Each instance captures the allowed URI components alongside the optional
+ * parameters class that should be constructed when a match occurs.
+ */
 @Serializable
 data class DeeplinkSpec(
     val scheme: Set<String>,
@@ -70,6 +76,10 @@ private val alphaNumericRegex = "[a-zA-Z0-9._~-]+".toRegex()
 private val numericRegex = "[0-9]+".toRegex()
 private val stringRegex = "[a-zA-Z._~-]+".toRegex()
 
+/**
+ * Definition of a single path or query parameter declared in a deeplink
+ * configuration.
+ */
 @Serializable
 data class Param(
     val name: String,
@@ -85,6 +95,10 @@ data class Param(
     }
 }
 
+/**
+ * Supported parameter types. The associated regular expression is embedded into
+ * generated URI matchers as well as typed conversions during runtime.
+ */
 @Serializable
 enum class ParamType(val regex: Regex) {
     @SerialName("alphanumeric")

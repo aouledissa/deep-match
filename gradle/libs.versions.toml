@@ -13,6 +13,7 @@ kotlinCoroutineTestVersion = "1.10.2"
 robolectricVersion = "4.16"
 binaryCompatibilityValidator = "0.18.1"
 gradleupNmcp = "1.2.0"
+gradlePublish = "2.0.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -37,8 +38,7 @@ gradle-plugin = { id = "java-gradle-plugin" }
 java-library = { id = "java-library" }
 maven-publish = { id = "maven-publish" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
-
-# DeepMatch
 binary-compatibility-validator = { id = "org.jetbrains.kotlinx.binary-compatibility-validator", version.ref = "binaryCompatibilityValidator" }
 gradleup-nmcp = { id = "com.gradleup.nmcp", version.ref = "gradleupNmcp" }
 gradleup-nmcp-aggregation = { id = "com.gradleup.nmcp.aggregation", version.ref = "gradleupNmcp" }
+gradle-publish = {id="com.gradle.plugin-publish", version.ref="gradlePublish"}

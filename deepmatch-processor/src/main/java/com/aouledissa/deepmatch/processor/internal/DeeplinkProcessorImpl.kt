@@ -11,6 +11,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
+/**
+ * Default implementation backing [DeeplinkProcessor]. It performs regex based
+ * matching off the main thread and marshals callbacks back to the UI thread.
+ */
 internal class DeeplinkProcessorImpl(
     private val registry: HashMap<DeeplinkSpec, DeeplinkHandler<out DeeplinkParams>>,
     private val coroutineScope: CoroutineScope,

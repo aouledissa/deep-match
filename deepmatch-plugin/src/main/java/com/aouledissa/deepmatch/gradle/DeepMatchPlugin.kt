@@ -8,6 +8,11 @@ import org.gradle.api.Project
 
 internal const val LOG_TAG = "> DeepMatch:"
 
+/**
+ * Gradle entry point that wires DeepMatch into Android application and library
+ * modules. The plugin configures per-variant tasks that parse YAML specs,
+ * generate Kotlin sources, and optionally produce manifest snippets.
+ */
 class DeepMatchPlugin : Plugin<Project> {
 
     override fun apply(target: Project) {
