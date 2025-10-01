@@ -18,6 +18,9 @@ and it will:
 
 The YAML file becomes the single source of truth for everything deeplink-related.
 
+## Documentation
+For full documentation please visit our [official docs page](https://deepmatch.aouledissa.com)
+
 ## Modules
 
 - `deepmatch-plugin` – Gradle plugin (`com.aouledissa.deepmatch.gradle`) that parses specs,
