@@ -1,6 +1,10 @@
 name: unit-tests
 
 on:
+  pull_request:
+  push:
+    branches:
+      - main
   workflow_call:
     inputs:
       artifact-name:
