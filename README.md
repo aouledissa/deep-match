@@ -87,6 +87,7 @@ deeplinkSpecs:
 
 Typed query params are validated by key and type, so query ordering does not matter.
 For example, `?ref=promo&page=1` and `?page=1&ref=promo` are treated the same.
+Path params are ordered and matched by position as declared in YAML.
 
 5. Generate sources (or just build normally):
 

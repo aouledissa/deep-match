@@ -17,7 +17,7 @@ class DeeplinkProcessorTest {
         val matchingSpec = DeeplinkSpec(
             scheme = setOf("app"),
             host = setOf("example.com"),
-            pathParams = linkedSetOf(
+            pathParams = listOf(
                 Param(name = "series"),
                 Param(name = "seriesId", type = ParamType.NUMERIC)
             ),
@@ -52,7 +52,7 @@ class DeeplinkProcessorTest {
         val spec = DeeplinkSpec(
             scheme = setOf("app"),
             host = setOf("example.com"),
-            pathParams = emptySet(),
+            pathParams = emptyList(),
             queryParams = emptySet(),
             fragment = null,
             parametersClass = null
@@ -77,7 +77,7 @@ class DeeplinkProcessorTest {
         val spec = DeeplinkSpec(
             scheme = setOf("app"),
             host = setOf("example.com"),
-            pathParams = emptySet(),
+            pathParams = listOf(),
             queryParams = emptySet(),
             fragment = null,
             parametersClass = null

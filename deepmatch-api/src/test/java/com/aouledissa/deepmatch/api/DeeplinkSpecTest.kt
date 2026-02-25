@@ -18,7 +18,7 @@ class DeeplinkSpecTest {
         sut = DeeplinkSpec(
             scheme = setOf(scheme),
             host = setOf(host),
-            pathParams = emptySet(),
+            pathParams = emptyList(),
             queryParams = emptySet(),
             fragment = null,
             parametersClass = null
@@ -40,7 +40,7 @@ class DeeplinkSpecTest {
         sut = DeeplinkSpec(
             scheme = setOf(scheme1, scheme2),
             host = setOf("test.com"),
-            pathParams = emptySet(),
+            pathParams = emptyList(),
             queryParams = emptySet(),
             fragment = null,
             parametersClass = null
@@ -65,7 +65,7 @@ class DeeplinkSpecTest {
         sut = DeeplinkSpec(
             scheme = setOf(scheme),
             host = hosts,
-            pathParams = emptySet(),
+            pathParams = emptyList(),
             queryParams = emptySet(),
             fragment = null,
             parametersClass = null
@@ -85,7 +85,7 @@ class DeeplinkSpecTest {
         sut = DeeplinkSpec(
             scheme = setOf("https"),
             host = setOf("test.com"),
-            pathParams = setOf(pathParam),
+            pathParams = listOf(pathParam),
             queryParams = emptySet(),
             fragment = null,
             parametersClass = null
@@ -101,7 +101,7 @@ class DeeplinkSpecTest {
         // given
         val pathParam1 = Param(name = "profile")
         val pathParam2 = Param(name = "bio")
-        val params = setOf(pathParam1, pathParam2)
+        val params = listOf(pathParam1, pathParam2)
         val expectedPattern = params.joinToString(separator = "/") { Regex.escape(it.name) }
 
         // when
@@ -128,7 +128,7 @@ class DeeplinkSpecTest {
         sut = DeeplinkSpec(
             scheme = setOf("https"),
             host = setOf("test.com"),
-            pathParams = setOf(pathParam),
+            pathParams = listOf(pathParam),
             queryParams = emptySet(),
             fragment = null,
             parametersClass = null
@@ -145,7 +145,7 @@ class DeeplinkSpecTest {
         sut = DeeplinkSpec(
             scheme = setOf("https"),
             host = setOf("test.com"),
-            pathParams = emptySet(),
+            pathParams = emptyList(),
             queryParams = setOf(
                 Param(name = "ref", type = ParamType.STRING),
                 Param(name = "page", type = ParamType.NUMERIC)
@@ -165,7 +165,7 @@ class DeeplinkSpecTest {
         sut = DeeplinkSpec(
             scheme = setOf("https"),
             host = setOf("test.com"),
-            pathParams = emptySet(),
+            pathParams = emptyList(),
             queryParams = setOf(
                 Param(name = "ref", type = ParamType.STRING),
                 Param(name = "page", type = ParamType.NUMERIC)
@@ -184,7 +184,7 @@ class DeeplinkSpecTest {
         sut = DeeplinkSpec(
             scheme = setOf("https"),
             host = setOf("test.com"),
-            pathParams = emptySet(),
+            pathParams = emptyList(),
             queryParams = setOf(Param(name = "page", type = ParamType.NUMERIC)),
             fragment = null,
             parametersClass = null
@@ -200,7 +200,7 @@ class DeeplinkSpecTest {
         sut = DeeplinkSpec(
             scheme = setOf("https"),
             host = setOf("test.com"),
-            pathParams = emptySet(),
+            pathParams = emptyList(),
             queryParams = setOf(Param(name = "ref")),
             fragment = null,
             parametersClass = null
@@ -220,7 +220,7 @@ class DeeplinkSpecTest {
         sut = DeeplinkSpec(
             scheme = setOf("https"),
             host = setOf("test.com"),
-            pathParams = emptySet(),
+            pathParams = emptyList(),
             queryParams = emptySet(),
             fragment = fragment,
             parametersClass = null
@@ -239,7 +239,7 @@ class DeeplinkSpecTest {
         sut = DeeplinkSpec(
             scheme = setOf("https"),
             host = setOf("test.com"),
-            pathParams = emptySet(),
+            pathParams = emptyList(),
             queryParams = emptySet(),
             fragment = null,
             parametersClass = null

@@ -7,6 +7,10 @@
 - Query parameters are no longer part of `DeeplinkSpec`'s structural regex matcher.
 - `DeeplinkProcessor` now validates typed query params separately after structural URI matching.
 - `DeeplinkProcessor` URI normalization no longer includes query string content.
+- `DeeplinkSpec.pathParams` now uses `List<Param>` (instead of `Set<Param>`) so declared path
+  segment order is preserved explicitly.
+- Plugin code generation now emits `pathParams = listOf(...)` for generated specs to align with
+  the new API shape.
 
 ### Fixed
 
@@ -17,7 +21,7 @@
 ### Documentation
 
 - Updated README and docs pages to document order-agnostic typed query param matching semantics.
-- Updated release notes and migration guide with the query matching behavior change.
+- Updated README/docs to clarify ordered path params list semantics in generated specs.
 
 ## [0.2.0-alpha] - 2026-02-25
 

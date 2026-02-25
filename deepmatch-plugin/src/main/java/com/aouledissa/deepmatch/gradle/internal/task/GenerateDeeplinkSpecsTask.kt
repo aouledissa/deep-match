@@ -190,7 +190,7 @@ internal abstract class GenerateDeeplinkSpecsTask : DefaultTask() {
                 %T(
                 scheme = setOf($schemes),
                 host = setOf($hosts),
-                pathParams = setOf($pathParams),
+                pathParams = listOf($pathParams),
                 queryParams = setOf($queryParams),
                 fragment = ${config.fragment?.let { "\"$it\"" } ?: "null"},
                 parametersClass = ${parametersClass?.simpleName?.plus("::class")}

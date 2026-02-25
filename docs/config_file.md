@@ -30,6 +30,7 @@ Each item in the `deeplinkSpecs` list is a deep link configuration object with t
 
 *   **`pathParams`**: (Optional, List of Param objects)
     *   Defines ordered parameters that are part of the URI path. Each item in the list is a `Param` object.
+    *   Order is significant and preserved in generated specs (`DeeplinkSpec.pathParams` is a list).
     *   **Param Object Structure:**
         *   **`name`**: (Required, String) The name of the path parameter (e.g., `userId`, `itemId`). This is how you'll refer to it in generated params.
         *   **`type`**: (Optional, String) The expected data type of the parameter. When provided, the generated matcher validates the segment against the type’s regex and the runtime converts the value to the corresponding Kotlin type.

@@ -14,7 +14,7 @@ import kotlin.reflect.KClass
 data class DeeplinkSpec(
     val scheme: Set<String>,
     val host: Set<String>,
-    val pathParams: Set<Param>,
+    val pathParams: List<Param>,
     val queryParams: Set<Param>,
     val fragment: String?,
     val parametersClass: KClass<out DeeplinkParams>?
