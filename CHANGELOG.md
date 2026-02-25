@@ -1,5 +1,24 @@
 # Changelog
 
+## [Unreleased]
+
+### Changed
+
+- Query parameters are no longer part of `DeeplinkSpec`'s structural regex matcher.
+- `DeeplinkProcessor` now validates typed query params separately after structural URI matching.
+- `DeeplinkProcessor` URI normalization no longer includes query string content.
+
+### Fixed
+
+- Fixed critical query matching behavior where typed query params could fail when URL query order
+  differed from spec declaration order (for example, `?page=1&ref=promo` now matches
+  `ref + page` specs correctly).
+
+### Documentation
+
+- Updated README and docs pages to document order-agnostic typed query param matching semantics.
+- Updated release notes and migration guide with the query matching behavior change.
+
 ## [0.2.0-alpha] - 2026-02-25
 
 ### Added

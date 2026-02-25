@@ -53,9 +53,40 @@ class DeeplinkProcessorRobolectricTest {
         assertThat(params).isNull()
     }
 
+    @Test
+    fun deeplinkWithOutOfOrderQueryParams_matchesAndReturnsParsedValues() {
+        val spec = DeeplinkSpec(
+            scheme = setOf("app"),
+            host = setOf("example.com"),
+            pathParams = linkedSetOf(
+                Param(name = "series"),
+                Param(name = "seriesId", type = ParamType.NUMERIC)
+            ),
+            queryParams = setOf(
+                Param(name = "ref", type = ParamType.STRING),
+                Param(name = "page", type = ParamType.NUMERIC)
+            ),
+            fragment = null,
+            parametersClass = PagedSeriesParams::class
+        )
+        val processor = DeeplinkProcessor(specs = setOf(spec))
+
+        val uri = Uri.parse("app://example.com/series/42?page=1&ref=promo")
+        val params = processor.match(uri) as PagedSeriesParams?
+        assertThat(params?.seriesId).isEqualTo(42)
+        assertThat(params?.page).isEqualTo(1)
+        assertThat(params?.ref).isEqualTo("promo")
+    }
+
     data class SeriesParams(
         val seriesId: Int,
         val ref: String?,
         val fragment: String?
+    ) : DeeplinkParams
+
+    data class PagedSeriesParams(
+        val seriesId: Int,
+        val ref: String?,
+        val page: Int?
     ) : DeeplinkParams
 }

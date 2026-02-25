@@ -43,7 +43,8 @@ Each item in the `deeplinkSpecs` list is a deep link configuration object with t
 
 *   **`queryParams`**: (Optional, List of Param objects)
     *   Mirrors the structure of `pathParams` but for query string parameters.
-    *   Query params should declare a `type` so the generated regex and parameter class enforce the expected format and type conversion.
+    *   Query params should declare a `type` so runtime validation and generated parameter classes enforce the expected format and type conversion.
+    *   Query param matching is order-agnostic (`?page=1&ref=promo` and `?ref=promo&page=1` are equivalent).
     *   Example:
         ```yaml
         queryParams:
@@ -86,5 +87,6 @@ deeplinkSpecs:
 - Regenerate sources (`./gradlew generate<Variant>DeeplinkSpecs`) whenever you modify the YAML schema.
 - If `generateManifestFiles` is disabled, remember to replicate the `<intent-filter>` changes manually in your main manifest.
 - When a deeplink declares typed path, query, or fragment values, the plugin also creates a `<Name>DeeplinkParams` class so your app receives strongly typed arguments after calling `match(uri)`.
+- Typed query params are validated by key and type after structural URI matching, so query order does not affect matching.
 - All generated params classes implement a module-level sealed interface named from the module name (for example, module `app` -> `AppDeeplinkParams`), enabling exhaustive `when` checks.
 - The plugin also generates a module-level processor object named from the module name (for example, module `app` -> `AppDeeplinkProcessor`) preloaded with all generated specs.

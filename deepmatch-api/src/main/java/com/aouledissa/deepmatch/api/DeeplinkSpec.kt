@@ -21,14 +21,21 @@ data class DeeplinkSpec(
 ) {
     val matcher: Regex by lazy { buildMatcher() }
 
+    fun matchesQueryParams(queryParamResolver: (String) -> String?): Boolean {
+        if (queryParams.isEmpty()) return true
+        return queryParams.filter { it.type != null }.all { param ->
+            val value = queryParamResolver(param.name)
+            value != null && param.type!!.regex.matches(value)
+        }
+    }
+
     private fun buildMatcher(): Regex {
         val schemePattern = buildSchemePattern()
         val hostPattern = buildHostPattern()
         val pathPattern = buildPathPattern()
-        val queryPattern = buildQueryPattern()
         val fragmentPattern = buildFragmentPattern()
 
-        return "$schemePattern://$hostPattern$pathPattern$queryPattern$fragmentPattern".toRegex()
+        return "$schemePattern://$hostPattern$pathPattern$fragmentPattern".toRegex()
     }
 
     private fun buildSchemePattern(): String {
@@ -51,18 +58,6 @@ data class DeeplinkSpec(
             when (pathParams.size) {
                 0 -> ""
                 else -> "/$it"
-            }
-        }
-    }
-
-    private fun buildQueryPattern(): String {
-        return when {
-            queryParams.isEmpty() -> ""
-            else -> {
-                queryParams.filter { it.type != null }
-                    .joinToString(prefix = Regex.escape("?"), separator = "&") {
-                        "${Regex.escape(it.name)}=${it.type!!.regex.pattern}"
-                    }
             }
         }
     }

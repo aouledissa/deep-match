@@ -21,6 +21,7 @@ public final class com/aouledissa/deepmatch/api/DeeplinkSpec {
 	public final fun getQueryParams ()Ljava/util/Set;
 	public final fun getScheme ()Ljava/util/Set;
 	public fun hashCode ()I
+	public final fun matchesQueryParams (Lkotlin/jvm/functions/Function1;)Z
 	public fun toString ()Ljava/lang/String;
 }
 

@@ -18,7 +18,9 @@ open class DeeplinkProcessor(
      * found.
      */
     open fun match(deeplink: Uri): DeeplinkParams? {
-        val spec = specs.find { it.matcher.matches(deeplink.decoded()) }
+        val spec = specs.find {
+            it.matcher.matches(deeplink.decoded()) && it.matchesQueryParams(deeplink::getQueryParameter)
+        }
             ?: return null
         return buildDeeplinkParams(spec, deeplink)
     }
@@ -26,9 +28,8 @@ open class DeeplinkProcessor(
     private fun Uri.decoded(): String {
         val decodedPathSegments = pathSegments.joinToString("/")
             .let { if (pathSegments.isNullOrEmpty().not()) "/$it" else it }
-        val decodedQuery = query?.let { "?$it" }.orEmpty()
         val decodedFragment = fragment?.let { "#$it" }.orEmpty()
-        return "$scheme://$host$decodedPathSegments$decodedQuery$decodedFragment"
+        return "$scheme://$host$decodedPathSegments$decodedFragment"
     }
 
     private fun buildDeeplinkParams(
