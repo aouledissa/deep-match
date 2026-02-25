@@ -1,6 +1,13 @@
 # Changelog
 
-## [Unreleased]
+## [0.2.0-alpha] - 2026-02-25
+
+### Added
+
+- Added `samples/android-app`, a composite-build Android sample that consumes the local plugin and
+  artifacts without publishing first.
+- Added a Compose-based sample UI that demonstrates deeplink matching results for profile/series/no-match flows.
+- Added sample-level documentation for real-device deeplink validation via `adb`.
 
 ### Changed
 
@@ -12,6 +19,8 @@
   (for example, module `app` -> `AppDeeplinkProcessor`) preconfigured with all generated specs.
 - Generated `*DeeplinkParams` classes now implement the module-level sealed params interface,
   allowing exhaustive `when` checks when matching deeplinks.
+- CI now validates sample codegen through the composite build flow.
+- README/docs were updated to document the zero-config runtime flow and sample app usage.
 
 ### Removed
 
@@ -27,6 +36,8 @@
 - Replace handler-based dispatch with caller-controlled branching:
   - Before: `processor.match(uri, activity = this)`
   - Now: `when (val params = <ModuleName>DeeplinkProcessor.match(uri)) { ... }`
+- For local integration testing, use the composite sample build in `samples/android-app`
+  (plugin resolved via `includeBuild("../..")`).
 
 ## [0.1.0-alpha] - 2025-02-14
 
