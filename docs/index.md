@@ -100,7 +100,7 @@ For an end-to-end sample app flow, see the repository sample at
 
 ```bash
 pip install -r docs/requirements.txt  # once
-mkdocs serve                            # start live-reloading docs site
+zensical serve                          # start live-reloading docs site
 ```
 
-The documentation is built with [Material for MkDocs](https://squidfunk.github.io/mkdocs-material/).
+The documentation is built with [Zensical](https://zensical.io/).

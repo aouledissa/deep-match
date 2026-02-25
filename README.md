@@ -144,11 +144,11 @@ can be reused in downstream projects.
 - [docs/migration-guide-0.2.0-alpha.md](docs/migration-guide-0.2.0-alpha.md) – Migration steps for the return-based runtime API.
 - [docs/release-notes/0.2.0-alpha.md](docs/release-notes/0.2.0-alpha.md) – Release notes for the latest alpha changes.
 - `deepmatch-testing/src/main/kotlin` – Reusable fakes and fixtures for tests.
-- MkDocs site powered by Material theme. Serve locally with:
+- Documentation site powered by Zensical. Serve locally with:
 
   ```bash
   pip install -r docs/requirements.txt
-  mkdocs serve
+  zensical serve
   ```
 
   The `Docs` GitHub Action publishes the site automatically to GitHub Pages (branch `gh-pages`) on
