@@ -11,6 +11,10 @@
 - `DeeplinkProcessor.Builder.register(...)` now registers only a `DeeplinkSpec`:
   - Before: `register(spec: DeeplinkSpec, handler: DeeplinkHandler<T>)`
   - Now: `register(spec: DeeplinkSpec)`
+- `deepmatch-plugin` now generates a module-level sealed params interface named from the module
+  name (for example, module `app` -> `AppDeeplinkParams`).
+- Generated `*DeeplinkParams` classes now implement the module-level sealed params interface,
+  allowing exhaustive `when` checks when matching deeplinks.
 
 ### Removed
 

@@ -14,8 +14,8 @@ The primary responsibilities and capabilities of the DeepMatch Gradle plugin are
 
 3.  **Code Generation (`DeeplinkSpecs`):**
     *   The plugin generates Kotlin source code, most notably a class named something like `[DeeplinkName]DeeplinkSpecs` (the exact name might vary based on the deeplink name in the `.yml` file).
-    *   The plugin also generates another Kotlin source for the dynamic params in the configured deeplink. This means if any of your deeplink's **path parameters** is pattern-based or if the deeplink contains at least one **query parameter**, a parameter class will be generated.
-    *   This makes it easy to access these parameters later when matching and handling the deeplink. 
+    *   The plugin also generates params classes for deeplinks with typed path/query/fragment values.
+    *   It additionally generates a module-level sealed interface (for example, module `app` -> `AppDeeplinkParams`) implemented by all generated params classes, enabling exhaustive `when` matching in app code.
 
 4.  **Integration with Build Process:**
     *   The plugin hooks into the Android Gradle Plugin's build lifecycle.
@@ -23,7 +23,6 @@ The primary responsibilities and capabilities of the DeepMatch Gradle plugin are
 
 5.  **Configuration Options:**
     *   The plugin provides a DSL (Domain Specific Language) extension in your `build.gradle` (`deepMatch { ... }` block) to customize its behavior:
-        *   **specsFile:** Specifying a custom path to your `.deeplinks.yml` file if it's not in the default location.
         *   **generateManifestFiles:** Specifying whether or not the plugin should generate `AndroidManifest.xml` file based on the deeplink config `yaml` file.
 
 ### Benefits of Using the Plugin
@@ -60,6 +59,7 @@ During the build the plugin generates Kotlin sources under `build/generated/` an
 
 ### Generated Artifacts
 
+- `<ModuleName>DeeplinkParams.kt` — module-level sealed interface implemented by generated params classes.
 - `*DeeplinkSpecs.kt` — exposes a `DeeplinkSpec` property per configuration entry.
 - `*DeeplinkParams.kt` — optional data class emitted when a deeplink defines typed template, query, or fragment parameters.
 - Generated manifest file — contains `<intent-filter>` definitions that Gradle merges into the final manifest.

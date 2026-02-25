@@ -48,6 +48,7 @@ private fun registerDeeplinkSpecsSourcesTask(
     ) {
         it.specsFileProperty.set(specsFile)
         it.packageNameProperty.set(variantPackageName)
+        it.moduleNameProperty.set(project.name)
     }
 
     /**
