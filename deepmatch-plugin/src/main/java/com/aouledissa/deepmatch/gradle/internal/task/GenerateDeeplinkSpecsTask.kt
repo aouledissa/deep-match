@@ -36,6 +36,9 @@ internal abstract class GenerateDeeplinkSpecsTask : DefaultTask() {
     @get:Input
     abstract val packageNameProperty: Property<String>
 
+    @get:Input
+    abstract val moduleNameProperty: Property<String>
+
     @get:OutputDirectory
     abstract val outputDir: DirectoryProperty
 
@@ -51,25 +54,33 @@ internal abstract class GenerateDeeplinkSpecsTask : DefaultTask() {
         logger.quiet("$LOG_TAG processing specs file in ${specsFile.path}")
 
         val packageName = "${packageNameProperty.get()}.deeplinks"
+        val moduleSealedInterfaceName = generateModuleSealedInterfaceName(moduleNameProperty.get())
         val deeplinkConfigs = yamlSerializer.deserializeDeeplinkConfigs(specsFile)
+
+        FileSpec.builder(packageName, moduleSealedInterfaceName)
+            .addType(generateModuleDeeplinkParamsType(moduleSealedInterfaceName))
+            .build()
+            .writeTo(outputFile)
 
         deeplinkConfigs.forEach { config ->
             assertValidQueryParams(config)
             val deeplinkName = config.name.toCamelCase().plus("Deeplink")
             val fileName = deeplinkName.plus("Specs").capitalize()
-            val deeplinkParamsType = when {
-                config.containsTemplateParams() -> generateDeeplinkParamType(
-                    name = deeplinkName.plus("Params").capitalize(),
-                    config = config
-                ).build()
-
-                else -> null
+            val deeplinkParamsTypeName =
+                deeplinkName.plus("Params").capitalize().takeIf { config.containsTemplateParams() }
+            val deeplinkParamsType = deeplinkParamsTypeName?.let {
+                generateDeeplinkParamType(
+                    name = it,
+                    config = config,
+                    moduleSealedInterfaceName = moduleSealedInterfaceName,
+                    packageName = packageName
+                )
             }
             val deeplinkProperty = generateDeeplinkSpecProperty(
                 name = deeplinkName.plus("Specs").capitalize(),
                 config = config,
                 packageName = packageName,
-                parametersClass = deeplinkParamsType?.name
+                parametersClass = deeplinkParamsTypeName
             ).build()
 
             FileSpec.builder(packageName, fileName)
@@ -85,6 +96,30 @@ internal abstract class GenerateDeeplinkSpecsTask : DefaultTask() {
 
             logger.quiet("$LOG_TAG generated Deeplink spec at : ${packageName}.${fileName}")
         }
+    }
+
+    private fun generateModuleSealedInterfaceName(moduleName: String): String {
+        val normalized = moduleName
+            .replace(Regex("[^A-Za-z0-9_\\-\\s]"), " ")
+            .toCamelCase()
+            .ifBlank { "module" }
+        val typeSafeName = when {
+            normalized.first().isDigit() -> "module${normalized.capitalize()}"
+            else -> normalized
+        }
+        return "${typeSafeName.capitalize()}DeeplinkParams"
+    }
+
+    private fun generateModuleDeeplinkParamsType(name: String): TypeSpec {
+        val deeplinkParamSuperInterface = ClassName(
+            DeeplinkParams::class.java.packageName,
+            DeeplinkParams::class.java.simpleName
+        )
+        return TypeSpec.interfaceBuilder(name)
+            .addModifiers(KModifier.PUBLIC, KModifier.SEALED)
+            .addSuperinterface(deeplinkParamSuperInterface)
+            .addKdoc("Base sealed params type for this module's generated deeplinks.")
+            .build()
     }
 
     private fun generateDeeplinkSpecProperty(
@@ -167,70 +202,56 @@ internal abstract class GenerateDeeplinkSpecsTask : DefaultTask() {
     private fun generateDeeplinkParamType(
         name: String,
         config: DeeplinkConfig,
-    ): TypeSpec.Builder {
-        val deeplinkParamSuperInterface = ClassName(
-            DeeplinkParams::class.java.packageName,
-            DeeplinkParams::class.java.simpleName
-        )
-
-        val pathParams = config.pathParams?.filter { it.type != null }?.map {
-            ParameterSpec.builder(
-                it.name.toCamelCase(),
-                it.type!!.getType()
-            ).build()
-        }
-
-        val queryParams = config.queryParams?.filter { it.type != null }?.map {
-            ParameterSpec.builder(
-                it.name.toCamelCase(),
-                it.type!!.getType()
-            ).build()
-        }
-
-        val fragmentParam = config.fragment?.let {
-            ParameterSpec.builder(
-                "fragment",
-                String::class
-            ).build()
+        packageName: String,
+        moduleSealedInterfaceName: String
+    ): TypeSpec {
+        val moduleDeeplinkParamsInterface = ClassName(packageName, moduleSealedInterfaceName)
+        val constructorParams = buildList {
+            config.pathParams?.filter { it.type != null }?.forEach {
+                add(
+                    ParameterSpec.builder(
+                        it.name.toCamelCase(),
+                        it.type!!.getType()
+                    ).build()
+                )
+            }
+            config.queryParams?.filter { it.type != null }?.forEach {
+                add(
+                    ParameterSpec.builder(
+                        it.name.toCamelCase(),
+                        it.type!!.getType()
+                    ).build()
+                )
+            }
+            config.fragment?.let {
+                add(
+                    ParameterSpec.builder(
+                        "fragment",
+                        String::class
+                    ).build()
+                )
+            }
         }
 
         return TypeSpec.classBuilder(name)
-            .addModifiers(KModifier.PUBLIC)
-            .addModifiers(KModifier.DATA)
-            .addSuperinterface(deeplinkParamSuperInterface)
+            .addModifiers(KModifier.PUBLIC, KModifier.DATA)
+            .addSuperinterface(moduleDeeplinkParamsInterface)
             .primaryConstructor(
                 FunSpec.constructorBuilder()
-                    .apply {
-                        pathParams?.forEach { addParameter(it) }
-                        queryParams?.forEach { addParameter(it) }
-                        fragmentParam?.let { addParameter(it) }
-                    }
+                    .addParameters(constructorParams)
                     .build()
             )
             .addKdoc("${config.name.toCamelCase().capitalize()} Deeplink Parameters.")
             .apply {
-                pathParams?.forEach {
+                constructorParams.forEach { param ->
                     addProperty(
-                        PropertySpec.builder(it.name, it.type)
-                            .initializer(it.name)
-                            .build()
-                    )
-                }
-                queryParams?.forEach {
-                    addProperty(
-                        PropertySpec.builder(it.name, it.type)
-                            .initializer(it.name)
-                            .build()
-                    )
-                }
-                fragmentParam?.let {
-                    addProperty(
-                        PropertySpec.builder(it.name, it.type)
-                            .initializer(it.name)
+                        PropertySpec.builder(param.name, param.type)
+                            .initializer("%N", param)
                             .build()
                     )
                 }
             }
+            .build()
     }
 
     private fun assertValidQueryParams(config: DeeplinkConfig) {
