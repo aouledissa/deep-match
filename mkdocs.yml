@@ -6,6 +6,21 @@ repo_name: "aouledissa/DeepMatch"
 docs_dir: docs
 theme:
   name: material
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: teal
+      accent: indigo
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: teal
+      accent: indigo
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to light mode
   features:
     - navigation.instant
     - navigation.sections
@@ -21,10 +36,14 @@ nav:
       - v0.1.0-alpha: release-notes/0.1.0-alpha.md
 markdown_extensions:
   - admonition
+  - pymdownx.highlight:
+      anchor_linenums: true
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.superfences
   - toc:
       permalink: true
   - tables
-  - fenced_code
 extra:
   social:
     - icon: fontawesome/brands/github
