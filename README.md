@@ -32,6 +32,9 @@ For full documentation please visit our [official docs page](https://aouledissa.
 - `deepmatch-api` – Shared model classes (`DeeplinkSpec`, `Param`, `ParamType`, `DeeplinkParams`).
 - `deepmatch-testing` – Shared test fixtures (fake processors and spec builders) used by the runtime
   and plugin tests.
+- `samples/android-app` – Composite-build sample app demonstrating generated processor usage,
+  manifest generation, and ADB deeplink testing. See
+  [`samples/android-app/README.md`](samples/android-app/README.md).
 
 ## Quick Start
 

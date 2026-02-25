@@ -41,3 +41,6 @@ jobs:
 
       - name: Run unit tests
         run: ./gradlew test --no-daemon
+
+      - name: Validate sample composite build
+        run: ./gradlew -p samples/android-app generateDebugDeeplinkSpecs --no-daemon

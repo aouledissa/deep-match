@@ -1,0 +1,27 @@
+deeplinkSpecs:
+  - name: "open profile"
+    activity: com.aouledissa.deepmatch.sample.MainActivity
+    categories: [DEFAULT, BROWSABLE]
+    scheme: [app]
+    host: ["sample.deepmatch.dev"]
+    pathParams:
+      - name: profile
+      - name: userId
+        type: alphanumeric
+    queryParams:
+      - name: ref
+        type: string
+    fragment: "details"
+
+  - name: "open series"
+    activity: com.aouledissa.deepmatch.sample.MainActivity
+    categories: [DEFAULT, BROWSABLE]
+    scheme: [app]
+    host: ["sample.deepmatch.dev"]
+    pathParams:
+      - name: series
+      - name: seriesId
+        type: numeric
+    queryParams:
+      - name: ref
+        type: string
