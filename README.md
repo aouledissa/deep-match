@@ -14,22 +14,22 @@ and it will:
   query, or fragment values).
 - Optionally emit manifest snippets so you never hand-write `<intent-filter>` entries again.
 - Provide a lightweight runtime (`deepmatch-processor`) that matches URIs against the generated
-  specs and dispatches to handlers.
+  specs and returns typed params.
 
 The YAML file becomes the single source of truth for everything deeplink-related.
 
 ## Documentation
-For full documentation please visit our [official docs page](https://deepmatch.aouledissa.com)
+For full documentation please visit our [official docs page](https://aouledissa.com/deep-match/)
 
 ## Modules
 
 - `deepmatch-plugin` – Gradle plugin (`com.aouledissa.deepmatch.gradle`) that parses specs,
   generates Kotlin sources, and (optionally) produces manifest entries for each variant.
-- `deepmatch-processor` – Android library that provides `DeeplinkProcessor` and handler abstractions
-  for runtime matching.
+- `deepmatch-processor` – Android library that provides `DeeplinkProcessor` for runtime URI
+  matching and typed params extraction.
 - `deepmatch-api` – Shared model classes (`DeeplinkSpec`, `Param`, `ParamType`, `DeeplinkParams`).
-- `deepmatch-testing` – Shared test fixtures (fake handlers/processors and spec builders) used by
-  the runtime and plugin tests.
+- `deepmatch-testing` – Shared test fixtures (fake processors and spec builders) used by the runtime
+  and plugin tests.
 
 ## Quick Start
 
@@ -76,11 +76,16 @@ For full documentation please visit our [official docs page](https://deepmatch.a
 
    ```kotlin
    val processor = DeeplinkProcessor.Builder()
-       .register(OpenSeriesDeeplinkSpecs, OpenSeriesDeeplinkHandler)
+       .register(OpenSeriesDeeplinkSpecs)
        .build()
 
    intent.data?.let { uri ->
-       processor.match(uri, activity = this)
+       when (val params = processor.match(uri)) {
+           is OpenSeriesDeeplinkParams -> {
+               // Perform navigation/business logic using params.
+           }
+           else -> Unit
+       }
    }
    ```
 
@@ -95,7 +100,7 @@ generated output.
 ```
 
 Runtime behaviour is exercised with Robolectric tests in `deepmatch-processor/src/test`. Shared
-fixtures (fake handlers, processors, and spec builders) live in the `deepmatch-testing` module and
+fixtures (fake processors and spec builders) live in the `deepmatch-testing` module and
 can be reused in downstream projects.
 
 ## Documentation

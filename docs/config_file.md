@@ -3,7 +3,7 @@
 Each item in the `deeplinkSpecs` list is a deep link configuration object with the following properties, corresponding to the fields in your `DeeplinkConfig` Kotlin class:
 
 *   **`name`**: (Required, String)
-    *   A unique identifier for this deep link specification. This name will be used to link to specific handlers in your code.
+    *   A unique identifier for this deep link specification. This name is used to generate stable spec/params types.
     *   Example: `userProfile`, `productView`
 
 *   **`activity`**: (Required, String)
@@ -31,7 +31,7 @@ Each item in the `deeplinkSpecs` list is a deep link configuration object with t
 *   **`pathParams`**: (Optional, List of Param objects)
     *   Defines ordered parameters that are part of the URI path. Each item in the list is a `Param` object.
     *   **Param Object Structure:**
-        *   **`name`**: (Required, String) The name of the path parameter (e.g., `userId`, `itemId`). This is how you'll refer to it in your handler.
+        *   **`name`**: (Required, String) The name of the path parameter (e.g., `userId`, `itemId`). This is how you'll refer to it in generated params.
         *   **`type`**: (Optional, String) The expected data type of the parameter. When provided, the generated matcher validates the segment against the type’s regex and the runtime converts the value to the corresponding Kotlin type.
     *   Example:
         ```yaml
@@ -82,7 +82,7 @@ deeplinkSpecs:
 
 ### Tips
 
-- Keep `name` values unique per spec to simplify handler identification.
+- Keep `name` values unique per spec to simplify generated type naming and runtime routing.
 - Regenerate sources (`./gradlew generate<Variant>DeeplinkSpecs`) whenever you modify the YAML schema.
 - If `generateManifestFiles` is disabled, remember to replicate the `<intent-filter>` changes manually in your main manifest.
-- When a deeplink declares typed path, query, or fragment values, the plugin also creates a `<Name>DeeplinkParams` class so your handler receives strongly typed arguments.
+- When a deeplink declares typed path, query, or fragment values, the plugin also creates a `<Name>DeeplinkParams` class so your app receives strongly typed arguments after calling `match(uri)`.
