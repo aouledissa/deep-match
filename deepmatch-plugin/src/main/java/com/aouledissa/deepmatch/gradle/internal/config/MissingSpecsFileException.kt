@@ -6,7 +6,7 @@ internal class MissingSpecsFileException(
     private val path: String,
     private val variantName: String
 ) : GradleException() {
-    override val message: String?
+    override val message: String
         get() = """
                 DeepMatch Configuration Error: Failed to find the '.deeplinks.yml' deeplink specification file.
                 To resolve this, create a '.deeplinks.yml' file in ONE of the following locations (checked in this order):

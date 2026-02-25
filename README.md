@@ -12,6 +12,8 @@ and it will:
 
 - Generate strongly-typed deeplink specs (plus parameter classes when the link declares template,
   query, or fragment values).
+- Generate a module-level sealed params interface (for example, module `app` generates
+  `AppDeeplinkParams`) that all generated params classes implement.
 - Optionally emit manifest snippets so you never hand-write `<intent-filter>` entries again.
 - Provide a lightweight runtime (`deepmatch-processor`) that matches URIs against the generated
   specs and returns typed params.
@@ -80,11 +82,11 @@ For full documentation please visit our [official docs page](https://aouledissa.
        .build()
 
    intent.data?.let { uri ->
-       when (val params = processor.match(uri)) {
+       val params = processor.match(uri)
+       when (params) {
            is OpenSeriesDeeplinkParams -> {
                // Perform navigation/business logic using params.
-           }
-           else -> Unit
+           } // Exhaustive when over your generated params types.
        }
    }
    ```

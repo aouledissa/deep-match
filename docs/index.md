@@ -16,7 +16,8 @@ runtime library matches incoming URIs and returns strongly-typed params.
 1. Apply the plugin alongside your Android/Kotlin plugins and enable manifest generation if desired.
 2. Describe deeplinks in `.deeplinks.yml`; both module-level and variant-specific files are supported.
 3. Register generated specs with `DeeplinkProcessor` and call `match(uri)` at runtime to retrieve
-   parsed params.
+   parsed params. Generated params classes share a module-level sealed interface (for example,
+   `AppDeeplinkParams`) so your app can use exhaustive `when` matching.
 
 For detailed configuration options, see the navigation links for the Gradle plugin and YAML schema.
 
