@@ -140,77 +140,74 @@ class DeeplinkSpecTest {
     }
 
     @Test
-    fun `deeplink pattern includes single query parameter`() {
-        // given
-        val queryParam = Param(name = "userId", type = ParamType.ALPHANUMERIC)
-        val expectedPattern =
-            "${Regex.escape("?")}${Regex.escape(queryParam.name)}=${queryParam.type!!.regex.pattern}".toRegex()
-
+    fun `matchesQueryParams returns true regardless of query params order`() {
         // when
         sut = DeeplinkSpec(
             scheme = setOf("https"),
             host = setOf("test.com"),
-            pathParams = setOf(),
-            queryParams = setOf(queryParam),
+            pathParams = emptySet(),
+            queryParams = setOf(
+                Param(name = "ref", type = ParamType.STRING),
+                Param(name = "page", type = ParamType.NUMERIC)
+            ),
             fragment = null,
             parametersClass = null
         )
-        val deeplinkMatcher = sut.matcher
 
         // then
-        assertThat(deeplinkMatcher.pattern).contains(expectedPattern.pattern)
+        assertThat(sut.matchesQueryParams(queryParamResolver("page=1&ref=promo"))).isTrue()
+        assertThat(sut.matchesQueryParams(queryParamResolver("ref=promo&page=1"))).isTrue()
     }
 
     @Test
-    fun `deeplink pattern includes multiple query parameters`() {
-        // given
-        val queryParam1 = Param(name = "q1", type = ParamType.STRING)
-        val queryParam2 = Param(name = "q2", type = ParamType.NUMERIC)
-        val queries = setOf(queryParam1, queryParam2)
-        val expectedPattern =
-            "${Regex.escape("?")}${Regex.escape(queryParam1.name)}=${queryParam1.type!!.regex.pattern}&${
-                Regex.escape(
-                    queryParam2.name
-                )
-            }=${queryParam2.type!!.regex.pattern}".toRegex()
-
+    fun `matchesQueryParams returns false when required typed query param is missing`() {
         // when
         sut = DeeplinkSpec(
             scheme = setOf("https"),
             host = setOf("test.com"),
-            pathParams = setOf(),
-            queryParams = queries,
+            pathParams = emptySet(),
+            queryParams = setOf(
+                Param(name = "ref", type = ParamType.STRING),
+                Param(name = "page", type = ParamType.NUMERIC)
+            ),
             fragment = null,
             parametersClass = null
         )
-        val deeplinkMatcher = sut.matcher
 
         // then
-        assertThat(deeplinkMatcher.pattern).contains(expectedPattern.pattern)
+        assertThat(sut.matchesQueryParams(queryParamResolver("ref=promo"))).isFalse()
     }
 
     @Test
-    fun `deeplink pattern includes only typed query parameters`() {
-        // given
-        val queryParam1 = Param(name = "q1")
-        val queryParam2 = Param(name = "q2", type = ParamType.NUMERIC)
-        val queries = setOf(queryParam1, queryParam2)
-        val expectedPattern =
-            "${Regex.escape("?")}${Regex.escape(queryParam2.name)}=${queryParam2.type!!.regex.pattern}".toRegex()
-
+    fun `matchesQueryParams returns false when typed query param does not satisfy declared regex`() {
         // when
         sut = DeeplinkSpec(
             scheme = setOf("https"),
             host = setOf("test.com"),
-            pathParams = setOf(),
-            queryParams = queries,
+            pathParams = emptySet(),
+            queryParams = setOf(Param(name = "page", type = ParamType.NUMERIC)),
             fragment = null,
             parametersClass = null
         )
-        val deeplinkMatcher = sut.matcher
 
         // then
-        assertThat(deeplinkMatcher.pattern).contains(expectedPattern.pattern)
+        assertThat(sut.matchesQueryParams(queryParamResolver("page=abc"))).isFalse()
+    }
+
+    @Test
+    fun `matchesQueryParams ignores untyped query params`() {
+        // when
+        sut = DeeplinkSpec(
+            scheme = setOf("https"),
+            host = setOf("test.com"),
+            pathParams = emptySet(),
+            queryParams = setOf(Param(name = "ref")),
+            fragment = null,
+            parametersClass = null
+        )
+
+        // then
+        assertThat(sut.matchesQueryParams(queryParamResolver(""))).isTrue()
     }
 
     @Test
@@ -251,5 +248,16 @@ class DeeplinkSpecTest {
 
         // then
         assertThat(deeplinkMatcher.pattern).doesNotContain("#")
+    }
+
+    private fun queryParamResolver(query: String): (String) -> String? {
+        if (query.isBlank()) return { null }
+        val queryMap = query.split("&")
+            .mapNotNull { entry ->
+                val parts = entry.split("=", limit = 2)
+                if (parts.size == 2) parts[0] to parts[1] else null
+            }
+            .toMap()
+        return { key -> queryMap[key] }
     }
 }
