@@ -3,37 +3,61 @@ package com.aouledissa.deepmatch.processor
 import android.net.Uri
 import com.aouledissa.deepmatch.api.DeeplinkParams
 import com.aouledissa.deepmatch.api.DeeplinkSpec
-import com.aouledissa.deepmatch.processor.internal.DeeplinkProcessorImpl
+import com.aouledissa.deepmatch.processor.internal.DeeplinkParamsAutoFactory
 
 /**
- * Coordinates deeplink resolution by matching incoming URIs against registered
- * specs and returning decoded parameters, if any.
+ * Matches incoming URIs against registered deeplink specs and returns decoded
+ * params for the first match.
  */
-interface DeeplinkProcessor {
+open class DeeplinkProcessor(
+    private val specs: Set<DeeplinkSpec>
+) {
     /**
-     * Attempts to match [deeplink] and returns the decoded parameters for the
-     * first matching spec.
+     * Attempts to match [deeplink] against the configured specs and returns the
+     * decoded params for the first matching spec, or `null` when no match is
+     * found.
      */
-    fun match(deeplink: Uri): DeeplinkParams?
+    open fun match(deeplink: Uri): DeeplinkParams? {
+        val spec = specs.find { it.matcher.matches(deeplink.decoded()) }
+            ?: return null
+        return buildDeeplinkParams(spec, deeplink)
+    }
 
-    /** Builder used to compose a processor instance at runtime. */
-    class Builder {
-        private val registry: MutableSet<DeeplinkSpec> = mutableSetOf()
+    private fun Uri.decoded(): String {
+        val decodedPathSegments = pathSegments.joinToString("/")
+            .let { if (pathSegments.isNullOrEmpty().not()) "/$it" else it }
+        val decodedQuery = query?.let { "?$it" }.orEmpty()
+        val decodedFragment = fragment?.let { "#$it" }.orEmpty()
+        return "$scheme://$host$decodedPathSegments$decodedQuery$decodedFragment"
+    }
 
-        /**
-         * Registers a [deeplinkSpec]. Duplicate specs are ignored so the first
-         * registration wins.
-         */
-        fun register(
-            deeplinkSpec: DeeplinkSpec,
-        ): Builder {
-            registry.add(deeplinkSpec)
-            return this
+    private fun buildDeeplinkParams(
+        spec: DeeplinkSpec,
+        deeplink: Uri
+    ): DeeplinkParams? {
+        val params = mutableMapOf<String, String?>()
+        val pathSegments = deeplink.pathSegments
+        val fragment = deeplink.fragment
+
+        // Extract typed path params.
+        spec.pathParams.forEachIndexed { index, param ->
+            val value = pathSegments[index]
+            if (param.type != null) {
+                params[param.name.lowercase()] = value
+            }
         }
 
-        /** Builds the processor using the registered specs. */
-        fun build(): DeeplinkProcessor {
-            return DeeplinkProcessorImpl(registry = registry)
+        // Extract query params.
+        spec.queryParams.forEach { param ->
+            val value = deeplink.getQueryParameter(param.name)
+            params[param.name.lowercase()] = value
+        }
+
+        // Extract fragment when declared in spec.
+        spec.fragment?.let { params["fragment"] = fragment }
+
+        return spec.parametersClass?.let {
+            DeeplinkParamsAutoFactory.tryCreate(spec.parametersClass, params)
         }
     }
 }

@@ -74,22 +74,22 @@ For full documentation please visit our [official docs page](https://aouledissa.
    Both `scheme` and `host` accept multiple values; DeepMatch generates the appropriate regex
    matcher to cover every combination.
 
-3. **Register the generated specs** with the runtime processor:
+3. **Call the generated processor** at runtime:
 
    ```kotlin
-   val processor = DeeplinkProcessor.Builder()
-       .register(OpenSeriesDeeplinkSpecs)
-       .build()
-
    intent.data?.let { uri ->
-       val params = processor.match(uri)
-       when (params) {
+       when (val params = AppDeeplinkProcessor.match(uri)) {
            is OpenSeriesDeeplinkParams -> {
                // Perform navigation/business logic using params.
-           } // Exhaustive when over your generated params types.
+           }
+           null -> {
+               // No matching deeplink
+           }
        }
    }
    ```
+
+   `AppDeeplinkProcessor` and `AppDeeplinkParams` are generated from your module name.
 
 See `docs/gradle_plugin.md` and `docs/config_file.md` for detailed configuration options and
 generated output.

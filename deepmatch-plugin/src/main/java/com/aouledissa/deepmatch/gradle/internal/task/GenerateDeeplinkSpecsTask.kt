@@ -12,6 +12,7 @@ import com.aouledissa.deepmatch.gradle.internal.toCamelCase
 import com.charleskorn.kaml.Yaml
 import com.charleskorn.kaml.YamlConfiguration
 import com.squareup.kotlinpoet.ClassName
+import com.squareup.kotlinpoet.CodeBlock
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.KModifier
@@ -55,7 +56,9 @@ internal abstract class GenerateDeeplinkSpecsTask : DefaultTask() {
 
         val packageName = "${packageNameProperty.get()}.deeplinks"
         val moduleSealedInterfaceName = generateModuleSealedInterfaceName(moduleNameProperty.get())
+        val moduleProcessorName = generateModuleProcessorName(moduleSealedInterfaceName)
         val deeplinkConfigs = yamlSerializer.deserializeDeeplinkConfigs(specsFile)
+        val generatedSpecPropertyNames = mutableListOf<String>()
 
         FileSpec.builder(packageName, moduleSealedInterfaceName)
             .addType(generateModuleDeeplinkParamsType(moduleSealedInterfaceName))
@@ -66,6 +69,7 @@ internal abstract class GenerateDeeplinkSpecsTask : DefaultTask() {
             assertValidQueryParams(config)
             val deeplinkName = config.name.toCamelCase().plus("Deeplink")
             val fileName = deeplinkName.plus("Specs").capitalize()
+            val specPropertyName = deeplinkName.plus("Specs").capitalize()
             val deeplinkParamsTypeName =
                 deeplinkName.plus("Params").capitalize().takeIf { config.containsTemplateParams() }
             val deeplinkParamsType = deeplinkParamsTypeName?.let {
@@ -77,11 +81,12 @@ internal abstract class GenerateDeeplinkSpecsTask : DefaultTask() {
                 )
             }
             val deeplinkProperty = generateDeeplinkSpecProperty(
-                name = deeplinkName.plus("Specs").capitalize(),
+                name = specPropertyName,
                 config = config,
                 packageName = packageName,
                 parametersClass = deeplinkParamsTypeName
             ).build()
+            generatedSpecPropertyNames.add(specPropertyName)
 
             FileSpec.builder(packageName, fileName)
                 .addImport(Param::class.qualifiedName.orEmpty(), "")
@@ -96,6 +101,11 @@ internal abstract class GenerateDeeplinkSpecsTask : DefaultTask() {
 
             logger.quiet("$LOG_TAG generated Deeplink spec at : ${packageName}.${fileName}")
         }
+
+        FileSpec.builder(packageName, moduleProcessorName)
+            .addType(generateModuleProcessorType(moduleProcessorName, generatedSpecPropertyNames))
+            .build()
+            .writeTo(outputFile)
     }
 
     private fun generateModuleSealedInterfaceName(moduleName: String): String {
@@ -119,6 +129,32 @@ internal abstract class GenerateDeeplinkSpecsTask : DefaultTask() {
             .addModifiers(KModifier.PUBLIC, KModifier.SEALED)
             .addSuperinterface(deeplinkParamSuperInterface)
             .addKdoc("Base sealed params type for this module's generated deeplinks.")
+            .build()
+    }
+
+    private fun generateModuleProcessorName(moduleSealedInterfaceName: String): String {
+        val prefix = moduleSealedInterfaceName.removeSuffix("DeeplinkParams")
+        return "${prefix}DeeplinkProcessor"
+    }
+
+    private fun generateModuleProcessorType(
+        name: String,
+        generatedSpecPropertyNames: List<String>
+    ): TypeSpec {
+        val processorClass = ClassName(
+            "com.aouledissa.deepmatch.processor",
+            "DeeplinkProcessor"
+        )
+        val specsSetInitializer = CodeBlock.of(
+            "setOf(%L)",
+            generatedSpecPropertyNames.joinToString(", ")
+        )
+
+        return TypeSpec.objectBuilder(name)
+            .addModifiers(KModifier.PUBLIC)
+            .superclass(processorClass)
+            .addSuperclassConstructorParameter("specs = %L", specsSetInitializer)
+            .addKdoc("Generated deeplink processor for this module.")
             .build()
     }
 
