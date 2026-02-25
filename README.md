@@ -94,8 +94,8 @@ For full documentation please visit our [official docs page](https://aouledissa.
 
    `AppDeeplinkProcessor` and `AppDeeplinkParams` are generated from your module name.
 
-See `docs/gradle_plugin.md` and `docs/config_file.md` for detailed configuration options and
-generated output.
+See [docs/gradle_plugin.md](docs/gradle_plugin.md) and
+[docs/config_file.md](docs/config_file.md) for detailed configuration options and generated output.
 
 ## Testing
 
@@ -110,8 +110,10 @@ can be reused in downstream projects.
 
 ## Documentation
 
-- `docs/gradle_plugin.md` – Plugin capabilities, setup, and build integration details.
-- `docs/config_file.md` – YAML specification reference with examples.
+- [docs/gradle_plugin.md](docs/gradle_plugin.md) – Plugin capabilities, setup, and build integration details.
+- [docs/config_file.md](docs/config_file.md) – YAML specification reference with examples.
+- [docs/migration-guide-0.2.0-alpha.md](docs/migration-guide-0.2.0-alpha.md) – Migration steps for the return-based runtime API.
+- [docs/release-notes/0.2.0-alpha.md](docs/release-notes/0.2.0-alpha.md) – Release notes for the latest alpha changes.
 - `deepmatch-testing/src/main/kotlin` – Reusable fakes and fixtures for tests.
 - MkDocs site powered by Material theme. Serve locally with:
 

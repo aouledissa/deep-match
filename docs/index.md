@@ -21,6 +21,11 @@ runtime library matches incoming URIs and returns strongly-typed params.
 
 For detailed configuration options, see the navigation links for the Gradle plugin and YAML schema.
 
+## Upgrading
+
+- Check **Release Notes** for version-specific changes.
+- For the runtime refactor in `0.2.0-alpha`, follow **Migration Guide**.
+
 ## Building the Documentation
 
 ```bash

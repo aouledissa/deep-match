@@ -15,7 +15,9 @@ nav:
   - Overview: index.md
   - Gradle Plugin: gradle_plugin.md
   - YAML Spec: config_file.md
+  - Migration Guide: migration-guide-0.2.0-alpha.md
   - Release Notes:
+      - v0.2.0-alpha: release-notes/0.2.0-alpha.md
       - v0.1.0-alpha: release-notes/0.1.0-alpha.md
 markdown_extensions:
   - admonition
