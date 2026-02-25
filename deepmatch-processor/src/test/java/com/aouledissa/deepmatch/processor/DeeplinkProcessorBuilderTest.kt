@@ -1,6 +1,5 @@
 package com.aouledissa.deepmatch.processor
 
-import com.aouledissa.deepmatch.api.DeeplinkParams
 import com.aouledissa.deepmatch.api.DeeplinkSpec
 import com.aouledissa.deepmatch.processor.internal.DeeplinkProcessorImpl
 import com.google.common.truth.Truth.assertThat
@@ -20,47 +19,41 @@ class DeeplinkProcessorBuilderTest {
     @Test
     fun `register returns the same Builder instance`() {
         val builder = DeeplinkProcessor.Builder()
-        val handler = FakeDeeplinkHandler<DeeplinkParams>()
 
-        val chainedBuilder = builder.register(deeplinkSpec, handler)
+        val chainedBuilder = builder.register(deeplinkSpec)
 
         assertThat(chainedBuilder).isSameInstanceAs(builder)
     }
 
     @Test
-    fun `build creates DeeplinkProcessorImpl with registered handler`() {
-        val handler = FakeDeeplinkHandler<DeeplinkParams>()
+    fun `build creates DeeplinkProcessorImpl with registered spec`() {
         val processor = DeeplinkProcessor.Builder()
-            .register(deeplinkSpec, handler)
+            .register(deeplinkSpec)
             .build()
 
         assertThat(processor).isInstanceOf(DeeplinkProcessorImpl::class.java)
 
         val registry = processor.registry()
-        assertThat(registry).containsKey(deeplinkSpec)
-        assertThat(registry[deeplinkSpec]).isSameInstanceAs(handler)
+        assertThat(registry).contains(deeplinkSpec)
     }
 
     @Test
-    fun `register does not override handler for same spec`() {
-        val firstHandler = FakeDeeplinkHandler<DeeplinkParams>()
-        val secondHandler = FakeDeeplinkHandler<DeeplinkParams>()
-
+    fun `register ignores duplicate specs`() {
         val processor = DeeplinkProcessor.Builder()
-            .register(deeplinkSpec, firstHandler)
-            .register(deeplinkSpec, secondHandler)
+            .register(deeplinkSpec)
+            .register(deeplinkSpec)
             .build()
 
         val registry = processor.registry()
         assertThat(registry).hasSize(1)
-        assertThat(registry[deeplinkSpec]).isSameInstanceAs(firstHandler)
+        assertThat(registry).contains(deeplinkSpec)
     }
 }
 
-private fun DeeplinkProcessor.registry(): Map<DeeplinkSpec, DeeplinkHandler<out DeeplinkParams>> {
+private fun DeeplinkProcessor.registry(): Set<DeeplinkSpec> {
     val impl = this as DeeplinkProcessorImpl
     val field = DeeplinkProcessorImpl::class.java.getDeclaredField("registry")
     field.isAccessible = true
     @Suppress("UNCHECKED_CAST")
-    return field.get(impl) as Map<DeeplinkSpec, DeeplinkHandler<out DeeplinkParams>>
+    return field.get(impl) as Set<DeeplinkSpec>
 }

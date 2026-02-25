@@ -2,12 +2,12 @@
 
 DeepMatch keeps your Android deeplinks consistent from configuration to runtime. The Gradle plugin
 parses a `.deeplinks.yml` file and generates Kotlin sources plus optional manifest entries, while the
-runtime library matches incoming URIs and dispatches to strongly-typed handlers.
+runtime library matches incoming URIs and returns strongly-typed params.
 
 ## Key Components
 
 - **deepmatch-plugin** — Gradle plugin you apply to Android modules to parse specs and generate code.
-- **deepmatch-processor** — Runtime router that maps URIs to handlers and builds parameter objects.
+- **deepmatch-processor** — Runtime matcher that maps URIs to specs and builds parameter objects.
 - **deepmatch-api** — Shared spec/parameter data models used across plugin and runtime.
 - **deepmatch-testing** — Reusable fixtures that assist in unit testing DeepMatch integrations.
 
@@ -15,7 +15,8 @@ runtime library matches incoming URIs and dispatches to strongly-typed handlers.
 
 1. Apply the plugin alongside your Android/Kotlin plugins and enable manifest generation if desired.
 2. Describe deeplinks in `.deeplinks.yml`; both module-level and variant-specific files are supported.
-3. Register generated specs with `DeeplinkProcessor` to match incoming URIs at runtime.
+3. Register generated specs with `DeeplinkProcessor` and call `match(uri)` at runtime to retrieve
+   parsed params.
 
 For detailed configuration options, see the navigation links for the Gradle plugin and YAML schema.
 

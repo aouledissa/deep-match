@@ -1,36 +1,22 @@
 package com.aouledissa.deepmatch.processor.internal
 
-import android.app.Activity
 import android.net.Uri
 import com.aouledissa.deepmatch.api.DeeplinkParams
 import com.aouledissa.deepmatch.api.DeeplinkSpec
-import com.aouledissa.deepmatch.processor.DeeplinkHandler
 import com.aouledissa.deepmatch.processor.DeeplinkProcessor
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 
 /**
- * Default implementation backing [DeeplinkProcessor]. It performs regex based
- * matching off the main thread and marshals callbacks back to the UI thread.
+ * Default implementation backing [DeeplinkProcessor]. It performs regex-based
+ * matching and returns decoded parameters for the first matching spec.
  */
 internal class DeeplinkProcessorImpl(
-    private val registry: HashMap<DeeplinkSpec, DeeplinkHandler<out DeeplinkParams>>,
-    private val coroutineScope: CoroutineScope,
+    private val registry: Set<DeeplinkSpec>,
 ) : DeeplinkProcessor {
 
-    override fun match(deeplink: Uri, activity: Activity) {
-        coroutineScope.launch {
-            val spec = registry.keys.find { it.matcher.matches(deeplink.decoded()) }
-            spec?.let {
-                val handler = registry[spec] as? DeeplinkHandler<DeeplinkParams>
-                val params = buildDeeplinkParams(spec, deeplink)
-                withContext(Dispatchers.Main) {
-                    handler?.handle(activity = activity, params = params)
-                }
-            }
-        }
+    override fun match(deeplink: Uri): DeeplinkParams? {
+        val spec = registry.find { it.matcher.matches(deeplink.decoded()) }
+            ?: return null
+        return buildDeeplinkParams(spec, deeplink)
     }
 
     private fun Uri.decoded(): String {

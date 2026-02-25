@@ -1,50 +1,39 @@
 package com.aouledissa.deepmatch.processor
 
-import android.app.Activity
 import android.net.Uri
 import com.aouledissa.deepmatch.api.DeeplinkParams
 import com.aouledissa.deepmatch.api.DeeplinkSpec
 import com.aouledissa.deepmatch.processor.internal.DeeplinkProcessorImpl
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
 
 /**
  * Coordinates deeplink resolution by matching incoming URIs against registered
- * specs and delegating to their handlers.
+ * specs and returning decoded parameters, if any.
  */
 interface DeeplinkProcessor {
     /**
-     * Attempts to match [deeplink] and, when successful, dispatches the
-     * associated handler on the main thread.
+     * Attempts to match [deeplink] and returns the decoded parameters for the
+     * first matching spec.
      */
-    fun match(deeplink: Uri, activity: Activity)
+    fun match(deeplink: Uri): DeeplinkParams?
 
     /** Builder used to compose a processor instance at runtime. */
     class Builder {
-        private val registry: HashMap<DeeplinkSpec, DeeplinkHandler<out DeeplinkParams>> =
-            hashMapOf()
+        private val registry: MutableSet<DeeplinkSpec> = mutableSetOf()
 
         /**
-         * Registers a [deeplinkSpec] with its [handler]. Duplicate specs are
-         * ignored so the first registration wins.
+         * Registers a [deeplinkSpec]. Duplicate specs are ignored so the first
+         * registration wins.
          */
-        fun <T : DeeplinkParams> register(
+        fun register(
             deeplinkSpec: DeeplinkSpec,
-            handler: DeeplinkHandler<out T>
         ): Builder {
-            if (registry.contains(deeplinkSpec).not())
-                registry[deeplinkSpec] = handler
+            registry.add(deeplinkSpec)
             return this
         }
 
-        /** Builds the processor using an isolated IO coroutine scope. */
+        /** Builds the processor using the registered specs. */
         fun build(): DeeplinkProcessor {
-            val coroutineScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
-            return DeeplinkProcessorImpl(
-                registry = registry,
-                coroutineScope = coroutineScope,
-            )
+            return DeeplinkProcessorImpl(registry = registry)
         }
     }
 }
