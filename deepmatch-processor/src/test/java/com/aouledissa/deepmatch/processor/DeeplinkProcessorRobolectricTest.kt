@@ -5,7 +5,6 @@ import com.aouledissa.deepmatch.api.DeeplinkParams
 import com.aouledissa.deepmatch.api.DeeplinkSpec
 import com.aouledissa.deepmatch.api.Param
 import com.aouledissa.deepmatch.api.ParamType
-import com.aouledissa.deepmatch.processor.internal.DeeplinkProcessorImpl
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -29,7 +28,7 @@ class DeeplinkProcessorRobolectricTest {
             fragment = "details",
             parametersClass = SeriesParams::class
         )
-        val processor = DeeplinkProcessorImpl(registry = setOf(spec))
+        val processor = DeeplinkProcessor(specs = setOf(spec))
 
         val uri = Uri.parse("app://example.com/series/42?ref=promo#details")
         val params = processor.match(uri) as SeriesParams?
@@ -48,7 +47,7 @@ class DeeplinkProcessorRobolectricTest {
             fragment = null,
             parametersClass = null
         )
-        val processor = DeeplinkProcessorImpl(registry = setOf(spec))
+        val processor = DeeplinkProcessor(specs = setOf(spec))
 
         val params = processor.match(Uri.parse("app://other.com"))
         assertThat(params).isNull()

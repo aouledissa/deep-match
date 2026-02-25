@@ -55,11 +55,9 @@ dependencies {
 
     api(project(":deepmatch-api"))
     implementation(kotlin("reflect"))
-    implementation(libs.androidx.core.ktx)
     testImplementation(libs.junit)
     testImplementation(libs.google.truth)
     testImplementation(libs.mockk.core)
-    testImplementation(libs.kotlin.coroutines.test)
     testImplementation(libs.robolectric)
     testImplementation(project(":deepmatch-testing"))
 }

@@ -4,30 +4,29 @@
 
 ### Changed
 
-- `DeeplinkProcessor.match(...)` now returns parsed deeplink parameters instead of dispatching a
-  handler:
-  - Before: `match(uri: Uri, activity: Activity): Unit`
-  - Now: `match(uri: Uri): DeeplinkParams?`
-- `DeeplinkProcessor.Builder.register(...)` now registers only a `DeeplinkSpec`:
-  - Before: `register(spec: DeeplinkSpec, handler: DeeplinkHandler<T>)`
-  - Now: `register(spec: DeeplinkSpec)`
+- `DeeplinkProcessor` is now an open runtime class configured with a set of specs and exposes
+  `match(uri: Uri): DeeplinkParams?`.
 - `deepmatch-plugin` now generates a module-level sealed params interface named from the module
   name (for example, module `app` -> `AppDeeplinkParams`).
+- `deepmatch-plugin` now generates a module-level processor object named from the module name
+  (for example, module `app` -> `AppDeeplinkProcessor`) preconfigured with all generated specs.
 - Generated `*DeeplinkParams` classes now implement the module-level sealed params interface,
   allowing exhaustive `when` checks when matching deeplinks.
 
 ### Removed
 
 - Removed `DeeplinkHandler` from the public `deepmatch-processor` API surface.
-- Removed handler dispatch responsibility from `DeeplinkProcessor`.
+- Removed `DeeplinkProcessor.Builder`.
+- Removed `DeeplinkProcessorImpl`; matching logic now lives directly in `DeeplinkProcessor`.
 
 ### Migration
 
-- Replace processor calls that passed `Activity`:
+- Replace manual runtime setup:
+  - Before: `DeeplinkProcessor.Builder().register(...).build()`
+  - Now: use the generated `<ModuleName>DeeplinkProcessor`.
+- Replace handler-based dispatch with caller-controlled branching:
   - Before: `processor.match(uri, activity = this)`
-  - Now: `val params = processor.match(uri)`
-- Move navigation/handling logic to the caller after `match` returns a non-null params object.
-- Update builder setup to register specs without handlers.
+  - Now: `when (val params = <ModuleName>DeeplinkProcessor.match(uri)) { ... }`
 
 ## [0.1.0-alpha] - 2025-02-14
 
