@@ -13,13 +13,83 @@ runtime library matches incoming URIs and returns strongly-typed params.
 
 ## Getting Started
 
-1. Apply the plugin alongside your Android/Kotlin plugins and enable manifest generation if desired.
-2. Describe deeplinks in `.deeplinks.yml`; both module-level and variant-specific files are supported.
-3. Call the generated module processor (for example, `AppDeeplinkProcessor`) and use `match(uri)`
-   to retrieve parsed params. Generated params classes share a module-level sealed interface (for
-   example, `AppDeeplinkParams`) so your app can use exhaustive `when` matching.
+1. Add the plugin to your Android module:
 
-For detailed configuration options, see the navigation links for the Gradle plugin and YAML schema.
+```kotlin
+plugins {
+    id("com.android.application")
+    id("org.jetbrains.kotlin.android")
+    id("com.aouledissa.deepmatch.gradle") version "<DEEPMATCH_VERSION>"
+}
+```
+
+2. Add the runtime dependency:
+
+```kotlin
+dependencies {
+    implementation("com.aouledissa.deepmatch:deepmatch-processor:<DEEPMATCH_VERSION>")
+}
+```
+
+3. Configure DeepMatch:
+
+```kotlin
+deepMatch {
+    generateManifestFiles = true
+}
+```
+
+4. Create `.deeplinks.yml` in your module root (or `src/<variant>/.deeplinks.yml`):
+
+```yaml
+deeplinkSpecs:
+  - name: "open series"
+    activity: com.example.app.MainActivity
+    categories: [DEFAULT, BROWSABLE]
+    scheme: [https, app]
+    host: ["example.com"]
+    pathParams:
+      - name: series
+      - name: seriesId
+        type: numeric
+    queryParams:
+      - name: ref
+        type: string
+```
+
+5. Generate sources (or run a normal build):
+
+```bash
+./gradlew :app:generateDebugDeeplinkSpecs
+```
+
+6. Use the generated processor:
+
+```kotlin
+intent.data?.let { uri ->
+    when (val params = AppDeeplinkProcessor.match(uri) as? AppDeeplinkParams) {
+        is OpenSeriesDeeplinkParams -> {
+            // use parsed params
+        }
+        null -> {
+            // no match
+        }
+    }
+}
+```
+
+7. Optional device test with ADB:
+
+```bash
+adb shell am start -W \
+  -a android.intent.action.VIEW \
+  -c android.intent.category.BROWSABLE \
+  -d "app://example.com/series/42?ref=promo"
+```
+
+For an end-to-end sample app flow, see the repository sample at
+`samples/android-app/README.md`. For schema/plugin details, see
+[YAML Spec](config_file.md) and [Gradle Plugin](gradle_plugin.md).
 
 ## Upgrading
 

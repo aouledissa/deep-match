@@ -38,64 +38,93 @@ For full documentation please visit our [official docs page](https://aouledissa.
 
 ## Quick Start
 
-1. **Apply the plugin** to your Android module and configure it:
+1. Add the plugin to your Android module:
 
-   ```kotlin
-   plugins {
-       id("com.android.application")
-       id("org.jetbrains.kotlin.android")
-       id("com.aouledissa.deepmatch.gradle") version "<DEEPMATCH_VERSION>"
-   }
+```kotlin
+plugins {
+    id("com.android.application")
+    id("org.jetbrains.kotlin.android")
+    id("com.aouledissa.deepmatch.gradle") version "<DEEPMATCH_VERSION>"
+}
+```
 
-   deepMatch {
-       generateManifestFiles = true
-   }
-   ```
+2. Add the runtime dependency:
 
-   Set `generateManifestFiles` to `false` if you prefer to manage `<intent-filter>` entries
-   manually.
+```kotlin
+dependencies {
+    implementation("com.aouledissa.deepmatch:deepmatch-processor:<DEEPMATCH_VERSION>")
+}
+```
 
-2. **Describe your deeplinks** in `.deeplinks.yml` located at the module root or under
-   `src/<variant>/.deeplinks.yml`:
+3. Configure plugin behavior:
 
-   ```yaml
-   deeplinkSpecs:
-     - name: "open series"
-       activity: com.example.app.MainActivity
-       scheme: [https, app]
-       host: ["example.com"]
-       pathParams:
-         - name: series
-         - name: seriesId
-           type: numeric
-       queryParams:
-         - name: ref
-           type: string
-       fragment: "details"
-   ```
+```kotlin
+deepMatch {
+    generateManifestFiles = true
+}
+```
 
-   Both `scheme` and `host` accept multiple values; DeepMatch generates the appropriate regex
-   matcher to cover every combination.
+Set `generateManifestFiles = false` if you want to manage `<intent-filter>` entries manually.
 
-3. **Call the generated processor** at runtime:
+4. Create `.deeplinks.yml` in your module root (or `src/<variant>/.deeplinks.yml`):
 
-   ```kotlin
-   intent.data?.let { uri ->
-       when (val params = AppDeeplinkProcessor.match(uri)) {
-           is OpenSeriesDeeplinkParams -> {
-               // Perform navigation/business logic using params.
-           }
-           null -> {
-               // No matching deeplink
-           }
-       }
-   }
-   ```
+```yaml
+deeplinkSpecs:
+  - name: "open series"
+    activity: com.example.app.MainActivity
+    categories: [DEFAULT, BROWSABLE]
+    scheme: [https, app]
+    host: ["example.com"]
+    pathParams:
+      - name: series
+      - name: seriesId
+        type: numeric
+    queryParams:
+      - name: ref
+        type: string
+    fragment: "details"
+```
 
-   `AppDeeplinkProcessor` and `AppDeeplinkParams` are generated from your module name.
+5. Generate sources (or just build normally):
 
-See [docs/gradle_plugin.md](docs/gradle_plugin.md) and
-[docs/config_file.md](docs/config_file.md) for detailed configuration options and generated output.
+```bash
+./gradlew :app:generateDebugDeeplinkSpecs
+```
+
+DeepMatch generates:
+- `<ModuleName>DeeplinkProcessor` (example: `AppDeeplinkProcessor`)
+- `<ModuleName>DeeplinkParams` sealed interface (example: `AppDeeplinkParams`)
+- `*DeeplinkSpecs` and typed `*DeeplinkParams` classes
+
+6. Use the generated processor at runtime:
+
+```kotlin
+intent.data?.let { uri ->
+    when (val params = AppDeeplinkProcessor.match(uri) as? AppDeeplinkParams) {
+        is OpenSeriesDeeplinkParams -> {
+            // Navigate using params.seriesId / params.ref
+        }
+        null -> {
+            // No deeplink matched
+        }
+    }
+}
+```
+
+7. Optional real-device smoke test via ADB:
+
+```bash
+adb shell am start -W \
+  -a android.intent.action.VIEW \
+  -c android.intent.category.BROWSABLE \
+  -d "app://example.com/series/42?ref=promo"
+```
+
+For an end-to-end reference app (Compose UI + generated manifest + ADB tests), see
+[`samples/android-app/README.md`](samples/android-app/README.md).
+
+For full configuration/schema details, see [docs/gradle_plugin.md](docs/gradle_plugin.md) and
+[docs/config_file.md](docs/config_file.md).
 
 ## Testing
 
