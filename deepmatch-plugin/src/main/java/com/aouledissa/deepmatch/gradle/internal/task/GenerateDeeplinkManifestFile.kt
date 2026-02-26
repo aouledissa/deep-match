@@ -46,11 +46,11 @@ internal abstract class GenerateDeeplinkManifestFile : DefaultTask() {
                 name = activity.key,
                 intentFilter = activity.value.map { config ->
                     IntentFilter(
-                        autoVerify = config.autoVerify.takeIf { it == true },
+                        autoVerify = config.autoVerify,
                         action = listOf(Action("android.intent.action.VIEW")),
                         category = getFilterCategories(
                             categories = config.categories,
-                            autoVerify = config.autoVerify == true
+                            autoVerify = config.autoVerify
                         ).toList(),
                         scheme = config.scheme.map { Scheme(name = it) },
                         hosts = config.host.map { Host(name = it) },
