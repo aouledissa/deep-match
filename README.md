@@ -185,8 +185,10 @@ can be reused in downstream projects.
 - [Composite Specs](docs/composite-specs.md) – How module-level processors are auto-composed and how match precedence works.
 - [Tasks](docs/tasks.md) – Generated Gradle tasks including `validateDeeplinks`.
 - [Report](docs/report.md) – Standalone deeplink catalog + live URI validator output.
-- [docs/migration-guide-0.2.0-alpha.md](docs/migration-guide-0.2.0-alpha.md) – Migration steps for the return-based runtime API.
-- [docs/release-notes/0.2.0-alpha.md](docs/release-notes/0.2.0-alpha.md) – Release notes for the latest alpha changes.
+- [Migration-guide-0.3.0-beta.md](docs/migration-guide-0.3.0-beta.md) – Migration steps for multi-file specs, report generation, and override precedence.
+- [Migration-guide-0.2.0-alpha.md](docs/migration-guide-0.2.0-alpha.md) – Migration steps for the return-based runtime API.
+- [Release-notes/0.3.0-beta.md](docs/release-notes/0.3.0-beta.md) – Release notes for the latest beta changes.
+- [Release-notes/0.2.0-alpha.md](docs/release-notes/0.2.0-alpha.md) – Release notes for the previous alpha changes.
 - `deepmatch-testing/src/main/kotlin` – Reusable fakes and fixtures for tests.
 - Documentation site powered by Zensical. Serve locally with:
 

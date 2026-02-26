@@ -117,6 +117,7 @@ For an end-to-end sample app flow, see the repository sample at
 ## Upgrading
 
 - Check **Release Notes** for version-specific changes.
+- For multi-file specs/report/override precedence in `0.3.0-beta`, follow **Migration Guide**.
 - For the runtime refactor in `0.2.0-alpha`, follow **Migration Guide**.
 
 ## Building the Documentation
