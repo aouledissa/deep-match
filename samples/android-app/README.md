@@ -39,12 +39,21 @@ adb shell am start -W \
   -d "app://sample.deepmatch.dev/profile/john123?ref=campaign#details"
 ```
 
-The screen should render parsed output for `OpenSeriesDeeplinkParams` and `OpenProfileDeeplinkParams`.
+```bash
+adb shell am start -W \
+  -a android.intent.action.VIEW \
+  -c android.intent.category.BROWSABLE \
+  -d "app:///profile/123"
+```
+
+The screen should render parsed output for `OpenSeriesDeeplinkParams`, `OpenProfileDeeplinkParams`,
+and `OpenHostlessProfileDeeplinkParams`.
 
 In this sample:
 - `open series` keeps `ref` optional.
 - `open profile` sets `ref` as required (`required: true`) in `.deeplinks.yml`, so profile links
   must include `?ref=...` to match.
+- `open hostless profile` demonstrates a hostless URI (`app:///...`) with typed path extraction.
 
 ## Notes
 

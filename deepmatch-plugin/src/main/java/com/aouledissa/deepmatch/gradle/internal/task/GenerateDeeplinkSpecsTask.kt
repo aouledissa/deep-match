@@ -67,6 +67,7 @@ internal abstract class GenerateDeeplinkSpecsTask : DefaultTask() {
             .writeTo(outputFile)
 
         deeplinkConfigs.forEach { config ->
+            assertRequiredFields(config)
             assertValidQueryParams(config)
             val deeplinkName = config.name.toCamelCase().plus("Deeplink")
             val fileName = deeplinkName.plus("Specs").capitalize()
@@ -167,7 +168,6 @@ internal abstract class GenerateDeeplinkSpecsTask : DefaultTask() {
             DeeplinkSpec::class.java.simpleName
         )
         val schemes = config.scheme.joinToString(separator = ", ") { "\"$it\"" }
-        // TODO: is empty host case handled?
         val hosts = config.host.joinToString(separator = ", ") { "\"$it\"" }
         val pathParams = config.pathParams?.joinToString(separator = ", ").orEmpty()
         val queryParams = config.queryParams?.joinToString(separator = ", ").orEmpty()
@@ -296,6 +296,14 @@ internal abstract class GenerateDeeplinkSpecsTask : DefaultTask() {
             if (queryParams.all { it.type != null }.not()) {
                 throw GradleException("DeepMatch: All queryParams should define a type: [numeric, alphanumeric, string]")
             }
+        }
+    }
+
+    private fun assertRequiredFields(config: DeeplinkConfig) {
+        if (config.scheme.isEmpty()) {
+            throw GradleException(
+                "DeepMatch: Spec '${config.name}' must define at least one scheme."
+            )
         }
     }
 }

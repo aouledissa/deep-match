@@ -9,6 +9,8 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -40,6 +42,7 @@ import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import com.aouledissa.deepmatch.sample.deeplinks.AppDeeplinkParams
 import com.aouledissa.deepmatch.sample.deeplinks.AppDeeplinkProcessor
+import com.aouledissa.deepmatch.sample.deeplinks.OpenHostlessProfileDeeplinkParams
 import com.aouledissa.deepmatch.sample.deeplinks.OpenProfileDeeplinkParams
 import com.aouledissa.deepmatch.sample.deeplinks.OpenSeriesDeeplinkParams
 
@@ -56,6 +59,7 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
+@OptIn(ExperimentalLayoutApi::class)
 private fun DeeplinkResultScreen(uri: Uri) {
     var selectedDemo by rememberSaveable { mutableStateOf(detectDemoUri(uri)) }
     val selectedUri = selectedDemo.uri.toUri()
@@ -79,6 +83,15 @@ private fun DeeplinkResultScreen(uri: Uri) {
             properties = listOf(
                 "seriesId" to result.seriesId.toString(),
                 "ref" to (result.ref ?: "absent")
+            )
+        )
+
+        is OpenHostlessProfileDeeplinkParams -> MatchUi(
+            title = "Hostless Deeplink",
+            subtitle = "Matched hostless URI (no host) successfully",
+            accent = Color(0xFF7C3AED),
+            properties = listOf(
+                "profileId" to result.profileId.toString()
             )
         )
 
@@ -127,9 +140,10 @@ private fun DeeplinkResultScreen(uri: Uri) {
                             style = MaterialTheme.typography.labelLarge,
                             fontWeight = FontWeight.SemiBold
                         )
-                        Row(
+                        FlowRow(
                             modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
                             DemoUri.entries.forEach { demo ->
                                 UriOptionButton(
@@ -281,6 +295,7 @@ private enum class DemoUri(
         label = "Profile",
         uri = "app://sample.deepmatch.dev/profile/john123?ref=demo#details"
     ),
+    Hostless(label = "Hostless", uri = "app:///profile/123"),
     Series(label = "Series", uri = "app://sample.deepmatch.dev/series/42?ref=home"),
     NoMatch(label = "No Match", uri = "app://sample.deepmatch.dev/unknown");
 }
@@ -288,6 +303,7 @@ private enum class DemoUri(
 private fun detectDemoUri(uri: Uri): DemoUri {
     return when (val params = AppDeeplinkProcessor.match(uri) as? AppDeeplinkParams) {
         is OpenProfileDeeplinkParams -> DemoUri.Profile
+        is OpenHostlessProfileDeeplinkParams -> DemoUri.Hostless
         is OpenSeriesDeeplinkParams -> DemoUri.Series
         null -> DemoUri.NoMatch
     }

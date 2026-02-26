@@ -49,8 +49,8 @@ Each item in the deeplinkSpecs list is a deep link configuration object with the
 
 - `host`
     - Type: List<String>
-    - Required: Yes
-    - Description: Allowed URI hosts/domains.
+    - Required: No (default: [])
+    - Description: Allowed URI hosts/domains. Leave empty (or omit) for hostless URIs such as app:///profile/123.
     - Example:
       ```yaml
       host: ["example.com", "m.example.com"]
@@ -182,5 +182,6 @@ deeplinkSpecs:
 - Typed query params are validated by key and type after structural URI matching, so query order does not affect matching.
 - Query params are optional by default; set `required: true` only for values that must be present.
 - Scheme and host matching are case-insensitive, so values like `HTTPS://Example.COM/...` still match `scheme: [https]` and `host: ["example.com"]`.
+- `scheme` must contain at least one value. `host` can be omitted (or set to `[]`) for hostless URIs.
 - All generated params classes implement a module-level sealed interface named from the module name (for example, module `app` -> `AppDeeplinkParams`), enabling exhaustive `when` checks.
 - The plugin also generates a module-level processor object named from the module name (for example, module `app` -> `AppDeeplinkProcessor`) preloaded with all generated specs.

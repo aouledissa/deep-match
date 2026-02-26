@@ -1,7 +1,9 @@
 package com.aouledissa.deepmatch.gradle.internal.task
 
 import com.google.common.truth.Truth.assertThat
+import org.gradle.api.GradleException
 import org.gradle.testfixtures.ProjectBuilder
+import org.junit.Assert.assertThrows
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TemporaryFolder
@@ -120,5 +122,101 @@ class GenerateDeeplinkSpecsTaskTest {
         assertThat(generatedSpecFile.exists()).isTrue()
         assertThat(generatedSpecCode).contains("class OpenHomeDeeplinkParams()")
         assertThat(generatedSpecCode).contains("parametersClass = OpenHomeDeeplinkParams::class")
+    }
+
+    @Test
+    fun `hostless spec generates empty host set`() {
+        val project = ProjectBuilder.builder().build()
+        val specsFile = temporaryFolder.newFile("hostless.deeplinks.yml").apply {
+            writeText(
+                """
+                deeplinkSpecs:
+                  - name: "open profile"
+                    activity: com.example.app.MainActivity
+                    scheme: [app]
+                    host: []
+                    pathParams:
+                      - name: profile
+                      - name: profileId
+                        type: numeric
+                """.trimIndent()
+            )
+        }
+        val outputDir = temporaryFolder.newFolder("generated-hostless")
+        val task = project.tasks.register("generateHostlessSpecs", GenerateDeeplinkSpecsTask::class.java).get()
+
+        task.specsFileProperty.set(project.layout.file(project.provider { specsFile }))
+        task.packageNameProperty.set("com.example.app")
+        task.moduleNameProperty.set("app")
+        task.outputDir.set(project.layout.dir(project.provider { outputDir }))
+
+        task.generateDeeplinkSpecs()
+
+        val generatedSpecFile = File(outputDir, "com/example/app/deeplinks/OpenProfileDeeplinkSpecs.kt")
+        val generatedSpecCode = generatedSpecFile.readText()
+
+        assertThat(generatedSpecCode).contains("host = setOf()")
+    }
+
+    @Test
+    fun `host omitted spec also generates empty host set`() {
+        val project = ProjectBuilder.builder().build()
+        val specsFile = temporaryFolder.newFile("host-omitted.deeplinks.yml").apply {
+            writeText(
+                """
+                deeplinkSpecs:
+                  - name: "open profile"
+                    activity: com.example.app.MainActivity
+                    scheme: [app]
+                    pathParams:
+                      - name: profile
+                      - name: profileId
+                        type: numeric
+                """.trimIndent()
+            )
+        }
+        val outputDir = temporaryFolder.newFolder("generated-host-omitted")
+        val task = project.tasks.register("generateHostOmittedSpecs", GenerateDeeplinkSpecsTask::class.java).get()
+
+        task.specsFileProperty.set(project.layout.file(project.provider { specsFile }))
+        task.packageNameProperty.set("com.example.app")
+        task.moduleNameProperty.set("app")
+        task.outputDir.set(project.layout.dir(project.provider { outputDir }))
+
+        task.generateDeeplinkSpecs()
+
+        val generatedSpecFile = File(outputDir, "com/example/app/deeplinks/OpenProfileDeeplinkSpecs.kt")
+        val generatedSpecCode = generatedSpecFile.readText()
+
+        assertThat(generatedSpecCode).contains("host = setOf()")
+    }
+
+    @Test
+    fun `empty scheme list throws validation error`() {
+        val project = ProjectBuilder.builder().build()
+        val specsFile = temporaryFolder.newFile("invalid-scheme.deeplinks.yml").apply {
+            writeText(
+                """
+                deeplinkSpecs:
+                  - name: "invalid"
+                    activity: com.example.app.MainActivity
+                    scheme: []
+                    host: ["example.com"]
+                """.trimIndent()
+            )
+        }
+        val outputDir = temporaryFolder.newFolder("generated-invalid")
+        val task = project.tasks.register("generateInvalidSpecs", GenerateDeeplinkSpecsTask::class.java).get()
+
+        task.specsFileProperty.set(project.layout.file(project.provider { specsFile }))
+        task.packageNameProperty.set("com.example.app")
+        task.moduleNameProperty.set("app")
+        task.outputDir.set(project.layout.dir(project.provider { outputDir }))
+
+        val error = assertThrows(GradleException::class.java) {
+            task.generateDeeplinkSpecs()
+        }
+        assertThat(error).hasMessageThat()
+            .contains("Spec 'invalid' must define at least one scheme")
     }
 }

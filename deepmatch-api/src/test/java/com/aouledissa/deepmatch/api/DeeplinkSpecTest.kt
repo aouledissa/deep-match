@@ -140,6 +140,23 @@ class DeeplinkSpecTest {
     }
 
     @Test
+    fun `deeplink matcher supports empty host`() {
+        sut = DeeplinkSpec(
+            scheme = setOf("app"),
+            host = emptySet(),
+            pathParams = listOf(
+                Param(name = "profile"),
+                Param(name = "profileId", type = ParamType.NUMERIC)
+            ),
+            queryParams = emptySet(),
+            fragment = null,
+            parametersClass = null
+        )
+
+        assertThat(sut.matcher.matches("app:///profile/123")).isTrue()
+    }
+
+    @Test
     fun `matchesQueryParams returns true regardless of query params order`() {
         // when
         sut = DeeplinkSpec(
