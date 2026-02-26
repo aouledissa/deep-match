@@ -29,9 +29,9 @@ theme:
 nav:
   - Overview: index.md
   - Plugin: plugin.md
+  - Tasks: tasks.md
   - Deeplink Specs: deeplink-specs.md
   - Composite Specs: composite-specs.md
-  - Tasks: tasks.md
   - Migration Guide: migration-guide-0.2.0-alpha.md
   - Release Notes:
       - v0.2.0-alpha: release-notes/0.2.0-alpha.md
