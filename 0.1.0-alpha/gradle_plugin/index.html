@@ -1,0 +1,649 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Android deeplink toolkit">
+      
+      
+      
+        <link rel="canonical" href="https://aouledissa.com/deep-match/0.1.0-alpha/gradle_plugin/">
+      
+      
+      
+        <link rel="next" href="../config_file/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.3">
+    
+    
+      
+        <title>Gradle Plugin - DeepMatch</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    <body dir="ltr">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#core-capabilities" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <div data-md-color-scheme="default" data-md-component="outdated" hidden>
+        
+      </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="DeepMatch" class="md-header__button md-logo" aria-label="DeepMatch" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            DeepMatch
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Gradle Plugin
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/aouledissa/deep-match" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    aouledissa/DeepMatch
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="DeepMatch" class="md-nav__button md-logo" aria-label="DeepMatch" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    DeepMatch
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/aouledissa/deep-match" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    aouledissa/DeepMatch
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Gradle Plugin
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Gradle Plugin
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#core-capabilities" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Core Capabilities
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#benefits-of-using-the-plugin" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Benefits of Using the Plugin
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#getting-started" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Getting Started
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#generated-artifacts" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Generated Artifacts
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#available-tasks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Available Tasks
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#testing-ci" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Testing &amp; CI
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../config_file/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    YAML Spec
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#core-capabilities" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Core Capabilities
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#benefits-of-using-the-plugin" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Benefits of Using the Plugin
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#getting-started" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Getting Started
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#generated-artifacts" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Generated Artifacts
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#available-tasks" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Available Tasks
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#testing-ci" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Testing &amp; CI
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+  <h1>Gradle Plugin</h1>
+
+<h3 id="core-capabilities">Core Capabilities<a class="headerlink" href="#core-capabilities" title="Permanent link">&para;</a></h3>
+<p>The primary responsibilities and capabilities of the DeepMatch Gradle plugin are:</p>
+<ol>
+<li>
+<p><strong>YAML Configuration Parsing:</strong></p>
+<ul>
+<li>The plugin automatically locates and reads your <code>.deeplinks.yml</code> file (by default, from the root of the module, e.g., <code>app/.deeplinks.yml</code>, but this is configurable).</li>
+<li>It parses the YAML content, validating its structure against the expected format (implicitly defined by how it generates code and manifest entries, aligning with the <code>DeeplinkConfig</code> structure).</li>
+</ul>
+</li>
+<li>
+<p><strong>Android Manifest Generation:</strong></p>
+<ul>
+<li>Based on the parsed <code>deeplinkSpecs</code> from your YAML file, the plugin dynamically generates the necessary <code>&lt;intent-filter&gt;</code> entries within your app's <code>AndroidManifest.xml</code>.</li>
+<li>For each <code>DeeplinkConfig</code> entry in your YAML, it creates an <code>&lt;activity&gt;</code> (or merges with an existing one if the <code>activity</code> name matches) and adds an <code>&lt;intent-filter&gt;</code> to it.</li>
+<li>This automation means you <strong>do not need to manually write or maintain these <code>&lt;intent-filter&gt;</code> tags</strong> in your main <code>AndroidManifest.xml</code> for the deep links defined in your YAML. The plugin handles keeping them in sync with your YAML configuration.</li>
+<li>The generated manifest entries are typically merged into the final manifest during the build process (e.g., visible in <code>app/build/intermediates/merged_manifests/debug/AndroidManifest.xml</code>).</li>
+</ul>
+</li>
+<li>
+<p><strong>Code Generation (<code>DeeplinkSpecs</code>):</strong></p>
+<ul>
+<li>The plugin generates Kotlin source code, most notably a class named something like <code>[DeeplinkName]DeeplinkSpecs</code> (the exact name might vary based on the deeplink name in the <code>.yml</code> file).</li>
+<li>The plugin also generates another Kotlin source for the dynamic params in the configured deeplink. This means if any of your deeplink's <strong>path parameters</strong> is pattern-based or if the deeplink contains at least one <strong>query parameter</strong>, a parameter class will be generated.</li>
+<li>This makes it easy to access these parameters later when matching and handling the deeplink. </li>
+</ul>
+</li>
+<li>
+<p><strong>Integration with Build Process:</strong></p>
+<ul>
+<li>The plugin hooks into the Android Gradle Plugin's build lifecycle.</li>
+<li>Its tasks (like YAML parsing, manifest generation, code generation) typically run before Java/Kotlin compilation, ensuring that the generated code and manifest entries are available when the rest of your app's code (including the codegen process) is processed.</li>
+</ul>
+</li>
+<li>
+<p><strong>Configuration Options:</strong></p>
+<ul>
+<li>The plugin provides a DSL (Domain Specific Language) extension in your <code>build.gradle</code> (<code>deepMatch { ... }</code> block) to customize its behavior:<ul>
+<li><strong>specsFile:</strong> Specifying a custom path to your <code>.deeplinks.yml</code> file if it's not in the default location.</li>
+<li><strong>generateManifestFiles:</strong> Specifying whether or not the plugin should generate <code>AndroidManifest.xml</code> file based on the deeplink config <code>yaml</code> file.</li>
+</ul>
+</li>
+</ul>
+</li>
+</ol>
+<h3 id="benefits-of-using-the-plugin">Benefits of Using the Plugin<a class="headerlink" href="#benefits-of-using-the-plugin" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Single Source of Truth:</strong> Your <code>.deeplinks.yml</code> becomes the definitive source for all your deep link definitions.</li>
+<li><strong>Reduced Boilerplate:</strong> No need to manually write complex and error-prone <code>&lt;intent-filter&gt;</code> tags in the manifest.</li>
+<li><strong>Consistency:</strong> Ensures that your manifest and the runtime parsing logic are always in sync with your declared specifications.</li>
+<li><strong>Improved Maintainability:</strong> Adding, removing, or modifying deep links is as simple as editing the YAML file and rebuilding.</li>
+<li><strong>Build-Time Checks (Implicit):</strong> While not a full validation suite, the parsing step can catch basic syntax errors in your YAML file early in the build process.</li>
+</ul>
+<h3 id="getting-started">Getting Started<a class="headerlink" href="#getting-started" title="Permanent link">&para;</a></h3>
+<ol>
+<li>
+<p>Apply the plugin alongside your usual Android and Kotlin plugins:</p>
+<p><code>kotlin
+plugins {
+    id("com.android.application")
+    id("org.jetbrains.kotlin.android")
+    id("com.aouledissa.deepmatch.gradle") version "0.1.0"
+}</code></p>
+</li>
+<li>
+<p>Configure the extension in the same module:</p>
+<p><code>kotlin
+deepMatch {
+    generateManifestFiles = true
+}</code></p>
+</li>
+<li>
+<p>Add a <code>.deeplinks.yml</code> file at the module root (or under <code>src/&lt;variant&gt;/.deeplinks.yml</code>). See <code>docs/config_file.md</code> for the full schema.</p>
+</li>
+</ol>
+<p>During the build the plugin generates Kotlin sources under <code>build/generated/</code> and, when enabled, a manifest snippet under <code>build/generated/manifests/&lt;variant&gt;/AndroidManifest.xml</code>.</p>
+<h3 id="generated-artifacts">Generated Artifacts<a class="headerlink" href="#generated-artifacts" title="Permanent link">&para;</a></h3>
+<ul>
+<li><code>*DeeplinkSpecs.kt</code> — exposes a <code>DeeplinkSpec</code> property per configuration entry.</li>
+<li><code>*DeeplinkParams.kt</code> — optional data class emitted when a deeplink defines typed template, query, or fragment parameters.</li>
+<li>Generated manifest file — contains <code>&lt;intent-filter&gt;</code> definitions that Gradle merges into the final manifest.</li>
+</ul>
+<h3 id="available-tasks">Available Tasks<a class="headerlink" href="#available-tasks" title="Permanent link">&para;</a></h3>
+<p>Each Android variant gets two dedicated tasks:</p>
+<ul>
+<li><code>generate&lt;Variant&gt;DeeplinkSpecs</code> — parses YAML and produces Kotlin sources.</li>
+<li><code>generate&lt;Variant&gt;DeeplinksManifest</code> — writes the manifest file when <code>generateManifestFiles</code> is <code>true</code>.</li>
+</ul>
+<p>Inspect the generated output with:</p>
+<pre><code class="language-bash">./gradlew :app:generateDebugDeeplinkSpecs
+</code></pre>
+<h3 id="testing-ci">Testing &amp; CI<a class="headerlink" href="#testing-ci" title="Permanent link">&para;</a></h3>
+<pre><code class="language-bash">./gradlew publishToMavenLocal  # Optional; handy when consuming the plugin from another project locally
+./gradlew test                 # Runs JVM tests for the plugin, runtime, and shared fixtures
+</code></pre>
+<p>Runtime behaviour is validated with Robolectric-based tests in <code>deepmatch-processor/src/test</code>, backed by reusable fakes from the <code>deepmatch-testing</code> module. The GitHub Action workflow (<code>.github/workflows/ci.yml</code>) runs the same <code>test</code> task on every push and pull request; enable branch protection to require the <strong>CI</strong> workflow before merging.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": [], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"provider": "mike"}}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+    
+  </body>
+</html>
