@@ -87,4 +87,38 @@ class GenerateDeeplinkSpecsTaskTest {
         assertThat(generatedSpecCode).contains("Param(name = \"query\", type = ParamType.STRING, required = true)")
         assertThat(generatedSpecCode).contains("Param(name = \"ref\", type = ParamType.STRING, required = false)")
     }
+
+    @Test
+    fun `static-only spec still generates params class and parametersClass`() {
+        val project = ProjectBuilder.builder().build()
+        val specsFile = temporaryFolder.newFile("static-only.deeplinks.yml").apply {
+            writeText(
+                """
+                deeplinkSpecs:
+                  - name: "open home"
+                    activity: com.example.app.MainActivity
+                    scheme: [app]
+                    host: ["example.com"]
+                    pathParams:
+                      - name: home
+                """.trimIndent()
+            )
+        }
+        val outputDir = temporaryFolder.newFolder("generated-static")
+        val task = project.tasks.register("generateStaticSpecs", GenerateDeeplinkSpecsTask::class.java).get()
+
+        task.specsFileProperty.set(project.layout.file(project.provider { specsFile }))
+        task.packageNameProperty.set("com.example.app")
+        task.moduleNameProperty.set("app")
+        task.outputDir.set(project.layout.dir(project.provider { outputDir }))
+
+        task.generateDeeplinkSpecs()
+
+        val generatedSpecFile = File(outputDir, "com/example/app/deeplinks/OpenHomeDeeplinkSpecs.kt")
+        val generatedSpecCode = generatedSpecFile.readText()
+
+        assertThat(generatedSpecFile.exists()).isTrue()
+        assertThat(generatedSpecCode).contains("class OpenHomeDeeplinkParams()")
+        assertThat(generatedSpecCode).contains("parametersClass = OpenHomeDeeplinkParams::class")
+    }
 }

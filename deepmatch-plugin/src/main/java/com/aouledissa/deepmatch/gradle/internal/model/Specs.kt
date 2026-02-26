@@ -21,9 +21,7 @@ internal data class DeeplinkConfig(
     val fragment: String? = null
 ) {
 
-    fun containsTemplateParams(): Boolean {
-        return pathParams?.any { it.type != null } == true
-                || queryParams.isNullOrEmpty().not()
-                || fragment != null
-    }
+    fun hasTypedParams(): Boolean =
+        pathParams?.any { it.type != null } == true ||
+                queryParams?.any { it.type != null } == true
 }

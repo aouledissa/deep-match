@@ -178,7 +178,7 @@ deeplinkSpecs:
 - Keep `name` values unique per spec to simplify generated type naming and runtime routing.
 - Regenerate sources (`./gradlew generate<Variant>DeeplinkSpecs`) whenever you modify the YAML schema.
 - If `generateManifestFiles` is disabled, remember to replicate the `<intent-filter>` changes manually in your main manifest.
-- When a deeplink declares typed path, query, or fragment values, the plugin also creates a `<Name>DeeplinkParams` class so your app receives strongly typed arguments after calling `match(uri)`.
+- The plugin creates a `<Name>DeeplinkParams` class for every deeplink spec. This avoids ambiguity between "no match" and "matched static deeplink".
 - Typed query params are validated by key and type after structural URI matching, so query order does not affect matching.
 - Query params are optional by default; set `required: true` only for values that must be present.
 - All generated params classes implement a module-level sealed interface named from the module name (for example, module `app` -> `AppDeeplinkParams`), enabling exhaustive `when` checks.

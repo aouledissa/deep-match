@@ -139,6 +139,22 @@ class DeeplinkProcessorRobolectricTest {
         assertThat(params).isNull()
     }
 
+    @Test
+    fun staticDeeplinkMatch_returnsEmptyParamsInstance() {
+        val spec = DeeplinkSpec(
+            scheme = setOf("app"),
+            host = setOf("example.com"),
+            pathParams = listOf(Param(name = "home")),
+            queryParams = emptySet(),
+            fragment = null,
+            parametersClass = HomeParams::class
+        )
+        val processor = DeeplinkProcessor(specs = setOf(spec))
+
+        val params = processor.match(Uri.parse("app://example.com/home"))
+        assertThat(params).isInstanceOf(HomeParams::class.java)
+    }
+
     data class SeriesParams(
         val seriesId: Int,
         val ref: String?,
@@ -164,4 +180,6 @@ class DeeplinkProcessorRobolectricTest {
         val seriesId: Int,
         val ref: String
     ) : DeeplinkParams
+
+    class HomeParams : DeeplinkParams
 }

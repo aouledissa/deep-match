@@ -1,25 +1,27 @@
 package com.aouledissa.deepmatch.gradle.internal.model
 
+import com.aouledissa.deepmatch.api.Param
+import com.aouledissa.deepmatch.api.ParamType
 import com.google.common.truth.Truth.assertThat
 import org.junit.Test
 
 class DeeplinkConfigTest {
 
     @Test
-    fun `containsTemplateParams returns true when fragment is present`() {
+    fun `hasTypedParams returns true when typed path param is present`() {
         val config = DeeplinkConfig(
             name = "open profile",
             activity = "com.example.app.MainActivity",
             scheme = listOf("app"),
             host = listOf("example.com"),
-            fragment = "details"
+            pathParams = listOf(Param(name = "id", type = ParamType.NUMERIC))
         )
 
-        assertThat(config.containsTemplateParams()).isTrue()
+        assertThat(config.hasTypedParams()).isTrue()
     }
 
     @Test
-    fun `containsTemplateParams returns false when no typed inputs are defined`() {
+    fun `hasTypedParams returns false when no typed inputs are defined`() {
         val config = DeeplinkConfig(
             name = "open profile",
             activity = "com.example.app.MainActivity",
@@ -28,6 +30,6 @@ class DeeplinkConfigTest {
             fragment = null
         )
 
-        assertThat(config.containsTemplateParams()).isFalse()
+        assertThat(config.hasTypedParams()).isFalse()
     }
 }
