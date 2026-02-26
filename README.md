@@ -87,14 +87,14 @@ deeplinkSpecs:
     fragment: "details"
 ```
 
-Typed query params are validated by key and type, so query ordering does not matter.
+- Typed query params are validated by key and type, so query ordering does not matter.
 For example, `?ref=promo&page=1` and `?page=1&ref=promo` are treated the same.
-Query params are optional by default; use `required: true` for mandatory keys.
-Scheme and host matching are case-insensitive (for example, `HTTPS://Example.COM/...` matches
+- Query params are optional by default; use `required: true` for mandatory keys.
+- Scheme and host matching are case-insensitive (for example, `HTTPS://Example.COM/...` matches
 `scheme: [https]` + `host: ["example.com"]`).
-Host is optional; omit it (or set `host: []`) for hostless URIs such as `app:///profile/123`.
-Path params are ordered and matched by position as declared in YAML.
-Each deeplink spec always generates a `*DeeplinkParams` type, so a successful match is never
+- Host is optional; omit it (or set `host: []`) for hostless URIs such as `app:///profile/123`.
+- Path params are ordered and matched by position as declared in YAML.
+- Each deeplink spec always generates a `*DeeplinkParams` type, so a successful match is never
 ambiguous with "no match". When declared, `fragment` is exposed in the generated params type.
 
 5. Generate sources (or just build normally):

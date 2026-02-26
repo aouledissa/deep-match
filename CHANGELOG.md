@@ -31,6 +31,7 @@
   to `null` (which was previously indistinguishable from "no match").
 - Fixed hostless deeplink matching (`app:///...`) by explicitly supporting empty-host specs.
 - Added build-time validation that every spec declares at least one scheme.
+- Added build-time validation for duplicate deeplink spec names with a clear plugin error message.
 
 ### Documentation
 
@@ -51,6 +52,7 @@
 - Added processor coverage for case-insensitive scheme/host matching (for example,
   `HTTPS://Example.COM/...` and `App://EXAMPLE.com/...`).
 - Added coverage for hostless deeplinks, including regex match, params extraction, and manifest output without `android:host`.
+- Added plugin test coverage for duplicate `name` validation in `.deeplinks.yml`.
 
 ## [0.2.0-alpha] - 2026-02-25
 

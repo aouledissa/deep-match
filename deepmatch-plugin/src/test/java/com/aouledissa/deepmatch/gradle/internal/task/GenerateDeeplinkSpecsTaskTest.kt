@@ -219,4 +219,37 @@ class GenerateDeeplinkSpecsTaskTest {
         assertThat(error).hasMessageThat()
             .contains("Spec 'invalid' must define at least one scheme")
     }
+
+    @Test
+    fun `duplicate spec names throws validation error`() {
+        val project = ProjectBuilder.builder().build()
+        val specsFile = temporaryFolder.newFile("duplicate-names.deeplinks.yml").apply {
+            writeText(
+                """
+                deeplinkSpecs:
+                  - name: "open profile"
+                    activity: com.example.app.MainActivity
+                    scheme: [app]
+                    host: ["example.com"]
+                  - name: "open profile"
+                    activity: com.example.app.MainActivity
+                    scheme: [https]
+                    host: ["example.com"]
+                """.trimIndent()
+            )
+        }
+        val outputDir = temporaryFolder.newFolder("generated-duplicate")
+        val task = project.tasks.register("generateDuplicateSpecs", GenerateDeeplinkSpecsTask::class.java).get()
+
+        task.specsFileProperty.set(project.layout.file(project.provider { specsFile }))
+        task.packageNameProperty.set("com.example.app")
+        task.moduleNameProperty.set("app")
+        task.outputDir.set(project.layout.dir(project.provider { outputDir }))
+
+        val error = assertThrows(GradleException::class.java) {
+            task.generateDeeplinkSpecs()
+        }
+        assertThat(error).hasMessageThat()
+            .contains("Duplicate deeplink spec names found: open profile")
+    }
 }

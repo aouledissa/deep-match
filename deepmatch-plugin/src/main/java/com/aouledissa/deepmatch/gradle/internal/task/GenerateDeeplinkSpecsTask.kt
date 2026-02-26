@@ -59,6 +59,7 @@ internal abstract class GenerateDeeplinkSpecsTask : DefaultTask() {
         val moduleSealedInterfaceName = generateModuleSealedInterfaceName(moduleNameProperty.get())
         val moduleProcessorName = generateModuleProcessorName(moduleSealedInterfaceName)
         val deeplinkConfigs = yamlSerializer.deserializeDeeplinkConfigs(specsFile)
+        assertUniqueNames(deeplinkConfigs)
         val generatedSpecPropertyNames = mutableListOf<String>()
 
         FileSpec.builder(packageName, moduleSealedInterfaceName)
@@ -303,6 +304,18 @@ internal abstract class GenerateDeeplinkSpecsTask : DefaultTask() {
         if (config.scheme.isEmpty()) {
             throw GradleException(
                 "DeepMatch: Spec '${config.name}' must define at least one scheme."
+            )
+        }
+    }
+
+    private fun assertUniqueNames(configs: List<DeeplinkConfig>) {
+        val duplicates = configs.groupBy { it.name }
+            .filter { it.value.size > 1 }
+            .keys
+        if (duplicates.isNotEmpty()) {
+            throw GradleException(
+                "DeepMatch: Duplicate deeplink spec names found: ${duplicates.joinToString()}. " +
+                        "Each spec must have a unique name."
             )
         }
     }
