@@ -279,7 +279,7 @@ private enum class DemoUri(
 ) {
     Profile(
         label = "Profile",
-        uri = "app://sample.deepmatch.dev/profile/john123#details"
+        uri = "app://sample.deepmatch.dev/profile/john123?ref=demo#details"
     ),
     Series(label = "Series", uri = "app://sample.deepmatch.dev/series/42?ref=home"),
     NoMatch(label = "No Match", uri = "app://sample.deepmatch.dev/unknown");
