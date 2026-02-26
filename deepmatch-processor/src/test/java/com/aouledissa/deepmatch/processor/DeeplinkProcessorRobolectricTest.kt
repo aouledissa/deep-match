@@ -190,6 +190,50 @@ class DeeplinkProcessorRobolectricTest {
         assertThat(params?.userId).isEqualTo("abc")
     }
 
+    @Test
+    fun trailingSlashAndNonTrailingSlash_matchSameSpec() {
+        val spec = DeeplinkSpec(
+            scheme = setOf("app"),
+            host = setOf("example.com"),
+            pathParams = listOf(
+                Param(name = "profile"),
+                Param(name = "userId", type = ParamType.NUMERIC)
+            ),
+            queryParams = emptySet(),
+            fragment = null,
+            parametersClass = NumericProfileParams::class
+        )
+        val processor = DeeplinkProcessor(specs = setOf(spec))
+
+        val withoutTrailingSlash = processor.match(Uri.parse("app://example.com/profile/123"))
+        val withTrailingSlash = processor.match(Uri.parse("app://example.com/profile/123/"))
+
+        assertThat(withoutTrailingSlash).isInstanceOf(NumericProfileParams::class.java)
+        assertThat(withTrailingSlash).isInstanceOf(NumericProfileParams::class.java)
+    }
+
+    @Test
+    fun pathParamsAreExtractedForTrailingSlashAndNonTrailingSlashForms() {
+        val spec = DeeplinkSpec(
+            scheme = setOf("app"),
+            host = setOf("example.com"),
+            pathParams = listOf(
+                Param(name = "profile"),
+                Param(name = "userId", type = ParamType.NUMERIC)
+            ),
+            queryParams = emptySet(),
+            fragment = null,
+            parametersClass = NumericProfileParams::class
+        )
+        val processor = DeeplinkProcessor(specs = setOf(spec))
+
+        val withoutTrailingSlash = processor.match(Uri.parse("app://example.com/profile/123")) as NumericProfileParams?
+        val withTrailingSlash = processor.match(Uri.parse("app://example.com/profile/123/")) as NumericProfileParams?
+
+        assertThat(withoutTrailingSlash?.userId).isEqualTo(123)
+        assertThat(withTrailingSlash?.userId).isEqualTo(123)
+    }
+
     data class SeriesParams(
         val seriesId: Int,
         val ref: String?,
@@ -220,5 +264,9 @@ class DeeplinkProcessorRobolectricTest {
 
     data class ProfileParams(
         val userId: String
+    ) : DeeplinkParams
+
+    data class NumericProfileParams(
+        val userId: Int
     ) : DeeplinkParams
 }
