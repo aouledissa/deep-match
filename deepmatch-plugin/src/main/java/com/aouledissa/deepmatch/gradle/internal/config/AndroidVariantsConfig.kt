@@ -8,12 +8,14 @@ import com.aouledissa.deepmatch.gradle.LOG_TAG
 import com.aouledissa.deepmatch.gradle.internal.capitalize
 import com.aouledissa.deepmatch.gradle.internal.generatedModuleProcessorName
 import com.aouledissa.deepmatch.gradle.internal.task.GenerateDeeplinkManifestFile
+import com.aouledissa.deepmatch.gradle.internal.task.GenerateDeeplinkReportTask
 import com.aouledissa.deepmatch.gradle.internal.task.GenerateDeeplinkSpecsTask
 import com.aouledissa.deepmatch.gradle.internal.task.ValidateCompositeSpecsCollisionsTask
 import com.aouledissa.deepmatch.gradle.internal.task.ValidateDeeplinksTask
 import org.gradle.api.Project
 import org.gradle.api.artifacts.ProjectDependency
 import org.gradle.api.file.RegularFile
+import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.TaskProvider
 
 internal fun configureAndroidVariants(project: Project, config: DeepMatchPluginConfig) {
@@ -23,7 +25,9 @@ internal fun configureAndroidVariants(project: Project, config: DeepMatchPluginC
         ?: 0
 
     android.onVariants { variant ->
-        val specsFile = getSpecsFile(project = project, variant = variant)
+        val specsFiles = getSpecsFiles(project = project, variant = variant)
+        val primarySpecsFile = specsFiles.first()
+        val additionalSpecsFiles = specsFiles.drop(1)
         val composedDependencyProjects = discoverDeepMatchDependencyProjects(
             project = project,
             variantName = variant.name
@@ -32,7 +36,8 @@ internal fun configureAndroidVariants(project: Project, config: DeepMatchPluginC
         val generateVariantDeeplinkSpecsTask = registerDeeplinkSpecsSourcesTask(
             project = project,
             variant = variant,
-            specsFile = specsFile,
+            specsFile = primarySpecsFile,
+            additionalSpecsFiles = additionalSpecsFiles,
             compositeProcessors = composedDependencyProjects
                 .mapNotNull(::toGeneratedProcessorFqcnOrNull)
                 .sorted()
@@ -40,7 +45,18 @@ internal fun configureAndroidVariants(project: Project, config: DeepMatchPluginC
 
         registerValidateDeeplinksTask(
             project = project,
-            specsFile = specsFile
+            specsFile = primarySpecsFile,
+            additionalSpecsFiles = additionalSpecsFiles
+        )
+        registerDeeplinkReportTask(
+            project = project,
+            variantName = variant.name,
+            moduleName = project.name,
+            composedDependencyProjects = composedDependencyProjects,
+            enabled = config.report.enabled.getOrElse(false),
+            outputFileProvider = config.report.output.orElse(
+                project.layout.buildDirectory.file("reports/deeplinks.html")
+            )
         )
 
         registerCompositeSpecsCollisionTask(
@@ -53,7 +69,8 @@ internal fun configureAndroidVariants(project: Project, config: DeepMatchPluginC
         registerDeeplinkManifestTask(
             project = project,
             variant = variant,
-            specsFile = specsFile,
+            specsFile = primarySpecsFile,
+            additionalSpecsFiles = additionalSpecsFiles,
             compileSdk = compileSdk,
             generateManifestFiles = config.generateManifestFiles.getOrElse(false)
         )
@@ -131,6 +148,7 @@ private fun registerDeeplinkSpecsSourcesTask(
     project: Project,
     variant: Variant,
     specsFile: RegularFile,
+    additionalSpecsFiles: List<RegularFile>,
     compositeProcessors: List<String>
 ): TaskProvider<GenerateDeeplinkSpecsTask> {
     val variantName = variant.name.capitalize()
@@ -144,6 +162,7 @@ private fun registerDeeplinkSpecsSourcesTask(
         GenerateDeeplinkSpecsTask::class.java
     ) {
         it.specsFileProperty.set(specsFile)
+        it.additionalSpecsFilesProperty.setFrom(additionalSpecsFiles)
         it.packageNameProperty.set(variantPackageName)
         it.moduleNameProperty.set(project.name)
         it.projectPathProperty.set(project.path)
@@ -219,7 +238,8 @@ private fun registerCompositeSpecsCollisionTask(
 
 private fun registerValidateDeeplinksTask(
     project: Project,
-    specsFile: RegularFile
+    specsFile: RegularFile,
+    additionalSpecsFiles: List<RegularFile>
 ) {
     if (project.tasks.findByName("validateDeeplinks") != null) return
     project.tasks.register(
@@ -227,8 +247,53 @@ private fun registerValidateDeeplinksTask(
         ValidateDeeplinksTask::class.java
     ) {
         it.specsFileProperty.set(specsFile)
+        it.additionalSpecsFilesProperty.setFrom(additionalSpecsFiles)
         it.group = "deepmatch"
         it.description = "Validates a URI against deeplink specs declared in .deeplinks.yml."
+    }
+}
+
+private fun registerDeeplinkReportTask(
+    project: Project,
+    variantName: String,
+    moduleName: String,
+    composedDependencyProjects: List<Project>,
+    enabled: Boolean,
+    outputFileProvider: Provider<RegularFile>
+) {
+    if (!enabled || project.tasks.findByName("generateDeeplinkReport") != null) return
+
+    val localReportSpecFiles = collectSpecsFiles(project, variantName)
+    if (localReportSpecFiles.isEmpty()) return
+
+    val moduleSourceEntries = mutableListOf<String>()
+    val additionalSpecFiles = mutableListOf<RegularFile>()
+    localReportSpecFiles.drop(1).forEach { localSource ->
+        additionalSpecFiles += localSource
+        moduleSourceEntries += "${project.name}::${localSource.asFile.absolutePath}"
+    }
+    composedDependencyProjects.forEach { dependencyProject ->
+        collectSpecsFiles(dependencyProject, variantName).forEach { reportSpecFile ->
+            additionalSpecFiles += reportSpecFile
+            moduleSourceEntries += "${dependencyProject.name}::${reportSpecFile.asFile.absolutePath}"
+        }
+    }
+
+    val reportTask = project.tasks.register(
+        "generateDeeplinkReport",
+        GenerateDeeplinkReportTask::class.java
+    ) {
+        it.specsFileProperty.set(localReportSpecFiles.first())
+        it.moduleNameProperty.set(moduleName)
+        it.additionalSpecsFilesProperty.setFrom(additionalSpecFiles)
+        it.additionalModuleSourcesProperty.set(moduleSourceEntries)
+        it.outputFile.set(outputFileProvider)
+        it.group = "deepmatch"
+        it.description = "Generates a standalone deeplink catalog and live URI validator HTML report."
+    }
+
+    project.tasks.matching { it.name == "check" }.configureEach { checkTask ->
+        checkTask.dependsOn(reportTask)
     }
 }
 
@@ -237,6 +302,7 @@ private fun registerDeeplinkManifestTask(
     project: Project,
     variant: Variant,
     specsFile: RegularFile,
+    additionalSpecsFiles: List<RegularFile>,
     compileSdk: Int
 ) {
     val variantName = variant.name.capitalize()
@@ -247,6 +313,7 @@ private fun registerDeeplinkManifestTask(
             GenerateDeeplinkManifestFile::class.java
         ) {
             it.specFileProperty.set(specsFile)
+            it.additionalSpecsFilesProperty.setFrom(additionalSpecsFiles)
             it.outputFile.set(project.layout.buildDirectory.file("generated/manifests/${variantName}"))
             it.compileSdkProperty.set(compileSdk)
             it.group = "deepmatch"
@@ -271,16 +338,35 @@ private fun registerDeeplinkManifestTask(
     }
 }
 
-private fun getSpecsFile(project: Project, variant: Variant): RegularFile {
-    val variantSpecsFile =
-        project.layout.projectDirectory.file("src/${variant.name}/.deeplinks.yml")
-    val defaultSpecsFile = project.layout.projectDirectory.file(".deeplinks.yml")
-    return when {
-        variantSpecsFile.asFile.exists() -> variantSpecsFile
-        defaultSpecsFile.asFile.exists() -> defaultSpecsFile
-        else -> throw MissingSpecsFileException(
-            path = project.projectDir.absolutePath,
-            variantName = variant.name
-        )
-    }
+private fun getSpecsFiles(project: Project, variant: Variant): List<RegularFile> {
+    return collectSpecsFiles(project, variant.name)
+        .ifEmpty {
+            throw MissingSpecsFileException(
+                path = project.projectDir.absolutePath,
+                variantName = variant.name
+            )
+        }
+}
+
+private fun collectSpecsFiles(project: Project, variantName: String): List<RegularFile> {
+    val variantDir = project.layout.projectDirectory.dir("src/$variantName").asFile
+    val rootDir = project.layout.projectDirectory.asFile
+
+    val rootFiles = listSpecFiles(rootDir)
+        .map { project.layout.projectDirectory.file(it.name) }
+    val variantFiles = listSpecFiles(variantDir)
+        .map { project.layout.projectDirectory.file("src/$variantName/${it.name}") }
+
+    return (rootFiles + variantFiles)
+        .distinctBy { it.asFile.absolutePath }
+}
+
+private fun listSpecFiles(directory: java.io.File): List<java.io.File> {
+    if (!directory.exists() || !directory.isDirectory) return emptyList()
+    return directory.listFiles()
+        .orEmpty()
+        .filter { file ->
+            file.isFile && (file.name == ".deeplinks.yml" || file.name.endsWith(".deeplinks.yml"))
+        }
+        .sortedBy { it.name }
 }

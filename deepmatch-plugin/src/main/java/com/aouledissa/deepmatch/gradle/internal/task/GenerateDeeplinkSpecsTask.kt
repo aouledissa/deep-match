@@ -7,6 +7,7 @@ import com.aouledissa.deepmatch.api.ParamType
 import com.aouledissa.deepmatch.gradle.LOG_TAG
 import com.aouledissa.deepmatch.gradle.internal.capitalize
 import com.aouledissa.deepmatch.gradle.internal.deserializeDeeplinkConfigs
+import com.aouledissa.deepmatch.gradle.internal.deserializeMergedDeeplinkConfigs
 import com.aouledissa.deepmatch.gradle.internal.generatedModuleProcessorName
 import com.aouledissa.deepmatch.gradle.internal.generatedModuleSealedInterfaceName
 import com.aouledissa.deepmatch.gradle.internal.model.CompositeSpecShape
@@ -31,12 +32,14 @@ import com.squareup.kotlinpoet.asTypeName
 import kotlinx.serialization.json.Json
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
+import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
+import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
@@ -45,6 +48,9 @@ internal abstract class GenerateDeeplinkSpecsTask : DefaultTask() {
 
     @get:InputFile
     abstract val specsFileProperty: RegularFileProperty
+
+    @get:InputFiles
+    abstract val additionalSpecsFilesProperty: ConfigurableFileCollection
 
     @get:Input
     abstract val packageNameProperty: Property<String>
@@ -73,6 +79,7 @@ internal abstract class GenerateDeeplinkSpecsTask : DefaultTask() {
     init {
         projectPathProperty.convention(project.path)
         variantNameProperty.convention("main")
+        additionalSpecsFilesProperty.setFrom(emptyList<String>())
         metadataOutputFile.convention(
             project.layout.buildDirectory.file("generated/deepmatch/specs/${name}/spec-shapes.json")
         )
@@ -80,18 +87,24 @@ internal abstract class GenerateDeeplinkSpecsTask : DefaultTask() {
 
     @TaskAction
     fun generateDeeplinkSpecs() {
-        val specsFile = specsFileProperty.get().asFile
+        val specsFiles = buildList {
+            add(specsFileProperty.get().asFile)
+            addAll(additionalSpecsFilesProperty.files.sortedBy { it.absolutePath })
+        }
         val outputFile = outputDir.get().asFile
 
         outputFile.deleteRecursively()
 
-        logger.quiet("$LOG_TAG processing specs file in ${specsFile.path}")
+        logger.quiet("$LOG_TAG processing specs files: ${specsFiles.joinToString { it.path }}")
 
         val packageName = "${packageNameProperty.get()}.deeplinks"
         val moduleSealedInterfaceName = generatedModuleSealedInterfaceName(moduleNameProperty.get())
         val moduleProcessorName = generatedModuleProcessorName(moduleNameProperty.get())
         val compositeProcessors = compositeProcessorsProperty.getOrElse(emptyList())
-        val deeplinkConfigs = yamlSerializer.deserializeDeeplinkConfigs(specsFile)
+        specsFiles.forEach { file ->
+            assertUniqueNames(yamlSerializer.deserializeDeeplinkConfigs(file))
+        }
+        val deeplinkConfigs = yamlSerializer.deserializeMergedDeeplinkConfigs(specsFiles)
         assertUniqueNames(deeplinkConfigs)
         val generatedSpecPropertyNames = mutableListOf<String>()
 

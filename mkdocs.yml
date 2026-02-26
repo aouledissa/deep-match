@@ -30,10 +30,14 @@ nav:
   - Overview: index.md
   - Plugin: plugin.md
   - Tasks: tasks.md
+  - Report: report.md
   - Deeplink Specs: deeplink-specs.md
   - Composite Specs: composite-specs.md
-  - Migration Guide: migration-guide-0.2.0-alpha.md
+  - Migration Guides:
+      - v0.3.0-beta: migration-guide-0.3.0-beta.md
+      - v0.2.0-alpha: migration-guide-0.2.0-alpha.md
   - Release Notes:
+      - v0.3.0-beta: release-notes/0.3.0-beta.md
       - v0.2.0-alpha: release-notes/0.2.0-alpha.md
       - v0.1.0-alpha: release-notes/0.1.0-alpha.md
 markdown_extensions:

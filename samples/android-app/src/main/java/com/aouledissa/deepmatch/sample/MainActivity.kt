@@ -44,9 +44,25 @@ import com.aouledissa.deepmatch.sample.deeplinks.AppDeeplinkParams
 import com.aouledissa.deepmatch.sample.deeplinks.AppDeeplinkProcessor
 import com.aouledissa.deepmatch.sample.deeplinks.OpenAboutDeeplinkParams
 import com.aouledissa.deepmatch.sample.deeplinks.OpenHostlessProfileDeeplinkParams
+import com.aouledissa.deepmatch.sample.deeplinks.OpenProfileAchievementsDeeplinkParams
 import com.aouledissa.deepmatch.sample.deeplinks.OpenProfileDeeplinkParams
+import com.aouledissa.deepmatch.sample.deeplinks.OpenProfileFollowersDeeplinkParams
+import com.aouledissa.deepmatch.sample.deeplinks.OpenProfileFollowingDeeplinkParams
+import com.aouledissa.deepmatch.sample.deeplinks.OpenProfileSettingsDeeplinkParams
+import com.aouledissa.deepmatch.sample.deeplinks.OpenProfileSpotlightDeeplinkParams
+import com.aouledissa.deepmatch.sample.deeplinks.OpenProfileTimelineDeeplinkParams
 import com.aouledissa.deepmatch.sample.deeplinks.OpenSeriesDeeplinkParams
 import com.aouledissa.deepmatch.sample.deeplinks.OpenUserPostsDeeplinkParams
+import kotlin.Boolean
+import kotlin.OptIn
+import kotlin.Pair
+import kotlin.String
+import kotlin.Unit
+import kotlin.collections.List
+import kotlin.collections.forEach
+import kotlin.collections.listOf
+import kotlin.to
+import kotlin.toString
 
 class MainActivity : ComponentActivity() {
 
@@ -63,7 +79,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 @OptIn(ExperimentalLayoutApi::class)
 private fun DeeplinkResultScreen(uri: Uri) {
-    var selectedDemo by rememberSaveable { mutableStateOf(DemoUri.Profile) }
+    var selectedDemo by rememberSaveable { mutableStateOf(detectDemoUri(uri)) }
     val selectedUri = selectedDemo.uri.toUri()
     val result: AppDeeplinkParams? = AppDeeplinkProcessor.match(selectedUri) as? AppDeeplinkParams
     val match = when (result) {
@@ -74,7 +90,7 @@ private fun DeeplinkResultScreen(uri: Uri) {
             accent = Color(0xFF0E7C66),
             properties = listOf(
                 "userId" to result.userId,
-                "ref" to (result.ref ?: "absent"),
+                "ref" to result.ref,
                 "fragment" to result.fragment
             )
         )
@@ -126,6 +142,17 @@ private fun DeeplinkResultScreen(uri: Uri) {
             subtitle = "URI did not match any generated spec",
             accent = Color(0xFF8A1C1C),
             properties = listOf("uri" to selectedUri.toString())
+        )
+
+        else -> MatchUi(
+            title = "Matched Deeplink",
+            status = "Valid",
+            subtitle = "Matched a generated deeplink type not mapped to a custom demo card",
+            accent = Color(0xFF334155),
+            properties = listOf(
+                "type" to result.javaClass.simpleName,
+                "uri" to selectedUri.toString()
+            )
         )
     }
 
@@ -334,6 +361,12 @@ private fun detectDemoUri(uri: Uri): DemoUri {
     return when (val params = AppDeeplinkProcessor.match(uri) as? AppDeeplinkParams) {
         is OpenAboutDeeplinkParams -> DemoUri.About
         is OpenProfileDeeplinkParams -> DemoUri.Profile
+        is OpenProfileAchievementsDeeplinkParams,
+        is OpenProfileFollowersDeeplinkParams,
+        is OpenProfileFollowingDeeplinkParams,
+        is OpenProfileSettingsDeeplinkParams,
+        is OpenProfileSpotlightDeeplinkParams,
+        is OpenProfileTimelineDeeplinkParams -> DemoUri.Profile
         is OpenUserPostsDeeplinkParams -> DemoUri.UserPosts
         is OpenHostlessProfileDeeplinkParams -> DemoUri.Hostless
         is OpenSeriesDeeplinkParams -> DemoUri.Series

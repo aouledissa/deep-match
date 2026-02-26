@@ -6,7 +6,7 @@
 
 # DeepMatch
 
-DeepMatch is an Android deep-linking toolkit that turns a `.deeplinks.yml` file into typed Kotlin
+DeepMatch is an Android deep-linking toolkit that turns deeplink YAML spec files into typed Kotlin
 code, optional manifest entries, and runtime routing logic. Point the plugin at your configuration
 and it will:
 
@@ -14,6 +14,7 @@ and it will:
 - Generate a module-level sealed params interface (for example, module `app` generates
   `AppDeeplinkParams`) that all generated params classes implement.
 - Optionally emit manifest snippets so you never hand-write `<intent-filter>` entries again.
+- Optionally generate a standalone HTML deeplink report with a live URI validator.
 - Provide a lightweight runtime (`deepmatch-processor`) that matches URIs against the generated
   specs and returns typed params.
 
@@ -60,6 +61,11 @@ dependencies {
 ```kotlin
 deepMatch {
     generateManifestFiles = true
+    report {
+        enabled = true
+        // Optional override (default: build/reports/deeplinks.html)
+        // output = layout.buildDirectory.file("reports/deeplinks.html")
+    }
 }
 ```
 
@@ -67,7 +73,13 @@ DeepMatch automatically composes processors from project dependencies that also 
 
 Set `generateManifestFiles = false` if you want to manage `<intent-filter>` entries manually.
 
-4. Create `.deeplinks.yml` in your module root (or `src/<variant>/.deeplinks.yml`):
+4. Create one or more spec files in your module:
+- Module root: `.deeplinks.yml` or `*.deeplinks.yml`
+- Variant folder: `src/<variant>/.deeplinks.yml` or `src/<variant>/*.deeplinks.yml`
+- Merge precedence is deterministic: root files first, then variant files. If two files define the
+  same spec `name`, the later source overrides the earlier one.
+- Explicitly: when a build-type/variant file and a module-root file define the same spec `name`,
+  the build-type/variant definition wins.
 
 ```yaml
 deeplinkSpecs:
@@ -140,6 +152,18 @@ adb shell am start -W \
 For an end-to-end reference app (Compose UI + generated manifest + ADB tests), see
 [`samples/android-app/README.md`](samples/android-app/README.md).
 
+8. Optional report generation:
+
+```bash
+./gradlew :app:generateDeeplinkReport
+```
+
+This generates a single self-contained HTML report at `build/reports/deeplinks.html` with:
+- Full catalog merged from discovered local spec files (and composed dependency modules when present).
+- Live URI validator with near-miss diagnostics.
+- Quick test URI buttons generated from specs.
+- URI validation directly in the browser, without building or running the app.
+
 For full configuration/schema details, see [Plugin](docs/plugin.md) and
 [Deeplink Specs](docs/deeplink-specs.md).
 
@@ -160,8 +184,11 @@ can be reused in downstream projects.
 - [Deeplink Specs](docs/deeplink-specs.md) – YAML specification reference with examples.
 - [Composite Specs](docs/composite-specs.md) – How module-level processors are auto-composed and how match precedence works.
 - [Tasks](docs/tasks.md) – Generated Gradle tasks including `validateDeeplinks`.
-- [docs/migration-guide-0.2.0-alpha.md](docs/migration-guide-0.2.0-alpha.md) – Migration steps for the return-based runtime API.
-- [docs/release-notes/0.2.0-alpha.md](docs/release-notes/0.2.0-alpha.md) – Release notes for the latest alpha changes.
+- [Report](docs/report.md) – Standalone deeplink catalog + live URI validator output.
+- [Migration-guide-0.3.0-beta.md](docs/migration-guide-0.3.0-beta.md) – Migration steps for multi-file specs, report generation, and override precedence.
+- [Migration-guide-0.2.0-alpha.md](docs/migration-guide-0.2.0-alpha.md) – Migration steps for the return-based runtime API.
+- [Release-notes/0.3.0-beta.md](docs/release-notes/0.3.0-beta.md) – Release notes for the latest beta changes.
+- [Release-notes/0.2.0-alpha.md](docs/release-notes/0.2.0-alpha.md) – Release notes for the previous alpha changes.
 - `deepmatch-testing/src/main/kotlin` – Reusable fakes and fixtures for tests.
 - Documentation site powered by Zensical. Serve locally with:
 

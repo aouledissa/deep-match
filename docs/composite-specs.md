@@ -2,17 +2,21 @@
 
 DeepMatch supports both:
 
-- Multiple deeplink specs in one module (single `.deeplinks.yml` with many `deeplinkSpecs` entries).
+- Multiple deeplink specs in one module.
 - Multiple Android modules, each with its own DeepMatch-generated processor.
 
 ## How to Structure Specs
 
 Each module can define:
 
-- `.deeplinks.yml` at module root, or
-- `src/<variant>/.deeplinks.yml` for variant-specific overrides.
+- Module root sources: `.deeplinks.yml` and `*.deeplinks.yml`
+- Variant sources: `src/<variant>/.deeplinks.yml` and `src/<variant>/*.deeplinks.yml`
 
-DeepMatch currently expects one YAML file per variant per module. Put multiple specs inside that file.
+Discovery and merge rules:
+
+1. Root files are loaded first (sorted by file name).
+2. Variant files are loaded next (sorted by file name).
+3. If two sources define the same spec `name`, the later source overrides the earlier one.
 
 ## Multi-Module Setup
 
@@ -61,7 +65,7 @@ val result = AppDeeplinkProcessor.match(uri)
 DeepMatch resolves in this order:
 
 1. Local module specs are evaluated first.
-2. Within the module, specs are checked in YAML declaration order.
+2. Local specs come from merged discovered files (root first, then variant with override-by-name).
 3. If local specs do not match, composed dependency processors are tried (deterministic order).
 4. The first non-null match wins.
 5. If nothing matches, result is `null`.

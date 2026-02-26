@@ -1,0 +1,1233 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>DeepMatch Report</title>
+  <style>
+    :root {
+      --dark: #262626;
+      --dark-2: #353535;
+      --light: #ffffff;
+      --light-2: #f6f6f6;
+      --line: #e4e4e4;
+      --text: #1f1f1f;
+      --text-muted: #666666;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      background: var(--light);
+      color: var(--text);
+      font-family: "Roboto", ui-sans-serif, -apple-system, Segoe UI, Helvetica, Arial, sans-serif;
+    }
+
+    .app {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 250px 1fr;
+    }
+
+    @media (max-width: 900px) {
+      .app {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .sidebar {
+      background: var(--dark);
+      color: var(--light);
+      padding: 20px 14px;
+      border-right: 1px solid var(--dark-2);
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow: auto;
+    }
+
+    @media (max-width: 900px) {
+      .sidebar {
+        position: static;
+        height: auto;
+      }
+    }
+
+    .brand {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 2px;
+    }
+
+    .subtitle {
+      font-size: 13px;
+      color: #cccccc;
+      margin-bottom: 16px;
+    }
+
+    .nav {
+      display: grid;
+      gap: 6px;
+    }
+
+    .nav a,
+    .nav-toggle {
+      text-decoration: none;
+      color: var(--light);
+      padding: 10px;
+      border-radius: 8px;
+      font-size: 14px;
+      transition: background-color .12s ease;
+      border: 0;
+      background: transparent;
+      text-align: left;
+      width: 100%;
+      cursor: pointer;
+      font-family: inherit;
+    }
+
+    .nav a:hover,
+    .nav-toggle:hover {
+      background: var(--dark-2);
+    }
+
+    .nav a.active {
+      background: var(--light);
+      color: var(--dark);
+      font-weight: 600;
+    }
+
+    .nav-toggle.active {
+      background: var(--light);
+      color: var(--dark);
+      font-weight: 600;
+    }
+
+    .nav-group {
+      display: grid;
+      gap: 4px;
+    }
+
+    .nav-toggle-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .nav-sub {
+      display: grid;
+      gap: 4px;
+      padding-left: 10px;
+      border-left: 1px solid #4d4d4d;
+      overflow: hidden;
+      max-height: 0;
+      opacity: 0;
+      transition: max-height .22s ease, opacity .18s ease;
+      will-change: max-height;
+    }
+
+    .nav-sub .nav-sub {
+      margin-top: 4px;
+      padding-left: 10px;
+    }
+
+    .nav-sub .nav-toggle,
+    .nav-sub a {
+      font-size: 13px;
+      padding: 8px 9px;
+    }
+
+    .nav-sub.expanded {
+      opacity: 1;
+    }
+
+    .caret {
+      transition: transform .2s ease;
+      font-size: 12px;
+      opacity: 0.9;
+    }
+
+    .caret.collapsed {
+      transform: rotate(-90deg);
+    }
+
+    .main {
+      display: grid;
+      grid-template-rows: auto 1fr;
+      min-width: 0;
+    }
+
+    .topbar {
+      background: var(--light);
+      border-bottom: 1px solid var(--line);
+      padding: 18px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .topbar h1 {
+      margin: 0;
+      font-size: 22px;
+      font-weight: 600;
+    }
+
+    .topbar .muted {
+      color: var(--text-muted);
+      font-size: 13px;
+    }
+
+    .content {
+      padding: 20px 24px;
+      background: var(--light);
+    }
+
+    @media (max-width: 900px) {
+      .content {
+        padding: 14px;
+      }
+    }
+
+    .page {
+      display: none;
+      gap: 14px;
+    }
+
+    .page.active {
+      display: grid;
+    }
+
+    .panel {
+      background: var(--light);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 14px;
+    }
+
+    .panel h2 {
+      margin: 0 0 10px;
+      font-size: 17px;
+      font-weight: 600;
+    }
+
+    .muted {
+      color: var(--text-muted);
+      font-size: 14px;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    @media (max-width: 900px) {
+      .stats {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .stat {
+      background: var(--light-2);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 12px;
+    }
+
+    .stat .label {
+      font-size: 12px;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .stat .value {
+      margin-top: 6px;
+      font-size: 24px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .catalog-head {
+      display: grid;
+      grid-template-columns: 1fr 260px;
+      gap: 10px;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    @media (max-width: 900px) {
+      .catalog-head {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 8px;
+      border: 1px solid var(--line);
+      background: var(--light);
+      color: var(--text);
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 14px;
+      outline: none;
+    }
+
+    input[type="text"]:focus {
+      border-color: #aaaaaa;
+      box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.07);
+    }
+
+    .spec-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    @media (max-width: 1000px) {
+      .spec-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .spec-card {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: var(--light-2);
+      padding: 12px;
+    }
+
+    .spec-name {
+      margin-bottom: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--text);
+    }
+
+    .spec-meta {
+      display: grid;
+      gap: 6px;
+      font-size: 14px;
+    }
+
+    .spec-meta strong {
+      color: var(--text);
+      font-weight: 600;
+      margin-right: 6px;
+    }
+
+    .spec-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 4px;
+    }
+
+    .chip {
+      background: var(--light);
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 5px 9px;
+      font-size: 12px;
+      color: var(--text);
+    }
+
+    .code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      color: var(--text);
+      font-size: 13px;
+      background: var(--light);
+      border-radius: 6px;
+      border: 1px solid var(--line);
+      padding: 2px 6px;
+      word-break: break-all;
+    }
+
+    .empty {
+      padding: 18px;
+      border: 1px dashed var(--line);
+      border-radius: 8px;
+      color: var(--text-muted);
+      background: var(--light-2);
+      font-size: 14px;
+    }
+
+    .validator-page {
+      display: grid;
+      gap: 14px;
+      align-content: start;
+    }
+
+    .validator-centered {
+      display: grid;
+      place-items: center;
+      min-height: 46vh;
+    }
+
+    .validator-shell {
+      width: min(760px, 100%);
+      display: grid;
+      gap: 12px;
+    }
+
+    .search-shell {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 6px 8px 6px 14px;
+      background: var(--light);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    }
+
+    .search-shell:focus-within {
+      border-color: #a8a8a8;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 0 0 3px rgba(0, 0, 0, 0.06);
+    }
+
+    .search-shell input[type="text"] {
+      border: 0;
+      box-shadow: none;
+      padding: 8px 4px;
+      border-radius: 0;
+      background: transparent;
+      flex: 1;
+    }
+
+    .search-shell input[type="text"]:focus {
+      border: 0;
+      box-shadow: none;
+    }
+
+    button {
+      border: 1px solid var(--line);
+      background: var(--light-2);
+      color: var(--text);
+      border-radius: 8px;
+      padding: 9px 12px;
+      cursor: pointer;
+      font-size: 14px;
+      font-weight: 600;
+      transition: background-color .12s ease, border-color .12s ease;
+    }
+
+    button:hover {
+      background: #ececec;
+      border-color: #d0d0d0;
+    }
+
+    .icon-btn {
+      width: 38px;
+      height: 38px;
+      border-radius: 999px;
+      border: 1px solid var(--dark);
+      background: var(--dark);
+      color: var(--light);
+      display: grid;
+      place-items: center;
+      padding: 0;
+      flex-shrink: 0;
+    }
+
+    .icon-btn:hover {
+      background: #111111;
+      border-color: #111111;
+    }
+
+    .quick-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      max-height: 440px;
+      overflow: auto;
+      align-items: flex-start;
+    }
+
+    .quick-list button {
+      width: auto;
+      max-width: 100%;
+      white-space: nowrap;
+      border-radius: 999px;
+      padding: 7px 12px;
+    }
+
+    .status {
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      border: 1px solid var(--line);
+      background: var(--light-2);
+      color: var(--text);
+    }
+
+    .status.ok,
+    .status.warn,
+    .status.error {
+      font-weight: 600;
+    }
+
+    .status.ok {
+      background: #ecfdf3;
+      color: #166534;
+      border-color: #a7f3d0;
+    }
+
+    .status.warn {
+      background: #fffbeb;
+      color: #92400e;
+      border-color: #fde68a;
+    }
+
+    .status.error {
+      background: #fef2f2;
+      color: #991b1b;
+      border-color: #fecaca;
+    }
+
+    .kv {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 6px 10px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 13px;
+      color: var(--text);
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand">DeepMatch Dashboard</div>
+    <div class="subtitle">Generated from .deeplinks.yml</div>
+    <nav class="nav">
+      <div class="nav-group">
+        <button id="catalog-toggle" class="nav-toggle active" type="button" aria-expanded="true" aria-controls="catalog-subnav">
+          <span class="nav-toggle-row">
+            <span>Deeplink Catalogue</span>
+            <span id="catalog-caret" class="caret">▾</span>
+          </span>
+        </button>
+        <div id="catalog-subnav" class="nav-sub"></div>
+      </div>
+      <a href="#validator" data-page-link="validator">URI Validator</a>
+    </nav>
+  </aside>
+
+  <section class="main">
+    <header class="topbar">
+      <h1 id="title">DeepMatch Report</h1>
+      <span class="muted">Single-file dashboard</span>
+    </header>
+
+    <div class="content">
+      <section class="page active" id="page-catalog">
+        <section class="panel">
+          <h2>Overview</h2>
+          <div class="stats">
+            <article class="stat">
+              <div class="label">Specs</div>
+              <div id="stat-specs" class="value">0</div>
+            </article>
+            <article class="stat">
+              <div class="label">Typed Params</div>
+              <div id="stat-typed" class="value">0</div>
+            </article>
+            <article class="stat">
+              <div class="label">Hostless Specs</div>
+              <div id="stat-hostless" class="value">0</div>
+            </article>
+          </div>
+        </section>
+
+        <section class="panel" id="spec-catalog-section">
+          <div class="catalog-head">
+            <h2 id="catalog-heading">Full Catalogue</h2>
+            <input id="catalog-search" type="text" placeholder="Search by name, host, or path">
+          </div>
+          <p id="catalog-description" class="muted">Combined view of all deeplinks from every configured source/module.</p>
+          <div id="spec-catalog" class="spec-grid"></div>
+        </section>
+      </section>
+
+      <section class="page" id="page-validator">
+        <div class="validator-page">
+          <section class="validator-centered" id="validator">
+            <div class="validator-shell">
+              <h2>Interactive URI Validator</h2>
+              <div class="search-shell">
+                <input id="uri-input" type="text" placeholder="app://example.com/profile/abc123?campaign=launch#details">
+                <button id="validate-btn" class="icon-btn" type="button" aria-label="Validate URI">
+                  <svg viewBox="0 0 24 24" width="18" height="18" fill="none" aria-hidden="true">
+                    <path d="M9.5 16.5L4.5 11.5L5.9 10.1L9.5 13.7L18.1 5.1L19.5 6.5L9.5 16.5Z" fill="currentColor"/>
+                  </svg>
+                </button>
+              </div>
+              <div id="validation-result" class="muted">Enter a URI to validate it against generated specs.</div>
+            </div>
+          </section>
+
+          <section class="panel" id="quick-tests-section">
+            <h2>Quick Test URIs</h2>
+            <div id="quick-tests" class="quick-list"></div>
+          </section>
+        </div>
+      </section>
+    </div>
+  </section>
+</div>
+
+<script>
+const reportData = /* __SPECS_JSON__ */;
+const modules = reportData.modules || [];
+const specs = reportData.specs || [];
+const TYPE_PATTERNS = {
+  numeric: /^[0-9]+$/,
+  alphanumeric: /^[a-zA-Z0-9._~-]+$/,
+  string: /^[a-zA-Z._~-]+$/
+};
+
+const titleEl = document.getElementById("title");
+const quickTestsEl = document.getElementById("quick-tests");
+const catalogEl = document.getElementById("spec-catalog");
+const catalogHeadingEl = document.getElementById("catalog-heading");
+const catalogDescriptionEl = document.getElementById("catalog-description");
+const catalogSearchEl = document.getElementById("catalog-search");
+const uriInputEl = document.getElementById("uri-input");
+const validateBtnEl = document.getElementById("validate-btn");
+const resultEl = document.getElementById("validation-result");
+const pageLinks = Array.from(document.querySelectorAll("[data-page-link]"));
+const catalogToggleEl = document.getElementById("catalog-toggle");
+const catalogSubnavEl = document.getElementById("catalog-subnav");
+const catalogCaretEl = document.getElementById("catalog-caret");
+const pages = {
+  catalog: document.getElementById("page-catalog"),
+  validator: document.getElementById("page-validator")
+};
+const catalogLinkByKey = new Map();
+const catalogEntriesByKey = new Map();
+let activeCatalogKey = "full";
+let hasCatalogChildren = false;
+
+const statSpecsEl = document.getElementById("stat-specs");
+const statTypedEl = document.getElementById("stat-typed");
+const statHostlessEl = document.getElementById("stat-hostless");
+
+titleEl.textContent = "DeepMatch Report - " + reportData.module;
+renderStats();
+renderQuickTests();
+buildCatalogNavigation();
+initializeNavigation();
+renderCatalog();
+
+validateBtnEl.addEventListener("click", validateCurrentUri);
+uriInputEl.addEventListener("keydown", event => {
+  if (event.key === "Enter") {
+    validateCurrentUri();
+  }
+});
+catalogSearchEl.addEventListener("input", () => {
+  const searchValue = catalogSearchEl.value.trim().toLowerCase();
+  renderCatalog(searchValue);
+});
+
+function initializeNavigation() {
+  const initial = routeFromHash(window.location.hash);
+  const initialPage = initial.page;
+  setActivePage(initialPage);
+  if (initial.catalogKey && catalogEntriesByKey.has(initial.catalogKey)) {
+    activeCatalogKey = initial.catalogKey;
+  } else if (initial.catalogKey === "full") {
+    activeCatalogKey = "full";
+  }
+  setCatalogExpanded(initialPage === "catalog" && hasCatalogChildren);
+  updateCatalogSelection();
+  renderCatalog(catalogSearchEl.value.trim().toLowerCase());
+
+  catalogToggleEl.addEventListener("click", () => {
+    setActivePage("catalog");
+    if (!hasCatalogChildren) {
+      activeCatalogKey = "full";
+      updateCatalogSelection();
+      renderCatalog(catalogSearchEl.value.trim().toLowerCase());
+      window.location.hash = "catalog";
+      return;
+    }
+    const isExpanded = catalogToggleEl.getAttribute("aria-expanded") !== "false";
+    setCatalogExpanded(!isExpanded);
+    window.location.hash = activeCatalogKey === "full"
+      ? "catalog"
+      : `catalog:${activeCatalogKey}`;
+  });
+
+  pageLinks.forEach(link => {
+    link.addEventListener("click", event => {
+      event.preventDefault();
+      const targetPage = link.getAttribute("data-page-link");
+      if (!targetPage) return;
+      setActivePage(targetPage);
+      if (targetPage === "catalog") {
+        activeCatalogKey = "full";
+        setCatalogExpanded(hasCatalogChildren);
+        updateCatalogSelection();
+        renderCatalog(catalogSearchEl.value.trim().toLowerCase());
+        window.location.hash = "catalog";
+      } else {
+        window.location.hash = targetPage;
+      }
+    });
+  });
+
+  window.addEventListener("hashchange", () => {
+    const route = routeFromHash(window.location.hash);
+    setActivePage(route.page);
+    if (route.catalogKey && catalogEntriesByKey.has(route.catalogKey)) {
+      activeCatalogKey = route.catalogKey;
+      updateCatalogSelection();
+      renderCatalog(catalogSearchEl.value.trim().toLowerCase());
+    } else if (route.page === "catalog") {
+      activeCatalogKey = "full";
+      updateCatalogSelection();
+      renderCatalog(catalogSearchEl.value.trim().toLowerCase());
+    }
+    if (route.page === "catalog") {
+      setCatalogExpanded(hasCatalogChildren);
+    } else {
+      setCatalogExpanded(false);
+    }
+  });
+}
+
+function routeFromHash(hashValue) {
+  if (hashValue === "#validator") {
+    return { page: "validator", catalogKey: null };
+  }
+  if (hashValue === "#catalog" || hashValue === "") {
+    return { page: "catalog", catalogKey: "full" };
+  }
+  const prefix = "#catalog:";
+  if (hashValue.startsWith(prefix)) {
+    const key = decodeURIComponent(hashValue.slice(prefix.length));
+    return { page: "catalog", catalogKey: key };
+  }
+  return { page: "catalog", catalogKey: "full" };
+}
+
+function setCatalogExpanded(expanded) {
+  if (!hasCatalogChildren) {
+    catalogToggleEl.setAttribute("aria-expanded", "false");
+    setExpandableState(catalogSubnavEl, false, false);
+    catalogCaretEl.classList.add("collapsed");
+    return;
+  }
+  catalogToggleEl.setAttribute("aria-expanded", expanded ? "true" : "false");
+  setExpandableState(catalogSubnavEl, expanded);
+  catalogCaretEl.classList.toggle("collapsed", !expanded);
+}
+
+function setActivePage(pageName) {
+  Object.entries(pages).forEach(([name, page]) => {
+    if (!page) return;
+    page.classList.toggle("active", name === pageName);
+  });
+  catalogToggleEl.classList.toggle("active", pageName === "catalog");
+  pageLinks.forEach(link => {
+    const isActive = link.getAttribute("data-page-link") === pageName;
+    link.classList.toggle("active", isActive);
+  });
+}
+
+function buildCatalogNavigation() {
+  const entries = buildCatalogEntries();
+  hasCatalogChildren = entries.length > 0;
+  catalogSubnavEl.innerHTML = "";
+  catalogEntriesByKey.clear();
+  catalogLinkByKey.clear();
+
+  if (!hasCatalogChildren) {
+    setExpandableState(catalogSubnavEl, false, false);
+    catalogCaretEl.classList.add("collapsed");
+    return;
+  }
+  setExpandableState(catalogSubnavEl, true, false);
+  catalogCaretEl.classList.remove("collapsed");
+
+  entries.forEach(entry => {
+    if (entry.type === "link") {
+      const link = createCatalogLink(entry);
+      catalogSubnavEl.appendChild(link);
+      return;
+    }
+
+    if (entry.type === "group") {
+      const group = document.createElement("div");
+      group.className = "nav-group";
+
+      const toggle = document.createElement("button");
+      toggle.type = "button";
+      toggle.className = "nav-toggle";
+      toggle.innerHTML =
+        "<span class='nav-toggle-row'>" +
+          "<span>" + escapeHtml(entry.label) + "</span>" +
+          "<span class='caret'>▾</span>" +
+        "</span>";
+      toggle.setAttribute("aria-expanded", "true");
+
+      const nested = document.createElement("div");
+      nested.className = "nav-sub";
+
+      entry.children.forEach(child => {
+        nested.appendChild(createCatalogLink(child));
+      });
+
+      setExpandableState(nested, true, false);
+
+      toggle.addEventListener("click", () => {
+        const expanded = toggle.getAttribute("aria-expanded") !== "false";
+        toggle.setAttribute("aria-expanded", expanded ? "false" : "true");
+        setExpandableState(nested, !expanded);
+        const caret = toggle.querySelector(".caret");
+        if (caret) caret.classList.toggle("collapsed", expanded);
+      });
+
+      group.appendChild(toggle);
+      group.appendChild(nested);
+      catalogSubnavEl.appendChild(group);
+    }
+  });
+}
+
+function setExpandableState(element, expanded, animate = true) {
+  if (!element) return;
+  const previousTransition = element.style.transition;
+  if (!animate) {
+    element.style.transition = "none";
+  }
+
+  if (expanded) {
+    element.classList.add("expanded");
+    element.classList.remove("collapsed");
+    element.style.maxHeight = element.scrollHeight + "px";
+  } else {
+    const currentHeight = element.scrollHeight;
+    element.style.maxHeight = currentHeight + "px";
+    requestAnimationFrame(() => {
+      element.classList.remove("expanded");
+      element.classList.add("collapsed");
+      element.style.maxHeight = "0px";
+    });
+  }
+
+  if (!animate) {
+    requestAnimationFrame(() => {
+      element.style.transition = previousTransition;
+    });
+  }
+
+  requestAnimationFrame(syncExpandedNavHeights);
+}
+
+function syncExpandedNavHeights() {
+  document.querySelectorAll(".nav-sub.expanded").forEach(element => {
+    element.style.maxHeight = element.scrollHeight + "px";
+  });
+}
+
+function createCatalogLink(entry) {
+  catalogEntriesByKey.set(entry.key, entry);
+
+  const link = document.createElement("a");
+  link.href = "#catalog:" + encodeURIComponent(entry.key);
+  link.textContent = entry.label;
+  link.dataset.catalogKey = entry.key;
+  link.addEventListener("click", event => {
+    event.preventDefault();
+    activeCatalogKey = entry.key;
+    setActivePage("catalog");
+    setCatalogExpanded(true);
+    updateCatalogSelection();
+    renderCatalog(catalogSearchEl.value.trim().toLowerCase());
+    window.location.hash = "catalog:" + encodeURIComponent(entry.key);
+  });
+  catalogLinkByKey.set(entry.key, link);
+  return link;
+}
+
+function updateCatalogSelection() {
+  catalogLinkByKey.forEach((link, key) => {
+    link.classList.toggle("active", key === activeCatalogKey);
+  });
+}
+
+function buildCatalogEntries() {
+  const availableModules = modules.filter(module => (module.sources || []).length > 0);
+  if (availableModules.length <= 1) {
+    const singleModule = availableModules[0];
+    if (!singleModule) return [];
+    const sources = singleModule.sources || [];
+    if (sources.length <= 1) return [];
+
+    return sources.map((source, index) => ({
+        type: "link",
+        key: `source:${singleModule.name}:${index}`,
+        label: fileNameFromPath(source.source),
+        description: `Deeplinks from ${fileNameFromPath(source.source)} in module ${singleModule.name}.`,
+        specs: source.specs || []
+      }));
+  }
+
+  const modulesWithMultipleFiles = availableModules.filter(module => (module.sources || []).length > 1);
+  if (modulesWithMultipleFiles.length === 0) {
+    return availableModules.map((module, index) => ({
+        type: "link",
+        key: `module:${module.name}:${index}`,
+        label: module.name,
+        description: `Deeplinks from module ${module.name}.`,
+        specs: (module.sources || []).flatMap(source => source.specs || [])
+      }));
+  }
+
+  return availableModules.map((module, moduleIndex) => {
+      const sources = module.sources || [];
+      if (sources.length <= 1) {
+        return {
+          type: "link",
+          key: `module:${module.name}:${moduleIndex}`,
+          label: module.name,
+          description: `Deeplinks from module ${module.name}.`,
+          specs: sources.flatMap(source => source.specs || [])
+        };
+      }
+      return {
+        type: "group",
+        label: module.name,
+        children: sources.map((source, sourceIndex) => ({
+          type: "link",
+          key: `source:${module.name}:${moduleIndex}:${sourceIndex}`,
+          label: fileNameFromPath(source.source),
+          description: `Deeplinks from ${fileNameFromPath(source.source)} in module ${module.name}.`,
+          specs: source.specs || []
+          }))
+      };
+    });
+}
+
+function fileNameFromPath(pathValue) {
+  if (!pathValue) return "spec";
+  return pathValue.split("/").pop() || pathValue;
+}
+
+function renderStats() {
+  const typedCount = specs.filter(spec => {
+    return [...(spec.pathParams || []), ...(spec.queryParams || [])]
+      .some(param => param.type && param.type !== "static");
+  }).length;
+  const hostlessCount = specs.filter(spec => !(spec.hosts || []).length).length;
+
+  statSpecsEl.textContent = String(specs.length);
+  statTypedEl.textContent = String(typedCount);
+  statHostlessEl.textContent = String(hostlessCount);
+}
+
+function validateCurrentUri() {
+  const rawUri = uriInputEl.value.trim();
+  const result = matchUri(rawUri);
+  renderValidationResult(result);
+}
+
+function matchUri(uriString) {
+  const uri = parseUri(uriString);
+  if (!uri) {
+    return { matched: false, error: "Malformed URI" };
+  }
+
+  const structuralUri = toStructuralUri(uri);
+  let nearMiss = null;
+
+  for (const spec of specs) {
+    const jsPattern = normalizeJavaRegexPattern(spec.regex);
+    const regex = new RegExp("^" + jsPattern + "$", "i");
+    if (!regex.test(structuralUri)) {
+      continue;
+    }
+
+    const queryResult = validateQueryParams(uri.queryParams, spec.queryParams || []);
+    if (!queryResult.valid) {
+      if (!nearMiss) {
+        nearMiss = { spec: spec.name, reason: queryResult.reason };
+      }
+      continue;
+    }
+
+    const pathParams = extractPathParams(uri.pathSegments, spec.pathParams || []);
+    return {
+      matched: true,
+      spec: spec.name,
+      pathParams: pathParams,
+      queryParams: queryResult.extracted,
+      fragment: uri.fragment || null
+    };
+  }
+
+  if (nearMiss) {
+    return { matched: false, nearMiss: nearMiss.spec, reason: nearMiss.reason };
+  }
+  return { matched: false, error: "No spec matched this URI" };
+}
+
+function normalizeJavaRegexPattern(pattern) {
+  return pattern.replace(/\\Q([\s\S]*?)\\E/g, (_, literal) => {
+    return escapeRegexLiteral(literal);
+  });
+}
+
+function escapeRegexLiteral(value) {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+function validateQueryParams(uriParams, specParams) {
+  const extracted = {};
+
+  for (const param of specParams) {
+    const value = Object.prototype.hasOwnProperty.call(uriParams, param.name)
+      ? uriParams[param.name]
+      : undefined;
+
+    if (value === undefined) {
+      if (param.required) {
+        return { valid: false, reason: "Missing required query param: " + param.name };
+      }
+      continue;
+    }
+
+    const pattern = TYPE_PATTERNS[param.type];
+    if (pattern && value !== null && !pattern.test(value)) {
+      return { valid: false, reason: "Query param '" + param.name + "' failed type validation" };
+    }
+
+    extracted[param.name] = value;
+  }
+
+  return { valid: true, extracted: extracted };
+}
+
+function extractPathParams(pathSegments, specPathParams) {
+  const extracted = {};
+  specPathParams.forEach((param, index) => {
+    if (param.type === "static") {
+      return;
+    }
+    extracted[param.name] = pathSegments[index];
+  });
+  return extracted;
+}
+
+function parseUri(raw) {
+  if (!raw) return null;
+
+  const matcher = /^([a-zA-Z][a-zA-Z0-9+.-]*):\/\/([^\/?#]*)(\/[^?#]*)?(?:\?([^#]*))?(?:#(.*))?$/;
+  const match = matcher.exec(raw);
+  if (!match) return null;
+
+  const scheme = match[1];
+  const authority = match[2] || "";
+  const rawPath = match[3] || "";
+  const rawQuery = match[4] || "";
+  const rawFragment = match[5] || "";
+
+  let host = authority;
+  let port = null;
+  const lastColon = authority.lastIndexOf(":");
+  if (lastColon >= 0) {
+    const candidatePort = authority.substring(lastColon + 1);
+    if (/^\d+$/.test(candidatePort)) {
+      host = authority.substring(0, lastColon);
+      port = candidatePort;
+    }
+  }
+
+  const pathSegments = rawPath
+    .split("/")
+    .filter(segment => segment.length > 0)
+    .map(decodeSafe);
+
+  const queryParams = {};
+  if (rawQuery.length > 0) {
+    rawQuery.split("&").forEach(part => {
+      if (!part) return;
+      const [keyPart, valuePart] = part.split("=", 2);
+      const key = decodeSafe(keyPart);
+      const value = valuePart === undefined ? null : decodeSafe(valuePart);
+      if (!Object.prototype.hasOwnProperty.call(queryParams, key)) {
+        queryParams[key] = value;
+      }
+    });
+  }
+
+  return {
+    scheme: scheme,
+    host: decodeSafe(host),
+    port: port,
+    pathSegments: pathSegments,
+    queryParams: queryParams,
+    fragment: rawFragment ? decodeSafe(rawFragment) : null
+  };
+}
+
+function toStructuralUri(uri) {
+  const path = uri.pathSegments.length ? "/" + uri.pathSegments.join("/") : "";
+  const fragment = uri.fragment ? "#" + uri.fragment : "";
+  const port = uri.port ? ":" + uri.port : "";
+  return uri.scheme + "://" + uri.host + port + path + fragment;
+}
+
+function decodeSafe(value) {
+  try {
+    return decodeURIComponent(value);
+  } catch (_) {
+    return value;
+  }
+}
+
+function renderValidationResult(result) {
+  if (result.matched) {
+    const rows = [];
+    Object.entries(result.pathParams || {}).forEach(([key, value]) => {
+      rows.push("<span>" + escapeHtml(key) + "</span><span>" + escapeHtml(String(value)) + "</span>");
+    });
+    Object.entries(result.queryParams || {}).forEach(([key, value]) => {
+      rows.push("<span>" + escapeHtml(key) + "</span><span>" + escapeHtml(String(value)) + "</span>");
+    });
+    if (result.fragment !== null) {
+      rows.push("<span>fragment</span><span>" + escapeHtml(result.fragment) + "</span>");
+    }
+
+    resultEl.innerHTML =
+      "<div class='status ok'>Matched: " + escapeHtml(result.spec) + "</div>" +
+      "<div class='kv'>" + rows.join("") + "</div>";
+    return;
+  }
+
+  if (result.nearMiss) {
+    resultEl.innerHTML =
+      "<div class='status warn'>Near miss: " + escapeHtml(result.nearMiss) + "</div>" +
+      "<div class='muted'>" + escapeHtml(result.reason) + "</div>";
+    return;
+  }
+
+  resultEl.innerHTML =
+    "<div class='status error'>" + escapeHtml(result.error || "No spec matched") + "</div>";
+}
+
+function renderQuickTests() {
+  const items = [];
+  specs.forEach(spec => {
+    items.push(
+      "<button type='button' data-uri='" + escapeHtml(spec.exampleUri) + "'>" +
+      escapeHtml(spec.name) +
+      "</button>"
+    );
+  });
+  items.push("<button type='button' data-uri='app://nomatch.example/path'>No Match</button>");
+  quickTestsEl.innerHTML = items.join("");
+
+  quickTestsEl.querySelectorAll("button[data-uri]").forEach(button => {
+    button.addEventListener("click", () => {
+      uriInputEl.value = button.getAttribute("data-uri") || "";
+      validateCurrentUri();
+    });
+  });
+}
+
+function renderCatalog(searchValue = "") {
+  const entry = catalogEntriesByKey.get(activeCatalogKey) || catalogEntriesByKey.get("full");
+  const entrySpecs = entry ? entry.specs : specs;
+  catalogHeadingEl.textContent = entry ? entry.label : "Full Catalogue";
+  catalogDescriptionEl.textContent = entry
+    ? entry.description
+    : "Combined view of all deeplinks from every configured source/module.";
+
+  const filteredSpecs = entrySpecs.filter(spec => {
+    if (!searchValue) return true;
+    const haystack = [
+      spec.name,
+      spec.pathTemplate,
+      (spec.hosts || []).join(" "),
+      (spec.schemes || []).join(" "),
+      spec.module || "",
+      spec.source || ""
+    ].join(" ").toLowerCase();
+    return haystack.includes(searchValue);
+  });
+
+  if (!filteredSpecs.length) {
+    catalogEl.innerHTML = "<div class='empty'>No specs matched your search.</div>";
+    return;
+  }
+
+  catalogEl.innerHTML = filteredSpecs.map(spec => {
+    const pathParamText = formatParams(spec.pathParams || []);
+    const queryParamText = formatParams(spec.queryParams || []);
+    const hostText = (spec.hosts || []).length ? spec.hosts.join(", ") : "(hostless)";
+    const portText = spec.port !== null ? String(spec.port) : "-";
+
+    return (
+      "<article class='spec-card'>" +
+        "<div class='spec-name'>" + escapeHtml(spec.name) + "</div>" +
+        "<div class='spec-meta'>" +
+          "<div><strong>Module:</strong> " + escapeHtml(spec.module || "-") + "</div>" +
+          "<div><strong>Source:</strong> <span class='code'>" + escapeHtml(fileNameFromPath(spec.source || "")) + "</span></div>" +
+          "<div><strong>Schemes:</strong> " + escapeHtml((spec.schemes || []).join(", ")) + "</div>" +
+          "<div><strong>Hosts:</strong> " + escapeHtml(hostText) + "</div>" +
+          "<div><strong>Port:</strong> " + escapeHtml(portText) + "</div>" +
+          "<div><strong>Path:</strong> <span class='code'>" + escapeHtml(spec.pathTemplate) + "</span></div>" +
+          "<div><strong>Path params:</strong> " + pathParamText + "</div>" +
+          "<div><strong>Query params:</strong> " + queryParamText + "</div>" +
+          "<div><strong>Fragment:</strong> " + escapeHtml(spec.fragment || "-") + "</div>" +
+          "<div><strong>Auto Verify:</strong> " + (spec.autoVerify ? "yes" : "no") + "</div>" +
+          "<div><strong>Generated spec:</strong> <span class='code'>" + escapeHtml(spec.generatedSpec) + "</span></div>" +
+          "<div><strong>Generated params:</strong> <span class='code'>" + escapeHtml(spec.generatedParams) + "</span></div>" +
+          "<div><strong>Example URI:</strong> <span class='code'>" + escapeHtml(spec.exampleUri) + "</span></div>" +
+        "</div>" +
+      "</article>"
+    );
+  }).join("");
+}
+
+function formatParams(params) {
+  if (!params.length) {
+    return "<span class='muted'>none</span>";
+  }
+  return (
+    "<div class='spec-list'>" +
+      params.map(param => {
+        const required = param.required ? "required" : "optional";
+        return "<span class='chip'>" +
+          escapeHtml(param.name) + " (" + escapeHtml(param.type) + ", " + required + ")" +
+        "</span>";
+      }).join("") +
+    "</div>"
+  );
+}
+
+function escapeHtml(value) {
+  return value
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll("\"", "&quot;")
+    .replaceAll("'", "&#39;");
+}
+</script>
+</body>
+</html>

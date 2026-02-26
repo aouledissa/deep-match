@@ -82,4 +82,43 @@ class ValidateDeeplinksTaskTest {
 
         task.validate()
     }
+
+    @Test
+    fun `validate reads additional specs files`() {
+        val project = ProjectBuilder.builder().build()
+        val mainSpecsFile = temporaryFolder.newFile("validate-main.deeplinks.yml").apply {
+            writeText(
+                """
+                deeplinkSpecs:
+                  - name: "open profile"
+                    activity: com.example.app.MainActivity
+                    scheme: [app]
+                    host: ["example.com"]
+                """.trimIndent()
+            )
+        }
+        val extraSpecsFile = temporaryFolder.newFile("validate-extra.deeplinks.yml").apply {
+            writeText(
+                """
+                deeplinkSpecs:
+                  - name: "open series"
+                    activity: com.example.app.MainActivity
+                    scheme: [app]
+                    host: ["series.example.com"]
+                    pathParams:
+                      - name: series
+                      - name: seriesId
+                        type: numeric
+                """.trimIndent()
+            )
+        }
+        val task = project.tasks.register("validateAdditional", ValidateDeeplinksTask::class.java).get()
+        task.specsFileProperty.set(project.layout.file(project.provider { mainSpecsFile }))
+        task.additionalSpecsFilesProperty.setFrom(
+            project.layout.file(project.provider { extraSpecsFile })
+        )
+        task.uriProperty.set("app://series.example.com/series/123")
+
+        task.validate()
+    }
 }

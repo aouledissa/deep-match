@@ -2,7 +2,7 @@ package com.aouledissa.deepmatch.gradle.internal.task
 
 import com.aouledissa.deepmatch.api.Param
 import com.aouledissa.deepmatch.gradle.LOG_TAG
-import com.aouledissa.deepmatch.gradle.internal.deserializeDeeplinkConfigs
+import com.aouledissa.deepmatch.gradle.internal.deserializeMergedDeeplinkConfigs
 import com.aouledissa.deepmatch.gradle.internal.model.Action
 import com.aouledissa.deepmatch.gradle.internal.model.AdvancedPatternPath
 import com.aouledissa.deepmatch.gradle.internal.model.AndroidActivity
@@ -21,10 +21,12 @@ import com.charleskorn.kaml.Yaml
 import com.charleskorn.kaml.YamlConfiguration
 import nl.adaptivity.xmlutil.serialization.XML
 import org.gradle.api.DefaultTask
+import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
+import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 
@@ -32,6 +34,9 @@ internal abstract class GenerateDeeplinkManifestFile : DefaultTask() {
 
     @get:InputFile
     abstract val specFileProperty: RegularFileProperty
+
+    @get:InputFiles
+    abstract val additionalSpecsFilesProperty: ConfigurableFileCollection
 
     @get:OutputFile
     abstract val outputFile: RegularFileProperty
@@ -46,11 +51,18 @@ internal abstract class GenerateDeeplinkManifestFile : DefaultTask() {
 
     @TaskAction
     fun generateDeeplinkManifest() {
-        val specsFile = specFileProperty.asFile.get()
+        val specsFiles = buildList {
+            add(specFileProperty.asFile.get())
+            addAll(additionalSpecsFilesProperty.files.sortedBy { it.absolutePath })
+        }
 
-        logger.quiet("$LOG_TAG generating Android manifest file for deeplink specs in ${specsFile.path}")
+        logger.quiet(
+            "$LOG_TAG generating Android manifest file for deeplink specs in ${
+                specsFiles.joinToString { it.path }
+            }"
+        )
 
-        val deeplinkConfigs = yamlSerializer.deserializeDeeplinkConfigs(specsFile)
+        val deeplinkConfigs = yamlSerializer.deserializeMergedDeeplinkConfigs(specsFiles)
         val activities = deeplinkConfigs.groupBy { it.activity }.map { activity ->
             AndroidActivity(
                 name = activity.key,

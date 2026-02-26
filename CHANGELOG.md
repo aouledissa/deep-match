@@ -1,6 +1,6 @@
 # Changelog
 
-## [Unreleased]
+## [0.3.0-beta]
 
 ### Added
 
@@ -10,6 +10,8 @@
   across composed module specs and fail builds with a detailed conflict report.
 - Added runtime composition support via `CompositeDeeplinkProcessor`, returning the first
   successful match across composed processors.
+- Added optional `generateDeeplinkReport` task that emits a standalone HTML deeplink catalog with
+  an embedded live URI validator and quick-test examples generated from YAML specs.
 
 ### Changed
 
@@ -76,6 +78,10 @@
   dependencies.
 - Added multi-module documentation (`docs/composite-specs.md`) covering multi-spec layout, automatic
   processor composition, and URI match resolution order/precedence.
+- Added report documentation (`docs/report.md`) and linked report generation/configuration in README,
+  overview, plugin, and tasks docs.
+- Updated README/docs to document multi-file spec discovery (`.deeplinks.yml` + `*.deeplinks.yml`),
+  root/variant merge precedence, and report catalog grouping across modules/source files.
 
 ### Tests
 
@@ -97,6 +103,8 @@
 - Added plugin task coverage for composite-spec collision validation (success and failure paths).
 - Added unit coverage for `ValidateDeeplinksTask` (`--uri` required, malformed URI handling,
   successful match flow).
+- Added plugin task coverage for `GenerateDeeplinkReportTask`, including embedded JSON correctness,
+  required/optional param metadata, example URI validity, idempotent output, and no external asset usage.
 - Added runtime tests for `CompositeDeeplinkProcessor` first-match behavior and null fallback.
 - Expanded processor tests with error-path handling (safe null on exceptions).
 - Expanded Robolectric coverage for empty/blank/scheme-less URIs and malformed typed values.

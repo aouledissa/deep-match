@@ -4,12 +4,14 @@ DeepMatch adds Gradle tasks under the `deepmatch` group.
 
 ## `generate<Variant>DeeplinkSpecs`
 
-Parses `.deeplinks.yml` and generates Kotlin sources for a variant.
+Parses discovered deeplink spec files and generates Kotlin sources for a variant.
 
 - Generates `<ModuleName>DeeplinkParams` sealed interface.
 - Generates `<ModuleName>DeeplinkProcessor` object.
 - Generates one `*DeeplinkSpecs` property per spec.
 - Generates one `*DeeplinkParams` class per spec.
+- Reads `.deeplinks.yml` and `*.deeplinks.yml` from module root and `src/<variant>/`.
+- Merges root first, then variant; same-name specs in later sources override earlier ones.
 
 Example:
 
@@ -33,7 +35,7 @@ Example:
 
 ## `validateDeeplinks`
 
-Validates a URI against specs in `.deeplinks.yml`.
+Validates a URI against merged specs from discovered deeplink YAML files.
 
 - Requires `--uri`.
 - Prints `[MATCH]` and `[MISS]` per spec.
@@ -58,6 +60,29 @@ Example:
 
 ```bash
 ./gradlew :app:validateDebugCompositeSpecsCollisions
+```
+
+## `generateDeeplinkReport`
+
+Generates a single self-contained HTML report from local specs plus composed dependency-module specs.
+
+- Enabled with:
+  - `deepMatch { report { enabled = true } }`
+- Output defaults to `build/reports/deeplinks.html`.
+- Output can be overridden with:
+  - `deepMatch { report { output = layout.buildDirectory.file("reports/custom.html") } }`
+- Includes:
+  - Full catalog (combined).
+  - Module/file catalog entries when multiple sources are present.
+  - Live URI validator.
+  - Near-miss diagnostics (for example, missing required query params).
+  - Quick test URI buttons generated from specs.
+  - Browser-side URI validation against generated specs without running the app.
+
+Example:
+
+```bash
+./gradlew :app:generateDeeplinkReport
 ```
 
 ## List Tasks
