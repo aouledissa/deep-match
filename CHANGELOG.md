@@ -2,6 +2,15 @@
 
 ## [Unreleased]
 
+### Added
+
+- Added `validateDeeplinks` Gradle task (`--uri`) to validate one URI against declared specs and
+  print per-spec `[MATCH]`/`[MISS]` diagnostics with extracted params.
+- Added `validate<Variant>CompositeSpecsCollisions` Gradle task to detect URI-shape collisions
+  across composed module specs and fail builds with a detailed conflict report.
+- Added runtime composition support via `CompositeDeeplinkProcessor`, returning the first
+  successful match across composed processors.
+
 ### Changed
 
 - Query parameters are no longer part of `DeeplinkSpec`'s structural regex matcher.
@@ -13,7 +22,7 @@
 - Plugin code generation now emits `pathParams = listOf(...)` for generated specs to align with
   the new API shape.
 - Fragment-only deeplink specs generate `*DeeplinkParams` with a `fragment` property and wire
-  `parametersClass` accordingly (alongside the new always-generate params behavior).
+  `paramsFactory` accordingly (alongside the new always-generate params behavior).
 - Added `required` to query params (`Param.required`) to support optional-vs-required query matching.
 - Optional typed query params are now generated as nullable constructor properties; required query
   params remain non-null.
@@ -25,6 +34,18 @@
   static-path entries to support trailing slash variants.
 - Generated manifests now include `android:exported="true"` and `tools:node="merge"` on deeplink
   activities.
+- DeepMatch Gradle tasks now register under a dedicated `deepmatch` task group with explicit task
+  descriptions (`generate<Variant>DeeplinkSpecs`, `generate<Variant>DeeplinksManifest`,
+  `validateDeeplinks`).
+- `DeeplinkSpec` now carries `name` metadata and uses `paramsFactory` instead of reflection-based
+  `parametersClass` construction.
+- `DeeplinkProcessor` now invokes spec-provided `paramsFactory` callbacks.
+- Plugin code generation now emits `name` and `paramsFactory = <Params>.Companion::fromMap` for
+  generated specs, and generates robust `fromMap` factories for params classes.
+- Plugin now auto-discovers project dependencies that also apply DeepMatch and composes their
+  generated processors implicitly.
+- Plugin now emits per-module spec-shape metadata during codegen and wires collision validation into
+  variant build/check for composed projects.
 
 ### Fixed
 
@@ -49,6 +70,12 @@
   query params.
 - Updated docs to document manifest path strategy, optional `port`, and hostless + trailing-slash
   manifest behavior.
+- Added a dedicated docs page for generated tasks and URI validation usage
+  (`docs/tasks.md`), and linked it from plugin/overview docs.
+- Updated README/docs to explain automatic processor composition from DeepMatch-enabled project
+  dependencies.
+- Added multi-module documentation (`docs/composite-specs.md`) covering multi-spec layout, automatic
+  processor composition, and URI match resolution order/precedence.
 
 ### Tests
 
@@ -65,6 +92,14 @@
 - Added plugin test coverage for duplicate `name` validation in `.deeplinks.yml`.
 - Added manifest generation coverage for smart path attribute selection, API 31+ advanced path
   patterns, exported/merge activity attributes, and optional port output.
+- Added plugin config coverage for auto-discovered composite processors from project dependencies
+  and variant-specific dependency resolution.
+- Added plugin task coverage for composite-spec collision validation (success and failure paths).
+- Added unit coverage for `ValidateDeeplinksTask` (`--uri` required, malformed URI handling,
+  successful match flow).
+- Added runtime tests for `CompositeDeeplinkProcessor` first-match behavior and null fallback.
+- Expanded processor tests with error-path handling (safe null on exceptions).
+- Expanded Robolectric coverage for empty/blank/scheme-less URIs and malformed typed values.
 
 ## [0.2.0-alpha] - 2026-02-25
 

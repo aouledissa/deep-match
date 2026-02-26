@@ -54,7 +54,6 @@ android {
 dependencies {
 
     api(project(":deepmatch-api"))
-    implementation(kotlin("reflect"))
     testImplementation(libs.junit)
     testImplementation(libs.google.truth)
     testImplementation(libs.mockk.core)

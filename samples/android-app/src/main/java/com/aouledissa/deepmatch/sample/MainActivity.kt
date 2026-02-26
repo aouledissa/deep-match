@@ -63,12 +63,13 @@ class MainActivity : ComponentActivity() {
 @Composable
 @OptIn(ExperimentalLayoutApi::class)
 private fun DeeplinkResultScreen(uri: Uri) {
-    var selectedDemo by rememberSaveable { mutableStateOf(detectDemoUri(uri)) }
+    var selectedDemo by rememberSaveable { mutableStateOf(DemoUri.Profile) }
     val selectedUri = selectedDemo.uri.toUri()
     val result: AppDeeplinkParams? = AppDeeplinkProcessor.match(selectedUri) as? AppDeeplinkParams
     val match = when (result) {
         is OpenProfileDeeplinkParams -> MatchUi(
             title = "Profile Deeplink",
+            status = "Valid",
             subtitle = "Matched and parsed successfully",
             accent = Color(0xFF0E7C66),
             properties = listOf(
@@ -80,6 +81,7 @@ private fun DeeplinkResultScreen(uri: Uri) {
 
         is OpenSeriesDeeplinkParams -> MatchUi(
             title = "Series Deeplink",
+            status = "Valid",
             subtitle = "Matched and parsed successfully",
             accent = Color(0xFF1F6FEB),
             properties = listOf(
@@ -90,6 +92,7 @@ private fun DeeplinkResultScreen(uri: Uri) {
 
         is OpenHostlessProfileDeeplinkParams -> MatchUi(
             title = "Hostless Deeplink",
+            status = "Valid",
             subtitle = "Matched hostless URI (no host) successfully",
             accent = Color(0xFF7C3AED),
             properties = listOf(
@@ -99,6 +102,7 @@ private fun DeeplinkResultScreen(uri: Uri) {
 
         is OpenAboutDeeplinkParams -> MatchUi(
             title = "Static Path Deeplink",
+            status = "Valid",
             subtitle = "Matched exact static path",
             accent = Color(0xFF9A3412),
             properties = listOf(
@@ -108,6 +112,7 @@ private fun DeeplinkResultScreen(uri: Uri) {
 
         is OpenUserPostsDeeplinkParams -> MatchUi(
             title = "Typed-Middle Deeplink",
+            status = "Valid",
             subtitle = "Matched path with typed segment in the middle",
             accent = Color(0xFF0F766E),
             properties = listOf(
@@ -117,6 +122,7 @@ private fun DeeplinkResultScreen(uri: Uri) {
 
         null -> MatchUi(
             title = "No Match",
+            status = "Invalid",
             subtitle = "URI did not match any generated spec",
             accent = Color(0xFF8A1C1C),
             properties = listOf("uri" to selectedUri.toString())
@@ -195,7 +201,7 @@ private fun DeeplinkResultScreen(uri: Uri) {
                                         style = MaterialTheme.typography.titleLarge,
                                         fontWeight = FontWeight.Bold
                                     )
-                                    StatusPill(text = match.title, accent = match.accent)
+                                    StatusPill(text = match.status)
                                 }
 
                                 Text(
@@ -276,14 +282,15 @@ private fun PropertyRow(label: String, value: String) {
 }
 
 @Composable
-private fun StatusPill(text: String, accent: Color) {
+private fun StatusPill(text: String) {
+    val color = if (text == "Valid") Color(0xFF15803D) else Color(0xFFB91C1C)
     Text(
         text = text,
         modifier = Modifier
             .clip(RoundedCornerShape(999.dp))
-            .background(accent.copy(alpha = 0.12f))
+            .background(color.copy(alpha = 0.12f))
             .padding(horizontal = 10.dp, vertical = 4.dp),
-        color = accent,
+        color = color,
         style = MaterialTheme.typography.labelMedium,
         fontWeight = FontWeight.Bold
     )
@@ -302,6 +309,7 @@ private fun sampleColorScheme() = lightColorScheme(
 
 private data class MatchUi(
     val title: String,
+    val status: String,
     val subtitle: String,
     val accent: Color,
     val properties: List<Pair<String, String>>

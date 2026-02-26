@@ -39,6 +39,8 @@ deepMatch {
 }
 ```
 
+By default, DeepMatch auto-composes processors from project dependencies that also apply the plugin.
+
 4. Create `.deeplinks.yml` in your module root (or `src/<variant>/.deeplinks.yml`):
 
 ```yaml
@@ -72,6 +74,8 @@ If `port` is declared, it is matched at runtime and emitted in generated manifes
 ./gradlew :app:generateDebugDeeplinkSpecs
 ```
 
+Need task details or URI validation? See [Tasks](tasks.md).
+
 6. Use the generated processor:
 
 ```kotlin
@@ -87,6 +91,10 @@ intent.data?.let { uri ->
 }
 ```
 
+Runtime APIs are also available when you want custom wiring:
+
+- `CompositeDeeplinkProcessor` to chain processors and return the first match.
+
 7. Optional device test with ADB:
 
 ```bash
@@ -98,7 +106,8 @@ adb shell am start -W \
 
 For an end-to-end sample app flow, see the repository sample at
 `samples/android-app/README.md`. For schema/plugin details, see
-[Deeplink Specs](deeplink-specs.md) and [Plugin](plugin.md).
+[Deeplink Specs](deeplink-specs.md), [Plugin](plugin.md), and
+[Composite Specs](composite-specs.md).
 
 ## Upgrading
 

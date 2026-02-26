@@ -21,7 +21,7 @@ class DeeplinkSpecTest {
             pathParams = emptyList(),
             queryParams = emptySet(),
             fragment = null,
-            parametersClass = null
+            paramsFactory = null
         )
         val deeplinkMatcher = sut.matcher
 
@@ -43,7 +43,7 @@ class DeeplinkSpecTest {
             pathParams = emptyList(),
             queryParams = emptySet(),
             fragment = null,
-            parametersClass = null
+            paramsFactory = null
         )
         val deeplinkMatcher = sut.matcher
 
@@ -68,7 +68,7 @@ class DeeplinkSpecTest {
             pathParams = emptyList(),
             queryParams = emptySet(),
             fragment = null,
-            parametersClass = null
+            paramsFactory = null
         )
         val deeplinkMatcher = sut.matcher
 
@@ -88,7 +88,7 @@ class DeeplinkSpecTest {
             pathParams = listOf(pathParam),
             queryParams = emptySet(),
             fragment = null,
-            parametersClass = null
+            paramsFactory = null
         )
         val deeplinkMatcher = sut.matcher
 
@@ -111,7 +111,7 @@ class DeeplinkSpecTest {
             pathParams = params,
             queryParams = emptySet(),
             fragment = null,
-            parametersClass = null
+            paramsFactory = null
         )
         val deeplinkMatcher = sut.matcher
 
@@ -131,7 +131,7 @@ class DeeplinkSpecTest {
             pathParams = listOf(pathParam),
             queryParams = emptySet(),
             fragment = null,
-            parametersClass = null
+            paramsFactory = null
         )
         val deeplinkMatcher = sut.matcher
 
@@ -150,7 +150,7 @@ class DeeplinkSpecTest {
             ),
             queryParams = emptySet(),
             fragment = null,
-            parametersClass = null
+            paramsFactory = null
         )
 
         assertThat(sut.matcher.matches("app:///profile/123")).isTrue()
@@ -165,7 +165,7 @@ class DeeplinkSpecTest {
             pathParams = listOf(Param(name = "profile")),
             queryParams = emptySet(),
             fragment = null,
-            parametersClass = null
+            paramsFactory = null
         )
 
         assertThat(sut.matcher.matches("https://example.com:8080/profile")).isTrue()
@@ -184,7 +184,7 @@ class DeeplinkSpecTest {
                 Param(name = "page", type = ParamType.NUMERIC)
             ),
             fragment = null,
-            parametersClass = null
+            paramsFactory = null
         )
 
         // then
@@ -201,7 +201,7 @@ class DeeplinkSpecTest {
             pathParams = emptyList(),
             queryParams = setOf(Param(name = "page", type = ParamType.NUMERIC)),
             fragment = null,
-            parametersClass = null
+            paramsFactory = null
         )
 
         // then
@@ -217,7 +217,7 @@ class DeeplinkSpecTest {
             pathParams = emptyList(),
             queryParams = setOf(Param(name = "page", type = ParamType.NUMERIC, required = true)),
             fragment = null,
-            parametersClass = null
+            paramsFactory = null
         )
 
         // then
@@ -233,7 +233,7 @@ class DeeplinkSpecTest {
             pathParams = emptyList(),
             queryParams = setOf(Param(name = "page", type = ParamType.NUMERIC)),
             fragment = null,
-            parametersClass = null
+            paramsFactory = null
         )
 
         // then
@@ -249,7 +249,7 @@ class DeeplinkSpecTest {
             pathParams = emptyList(),
             queryParams = setOf(Param(name = "ref")),
             fragment = null,
-            parametersClass = null
+            paramsFactory = null
         )
 
         // then
@@ -269,7 +269,7 @@ class DeeplinkSpecTest {
             pathParams = emptyList(),
             queryParams = emptySet(),
             fragment = fragment,
-            parametersClass = null
+            paramsFactory = null
         )
         val deeplinkMatcher = sut.matcher
 
@@ -288,7 +288,7 @@ class DeeplinkSpecTest {
             pathParams = emptyList(),
             queryParams = emptySet(),
             fragment = null,
-            parametersClass = null
+            paramsFactory = null
         )
         val deeplinkMatcher = sut.matcher
 

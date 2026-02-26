@@ -8,17 +8,17 @@ import kotlin.reflect.KClass
  * Immutable description of a deeplink shape generated from the YAML spec.
  *
  * Each instance captures the allowed URI components alongside the optional
- * parameters class that should be constructed when a match occurs.
+ * params factory that should be invoked when a match occurs.
  */
-@Serializable
 data class DeeplinkSpec(
+    val name: String = "",
     val scheme: Set<String>,
     val host: Set<String>,
     val port: Int? = null,
     val pathParams: List<Param>,
     val queryParams: Set<Param>,
     val fragment: String?,
-    val parametersClass: KClass<out DeeplinkParams>?
+    val paramsFactory: ((Map<String, String?>) -> DeeplinkParams?)?
 ) {
     val matcher: Regex by lazy { buildMatcher() }
 

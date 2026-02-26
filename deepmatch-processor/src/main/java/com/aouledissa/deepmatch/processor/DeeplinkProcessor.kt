@@ -3,7 +3,6 @@ package com.aouledissa.deepmatch.processor
 import android.net.Uri
 import com.aouledissa.deepmatch.api.DeeplinkParams
 import com.aouledissa.deepmatch.api.DeeplinkSpec
-import com.aouledissa.deepmatch.processor.internal.DeeplinkParamsAutoFactory
 
 /**
  * Matches incoming URIs against registered deeplink specs and returns decoded
@@ -18,20 +17,42 @@ open class DeeplinkProcessor(
      * found.
      */
     open fun match(deeplink: Uri): DeeplinkParams? {
-        val spec = specs.find {
-            it.matcher.matches(deeplink.decoded()) && it.matchesQueryParams(deeplink::getQueryParameter)
+        return try {
+            val decoded = deeplink.decoded() ?: return null
+
+            for (spec in specs) {
+                val regexMatch = spec.matcher.matches(decoded)
+                if (!regexMatch) {
+                    continue
+                }
+
+                val queryMatch = spec.matchesQueryParams(deeplink::getQueryParameter)
+                if (!queryMatch) {
+                    continue
+                }
+
+                val params = buildDeeplinkParams(spec, deeplink)
+                if (params == null) {
+                    continue
+                }
+
+                return params
+            }
+
+            null
+        } catch (error: Exception) {
+            null
         }
-            ?: return null
-        return buildDeeplinkParams(spec, deeplink)
     }
 
-    private fun Uri.decoded(): String {
+    private fun Uri.decoded(): String? {
+        val decodedScheme = scheme ?: return null
         val decodedPathSegments = pathSegments.joinToString("/")
             .trimEnd('/')
             .let { if (pathSegments.isNullOrEmpty().not()) "/$it" else it }
         val decodedFragment = fragment?.let { "#$it" }.orEmpty()
         val decodedPort = if (port >= 0) ":$port" else ""
-        return "$scheme://${host.orEmpty()}$decodedPort$decodedPathSegments$decodedFragment"
+        return "$decodedScheme://${host.orEmpty()}$decodedPort$decodedPathSegments$decodedFragment"
     }
 
     private fun buildDeeplinkParams(
@@ -44,6 +65,7 @@ open class DeeplinkProcessor(
 
         // Extract typed path params.
         spec.pathParams.forEachIndexed { index, param ->
+            if (index >= pathSegments.size) return@forEachIndexed
             val value = pathSegments[index]
             if (param.type != null) {
                 params[param.name.lowercase()] = value
@@ -59,8 +81,6 @@ open class DeeplinkProcessor(
         // Extract fragment when declared in spec.
         spec.fragment?.let { params["fragment"] = fragment }
 
-        return spec.parametersClass?.let {
-            DeeplinkParamsAutoFactory.tryCreate(spec.parametersClass, params)
-        }
+        return spec.paramsFactory?.invoke(params)
     }
 }
