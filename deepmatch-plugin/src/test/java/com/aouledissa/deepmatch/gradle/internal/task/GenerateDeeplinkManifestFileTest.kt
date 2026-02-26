@@ -250,6 +250,51 @@ class GenerateDeeplinkManifestFileTest {
         assertThat(withoutPort).doesNotContain("android:port=")
     }
 
+    @Test
+    fun `additional specs files are merged into generated manifest`() {
+        val project = ProjectBuilder.builder().build()
+        val mainSpecsFile = temporaryFolder.newFile("main-${System.nanoTime()}.deeplinks.yml").apply {
+            writeText(
+                """
+                deeplinkSpecs:
+                  - name: "open profile"
+                    activity: com.example.app.MainActivity
+                    scheme: [app]
+                    host: ["example.com"]
+                """.trimIndent()
+            )
+        }
+        val extraSpecsFile = temporaryFolder.newFile("extra-${System.nanoTime()}.deeplinks.yml").apply {
+            writeText(
+                """
+                deeplinkSpecs:
+                  - name: "open series"
+                    activity: com.example.app.MainActivity
+                    scheme: [app]
+                    host: ["series.example.com"]
+                """.trimIndent()
+            )
+        }
+        val outputManifest = temporaryFolder.newFile("AndroidManifest-${System.nanoTime()}.xml")
+        val task = project.tasks.register(
+            "generateManifestMultiFile${System.nanoTime()}",
+            GenerateDeeplinkManifestFile::class.java
+        ).get()
+
+        task.specFileProperty.set(project.layout.file(project.provider { mainSpecsFile }))
+        task.additionalSpecsFilesProperty.setFrom(
+            project.layout.file(project.provider { extraSpecsFile })
+        )
+        task.outputFile.set(project.layout.file(project.provider { outputManifest }))
+        task.compileSdkProperty.set(34)
+
+        task.generateDeeplinkManifest()
+        val xml = outputManifest.readText()
+
+        assertThat(xml).contains("android:host=\"example.com\"")
+        assertThat(xml).contains("android:host=\"series.example.com\"")
+    }
+
     private fun generateManifest(yaml: String, compileSdk: Int = 34): String {
         val project = ProjectBuilder.builder().build()
         val specsFile = temporaryFolder.newFile("manifest-${System.nanoTime()}.deeplinks.yml").apply {

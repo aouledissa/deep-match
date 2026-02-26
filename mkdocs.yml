@@ -30,6 +30,7 @@ nav:
   - Overview: index.md
   - Plugin: plugin.md
   - Tasks: tasks.md
+  - Report: report.md
   - Deeplink Specs: deeplink-specs.md
   - Composite Specs: composite-specs.md
   - Migration Guide: migration-guide-0.2.0-alpha.md

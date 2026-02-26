@@ -2,15 +2,17 @@ package com.aouledissa.deepmatch.gradle.internal.task
 
 import com.aouledissa.deepmatch.api.DeeplinkSpec
 import com.aouledissa.deepmatch.gradle.LOG_TAG
-import com.aouledissa.deepmatch.gradle.internal.deserializeDeeplinkConfigs
+import com.aouledissa.deepmatch.gradle.internal.deserializeMergedDeeplinkConfigs
 import com.charleskorn.kaml.Yaml
 import com.charleskorn.kaml.YamlConfiguration
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
+import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
+import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.TaskAction
 import org.gradle.api.tasks.options.Option
 import java.net.URI
@@ -21,6 +23,9 @@ internal abstract class ValidateDeeplinksTask : DefaultTask() {
 
     @get:InputFile
     abstract val specsFileProperty: RegularFileProperty
+
+    @get:InputFiles
+    abstract val additionalSpecsFilesProperty: ConfigurableFileCollection
 
     @get:Input
     @get:Option(option = "uri", description = "URI to validate against deeplink specs")
@@ -39,8 +44,11 @@ internal abstract class ValidateDeeplinksTask : DefaultTask() {
             logger.quiet("  Invalid URI: ${e.message}")
             return
         }
-        val specsFile = specsFileProperty.asFile.get()
-        val configs = yamlSerializer.deserializeDeeplinkConfigs(specsFile)
+        val specsFiles = buildList {
+            add(specsFileProperty.asFile.get())
+            addAll(additionalSpecsFilesProperty.files.sortedBy { it.absolutePath })
+        }
+        val configs = yamlSerializer.deserializeMergedDeeplinkConfigs(specsFiles)
 
         logger.quiet("$LOG_TAG validating '$uriValue'")
         var hasMatch = false

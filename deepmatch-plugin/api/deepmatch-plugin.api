@@ -8,8 +8,16 @@ public abstract class com/aouledissa/deepmatch/gradle/DeepMatchPluginConfig {
 	public static final field Companion Lcom/aouledissa/deepmatch/gradle/DeepMatchPluginConfig$Companion;
 	public fun <init> (Lorg/gradle/api/model/ObjectFactory;)V
 	public final fun getGenerateManifestFiles ()Lorg/gradle/api/provider/Property;
+	public final fun getReport ()Lcom/aouledissa/deepmatch/gradle/DeepMatchReportConfig;
+	public final fun report (Lorg/gradle/api/Action;)V
 }
 
 public final class com/aouledissa/deepmatch/gradle/DeepMatchPluginConfig$Companion {
+}
+
+public abstract class com/aouledissa/deepmatch/gradle/DeepMatchReportConfig {
+	public fun <init> (Lorg/gradle/api/model/ObjectFactory;)V
+	public final fun getEnabled ()Lorg/gradle/api/provider/Property;
+	public final fun getOutput ()Lorg/gradle/api/file/RegularFileProperty;
 }
 

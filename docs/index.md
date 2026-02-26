@@ -1,7 +1,7 @@
 # DeepMatch
 
 DeepMatch keeps your Android deeplinks consistent from configuration to runtime. The Gradle plugin
-parses a `.deeplinks.yml` file and generates Kotlin sources plus optional manifest entries, while the
+parses deeplink YAML spec files and generates Kotlin sources plus optional manifest entries, while the
 runtime library matches incoming URIs and returns strongly-typed params.
 
 ## Key Components
@@ -41,7 +41,10 @@ deepMatch {
 
 By default, DeepMatch auto-composes processors from project dependencies that also apply the plugin.
 
-4. Create `.deeplinks.yml` in your module root (or `src/<variant>/.deeplinks.yml`):
+4. Create one or more spec files in your module:
+- Module root: `.deeplinks.yml` or `*.deeplinks.yml`
+- Variant folder: `src/<variant>/.deeplinks.yml` or `src/<variant>/*.deeplinks.yml`
+- Merge precedence is root first, then variant. Same-name specs in later sources override earlier ones.
 
 ```yaml
 deeplinkSpecs:
@@ -75,6 +78,7 @@ If `port` is declared, it is matched at runtime and emitted in generated manifes
 ```
 
 Need task details or URI validation? See [Tasks](tasks.md).
+Need a human-friendly catalog and browser validator (full catalog + source/module views)? See [Report](report.md).
 
 6. Use the generated processor:
 

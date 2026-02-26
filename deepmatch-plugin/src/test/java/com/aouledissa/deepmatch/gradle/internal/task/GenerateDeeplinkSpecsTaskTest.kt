@@ -342,4 +342,97 @@ class GenerateDeeplinkSpecsTaskTest {
         assertThat(processorCode).contains("ProfileDeeplinkProcessor")
         assertThat(processorCode).contains("SeriesDeeplinkProcessor")
     }
+
+    @Test
+    fun `additional specs files are merged into generated output`() {
+        val project = ProjectBuilder.builder().build()
+        val mainSpecsFile = temporaryFolder.newFile("main.deeplinks.yml").apply {
+            writeText(
+                """
+                deeplinkSpecs:
+                  - name: "open profile"
+                    activity: com.example.app.MainActivity
+                    scheme: [app]
+                    host: ["example.com"]
+                """.trimIndent()
+            )
+        }
+        val featureSpecsFile = temporaryFolder.newFile("feature.deeplinks.yml").apply {
+            writeText(
+                """
+                deeplinkSpecs:
+                  - name: "open series"
+                    activity: com.example.app.MainActivity
+                    scheme: [app]
+                    host: ["example.com"]
+                """.trimIndent()
+            )
+        }
+        val outputDir = temporaryFolder.newFolder("generated-multi-file")
+        val task = project.tasks.register("generateMergedSpecs", GenerateDeeplinkSpecsTask::class.java).get()
+
+        task.specsFileProperty.set(project.layout.file(project.provider { mainSpecsFile }))
+        task.additionalSpecsFilesProperty.setFrom(
+            project.layout.file(project.provider { featureSpecsFile })
+        )
+        task.packageNameProperty.set("com.example.app")
+        task.moduleNameProperty.set("app")
+        task.compositeProcessorsProperty.set(emptyList())
+        task.outputDir.set(project.layout.dir(project.provider { outputDir }))
+
+        task.generateDeeplinkSpecs()
+
+        val generatedPackageDir = File(outputDir, "com/example/app/deeplinks")
+        val profileSpec = File(generatedPackageDir, "OpenProfileDeeplinkSpecs.kt")
+        val seriesSpec = File(generatedPackageDir, "OpenSeriesDeeplinkSpecs.kt")
+
+        assertThat(profileSpec.exists()).isTrue()
+        assertThat(seriesSpec.exists()).isTrue()
+    }
+
+    @Test
+    fun `additional specs override base specs by name`() {
+        val project = ProjectBuilder.builder().build()
+        val mainSpecsFile = temporaryFolder.newFile("override-main.deeplinks.yml").apply {
+            writeText(
+                """
+                deeplinkSpecs:
+                  - name: "open profile"
+                    activity: com.example.app.MainActivity
+                    scheme: [app]
+                    host: ["main.example.com"]
+                """.trimIndent()
+            )
+        }
+        val overrideSpecsFile = temporaryFolder.newFile("override-variant.deeplinks.yml").apply {
+            writeText(
+                """
+                deeplinkSpecs:
+                  - name: "open profile"
+                    activity: com.example.app.MainActivity
+                    scheme: [app]
+                    host: ["variant.example.com"]
+                """.trimIndent()
+            )
+        }
+        val outputDir = temporaryFolder.newFolder("generated-override")
+        val task = project.tasks.register("generateOverrideSpecs", GenerateDeeplinkSpecsTask::class.java).get()
+
+        task.specsFileProperty.set(project.layout.file(project.provider { mainSpecsFile }))
+        task.additionalSpecsFilesProperty.setFrom(
+            project.layout.file(project.provider { overrideSpecsFile })
+        )
+        task.packageNameProperty.set("com.example.app")
+        task.moduleNameProperty.set("app")
+        task.compositeProcessorsProperty.set(emptyList())
+        task.outputDir.set(project.layout.dir(project.provider { outputDir }))
+
+        task.generateDeeplinkSpecs()
+
+        val generatedSpecFile = File(outputDir, "com/example/app/deeplinks/OpenProfileDeeplinkSpecs.kt")
+        val generatedSpecCode = generatedSpecFile.readText()
+
+        assertThat(generatedSpecCode).contains("host = setOf(\"variant.example.com\")")
+        assertThat(generatedSpecCode).doesNotContain("main.example.com")
+    }
 }

@@ -8,11 +8,11 @@ internal class MissingSpecsFileException(
 ) : GradleException() {
     override val message: String
         get() = """
-                DeepMatch Configuration Error: Failed to find the '.deeplinks.yml' deeplink specification file.
-                To resolve this, create a '.deeplinks.yml' file in ONE of the following locations (checked in this order):
-                  - For variant-specific configuration: $path/src/$variantName/.deeplinks.yml
-                  - For a global fallback: $path/.deeplinks.yml
+                DeepMatch Configuration Error: Failed to find deeplink specification files.
+                To resolve this, add one or more '*.deeplinks.yml' files in ONE of the following locations (checked in this order):
+                  - For variant-specific configuration: $path/src/$variantName/
+                  - For a global fallback: $path/
 
-                No '.deeplinks.yml' was found for the '$variantName' build variant in its source directory or at the project root.
+                No '*.deeplinks.yml' files were found for the '$variantName' build variant in its source directory or at the project root.
             """.trimIndent()
 }

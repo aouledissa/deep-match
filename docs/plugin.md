@@ -3,12 +3,15 @@
 The primary responsibilities and capabilities of the DeepMatch Gradle plugin are:
 
 1.  **YAML Configuration Parsing:**
-    *   The plugin automatically locates and reads your `.deeplinks.yml` file from one of these locations:
-        *   `src/<variant>/.deeplinks.yml` (variant-specific)
-        *   `.deeplinks.yml` at the module root (fallback)
+    *   The plugin automatically locates and reads all deeplink spec files from:
+        *   module root: `.deeplinks.yml` and `*.deeplinks.yml`
+        *   `src/<variant>/`: `.deeplinks.yml` and `*.deeplinks.yml`
+    *   Sources are merged in deterministic order: root files first, then variant files.
+        *   If the same spec `name` appears in multiple sources, the later source overrides the earlier one.
+        *   This means a build-type/variant spec overrides a module-root spec with the same `name`.
     *   It parses the YAML content, validating its structure against the expected format (implicitly defined by how it generates code and manifest entries, aligning with the `DeeplinkConfig` structure).
     *   Each spec must define at least one `scheme`; `host` is optional and can be omitted for hostless deeplinks.
-    *   Spec `name` values must be unique within the same `.deeplinks.yml`; duplicates fail early with a clear plugin error.
+    *   Spec `name` values must be unique within the same source file; duplicates fail early with a clear plugin error.
 
 2.  **Android Manifest Generation:**
     *   Based on the parsed `deeplinkSpecs` from your YAML file, the plugin dynamically generates the necessary `<intent-filter>` entries within your app's `AndroidManifest.xml`.
@@ -37,10 +40,12 @@ The primary responsibilities and capabilities of the DeepMatch Gradle plugin are
 5.  **Configuration Options:**
     *   The plugin provides a DSL (Domain Specific Language) extension in your `build.gradle` (`deepMatch { ... }` block) to customize its behavior:
         *   **generateManifestFiles:** Specifying whether or not the plugin should generate `AndroidManifest.xml` file based on the deeplink config `yaml` file.
+        *   **report.enabled:** Enables generation of a standalone deeplink HTML report.
+        *   **report.output:** Optional output file override for the generated report.
 
 ### Benefits of Using the Plugin
 
-*   **Single Source of Truth:** Your `.deeplinks.yml` becomes the definitive source for all your deep link definitions.
+*   **Single Source of Truth:** Your discovered deeplink YAML sources become the definitive source for all deep link definitions.
 *   **Reduced Boilerplate:** No need to manually write complex and error-prone `<intent-filter>` tags in the manifest.
 *   **Consistency:** Ensures that your manifest and the runtime parsing logic are always in sync with your declared specifications.
 *   **Improved Maintainability:** Adding, removing, or modifying deep links is as simple as editing the YAML file and rebuilding.
@@ -63,10 +68,17 @@ The primary responsibilities and capabilities of the DeepMatch Gradle plugin are
     ```kotlin
     deepMatch {
         generateManifestFiles = true
+        report {
+            enabled = true
+            // output = layout.buildDirectory.file("reports/deeplinks.html")
+        }
     }
     ```
 
-3. Add a `.deeplinks.yml` file at the module root (or under `src/<variant>/.deeplinks.yml`). See `deeplink-specs.md` for the full schema.
+3. Add one or more deeplink YAML files:
+    - module root: `.deeplinks.yml` or `*.deeplinks.yml`
+    - variant-specific: `src/<variant>/.deeplinks.yml` or `src/<variant>/*.deeplinks.yml`
+   See `deeplink-specs.md` for the full schema.
 
 During the build the plugin generates Kotlin sources under `build/generated/` and, when enabled, a manifest snippet under `build/generated/manifests/<variant>/AndroidManifest.xml`.
 For multi-module behavior and precedence, see [Composite Specs](composite-specs.md).
@@ -89,6 +101,7 @@ Task details are documented in [Tasks](tasks.md), including:
 - `generate<Variant>DeeplinkSpecs`
 - `generate<Variant>DeeplinksManifest`
 - `validateDeeplinks`
+- `generateDeeplinkReport`
 
 ### Testing & CI
 

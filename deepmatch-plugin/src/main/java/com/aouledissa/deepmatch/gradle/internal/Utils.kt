@@ -72,3 +72,14 @@ internal fun Yaml.deserializeDeeplinkConfigs(file: File): List<DeeplinkConfig> {
     val content = file.readText()
     return decodeFromString(Specs.serializer(), content).deeplinkSpecs
 }
+
+internal fun Yaml.deserializeMergedDeeplinkConfigs(files: List<File>): List<DeeplinkConfig> {
+    val mergedByName = linkedMapOf<String, DeeplinkConfig>()
+    files.forEach { file ->
+        deserializeDeeplinkConfigs(file).forEach { config ->
+            // Later files override earlier ones for the same spec name.
+            mergedByName[config.name] = config
+        }
+    }
+    return mergedByName.values.toList()
+}

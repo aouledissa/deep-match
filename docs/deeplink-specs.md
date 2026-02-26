@@ -185,7 +185,7 @@ deeplinkSpecs:
 
 ### Tips
 
-- `name` values must be unique per spec. Duplicate names fail fast at generation time with a plugin validation error.
+- `name` values must be unique within each YAML source file. Across multiple sources, later files override earlier specs with the same `name`.
 - Regenerate sources (`./gradlew generate<Variant>DeeplinkSpecs`) whenever you modify the YAML schema.
 - If `generateManifestFiles` is disabled, remember to replicate the `<intent-filter>` changes manually in your main manifest.
 - The plugin creates a `<Name>DeeplinkParams` class for every deeplink spec. This avoids ambiguity between "no match" and "matched static deeplink".

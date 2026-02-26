@@ -1,0 +1,99 @@
+deeplinkSpecs:
+  - name: "open profile spotlight"
+    activity: com.aouledissa.deepmatch.sample.MainActivity
+    categories: [DEFAULT, BROWSABLE]
+    autoVerify: true
+    scheme: [app, https]
+    host: ["sample.deepmatch.dev"]
+    pathParams:
+      - name: profile
+      - name: handle
+        type: alphanumeric
+      - name: spotlight
+    queryParams:
+      - name: source
+        type: string
+        required: true
+      - name: ref
+        type: string
+    fragment: "bio"
+
+  - name: "open profile timeline"
+    activity: com.aouledissa.deepmatch.sample.MainActivity
+    categories: [DEFAULT, BROWSABLE]
+    scheme: [app]
+    host: ["sample.deepmatch.dev"]
+    pathParams:
+      - name: profile
+      - name: handle
+        type: alphanumeric
+      - name: timeline
+    queryParams:
+      - name: range
+        type: string
+      - name: page
+        type: numeric
+
+  - name: "open profile followers"
+    activity: com.aouledissa.deepmatch.sample.MainActivity
+    categories: [DEFAULT, BROWSABLE]
+    scheme: [https]
+    host: ["sample.deepmatch.dev"]
+    pathParams:
+      - name: profile
+      - name: handle
+        type: alphanumeric
+      - name: followers
+    queryParams:
+      - name: sort
+        type: string
+      - name: ref
+        type: string
+
+  - name: "open profile following"
+    activity: com.aouledissa.deepmatch.sample.MainActivity
+    categories: [DEFAULT, BROWSABLE]
+    scheme: [https, app]
+    host: ["sample.deepmatch.dev"]
+    pathParams:
+      - name: profile
+      - name: handle
+        type: alphanumeric
+      - name: following
+    queryParams:
+      - name: source
+        type: string
+        required: true
+
+  - name: "open profile achievements"
+    activity: com.aouledissa.deepmatch.sample.MainActivity
+    categories: [DEFAULT, BROWSABLE]
+    scheme: [app]
+    host: ["sample.deepmatch.dev"]
+    pathParams:
+      - name: profile
+      - name: handle
+        type: alphanumeric
+      - name: achievements
+    queryParams:
+      - name: season
+        type: numeric
+      - name: ref
+        type: string
+    fragment: "top"
+
+  - name: "open profile settings"
+    activity: com.aouledissa.deepmatch.sample.MainActivity
+    categories: [DEFAULT, BROWSABLE]
+    scheme: [app]
+    host: ["sample.deepmatch.dev"]
+    pathParams:
+      - name: profile
+      - name: handle
+        type: alphanumeric
+      - name: settings
+    queryParams:
+      - name: section
+        type: string
+      - name: source
+        type: string
