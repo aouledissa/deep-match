@@ -11,6 +11,7 @@ deeplinkSpecs:
     queryParams:
       - name: ref
         type: string
+        required: true
     fragment: "details"
 
   - name: "open series"

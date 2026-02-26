@@ -79,6 +79,47 @@ class DeeplinkProcessorRobolectricTest {
     }
 
     @Test
+    fun deeplinkMatchesWhenOptionalQueryParamIsAbsent() {
+        val spec = DeeplinkSpec(
+            scheme = setOf("app"),
+            host = setOf("example.com"),
+            pathParams = listOf(
+                Param(name = "series"),
+                Param(name = "seriesId", type = ParamType.NUMERIC)
+            ),
+            queryParams = setOf(Param(name = "ref", type = ParamType.STRING)),
+            fragment = null,
+            parametersClass = OptionalRefParams::class
+        )
+        val processor = DeeplinkProcessor(specs = setOf(spec))
+
+        val uri = Uri.parse("app://example.com/series/42")
+        val params = processor.match(uri) as OptionalRefParams?
+        assertThat(params?.seriesId).isEqualTo(42)
+        assertThat(params?.ref).isNull()
+    }
+
+    @Test
+    fun deeplinkDoesNotMatchWhenRequiredQueryParamIsAbsent() {
+        val spec = DeeplinkSpec(
+            scheme = setOf("app"),
+            host = setOf("example.com"),
+            pathParams = listOf(
+                Param(name = "series"),
+                Param(name = "seriesId", type = ParamType.NUMERIC)
+            ),
+            queryParams = setOf(Param(name = "ref", type = ParamType.STRING, required = true)),
+            fragment = null,
+            parametersClass = RequiredRefParams::class
+        )
+        val processor = DeeplinkProcessor(specs = setOf(spec))
+
+        val uri = Uri.parse("app://example.com/series/42")
+        val params = processor.match(uri)
+        assertThat(params).isNull()
+    }
+
+    @Test
     fun deeplinkWithDifferentPathOrder_doesNotMatch() {
         val spec = DeeplinkSpec(
             scheme = setOf("app"),
@@ -112,5 +153,15 @@ class DeeplinkProcessorRobolectricTest {
 
     data class SeriesOnlyParams(
         val seriesId: Int
+    ) : DeeplinkParams
+
+    data class OptionalRefParams(
+        val seriesId: Int,
+        val ref: String?
+    ) : DeeplinkParams
+
+    data class RequiredRefParams(
+        val seriesId: Int,
+        val ref: String
     ) : DeeplinkParams
 }

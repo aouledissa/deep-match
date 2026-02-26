@@ -65,6 +65,7 @@ During the build the plugin generates Kotlin sources under `build/generated/` an
 - `*DeeplinkSpecs.kt` — exposes a `DeeplinkSpec` property per configuration entry.
   Generated specs use `pathParams` as an ordered list to preserve YAML-declared path segment order.
 - `*DeeplinkParams.kt` — optional data class emitted when a deeplink defines typed template/query params or a fragment requirement (including fragment-only specs).
+  Query params marked `required: true` are generated as non-null properties; optional query params are generated as nullable properties.
 - Generated manifest file — contains `<intent-filter>` definitions that Gradle merges into the final manifest.
 
 ### Available Tasks

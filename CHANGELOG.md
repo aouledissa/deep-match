@@ -14,23 +14,32 @@
 - Fragment presence is now treated as a params-generation trigger in plugin config evaluation.
 - Fragment-only deeplink specs now generate `*DeeplinkParams` with a `fragment` property and wire
   `parametersClass` accordingly.
+- Added `required` to query params (`Param.required`) to support optional-vs-required query matching.
+- Optional typed query params are now generated as nullable constructor properties; required query
+  params remain non-null.
 
 ### Fixed
 
 - Fixed critical query matching behavior where typed query params could fail when URL query order
   differed from spec declaration order (for example, `?page=1&ref=promo` now matches
   `ref + page` specs correctly).
+- Fixed query matching strictness: typed query params are optional by default, validated only when
+  present, and enforced only when marked `required: true`.
 
 ### Documentation
 
 - Updated README and docs pages to document order-agnostic typed query param matching semantics.
 - Updated README/docs to clarify ordered path params list semantics in generated specs.
+- Updated docs to cover `queryParams.required` and generated nullability semantics for optional
+  query params.
 
 ### Tests
 
 - Added plugin tests to validate fragment-only specs generate params classes and that generated
   specs emit `pathParams = listOf(...)`.
 - Added processor regression coverage to ensure path matching remains positional and order-sensitive.
+- Added query optionality tests for API/processor/plugin generation, including required-missing
+  rejection and optional-missing acceptance.
 
 ## [0.2.0-alpha] - 2026-02-25
 

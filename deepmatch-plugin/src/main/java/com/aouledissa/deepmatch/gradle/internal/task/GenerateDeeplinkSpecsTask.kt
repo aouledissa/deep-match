@@ -19,6 +19,7 @@ import com.squareup.kotlinpoet.KModifier
 import com.squareup.kotlinpoet.ParameterSpec
 import com.squareup.kotlinpoet.PropertySpec
 import com.squareup.kotlinpoet.TypeSpec
+import com.squareup.kotlinpoet.asTypeName
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.file.DirectoryProperty
@@ -255,7 +256,7 @@ internal abstract class GenerateDeeplinkSpecsTask : DefaultTask() {
                 add(
                     ParameterSpec.builder(
                         it.name.toCamelCase(),
-                        it.type!!.getType()
+                        it.type!!.getType().asTypeName().copy(nullable = !it.required)
                     ).build()
                 )
             }

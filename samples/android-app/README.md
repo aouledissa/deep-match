@@ -41,6 +41,11 @@ adb shell am start -W \
 
 The screen should render parsed output for `OpenSeriesDeeplinkParams` and `OpenProfileDeeplinkParams`.
 
+In this sample:
+- `open series` keeps `ref` optional.
+- `open profile` sets `ref` as required (`required: true`) in `.deeplinks.yml`, so profile links
+  must include `?ref=...` to match.
+
 ## Notes
 
 - The sample uses composite build (`includeBuild("../..")`) to consume the local plugin and modules.
