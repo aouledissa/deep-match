@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+    <url>
+         <loc>https://aouledissa.com/deep-match/0.2.0-alpha/</loc>
+         <lastmod>2026-02-26</lastmod>
+    </url>
+    <url>
+         <loc>https://aouledissa.com/deep-match/0.2.0-alpha/config_file/</loc>
+         <lastmod>2026-02-26</lastmod>
+    </url>
+    <url>
+         <loc>https://aouledissa.com/deep-match/0.2.0-alpha/gradle_plugin/</loc>
+         <lastmod>2026-02-26</lastmod>
+    </url>
+    <url>
+         <loc>https://aouledissa.com/deep-match/0.2.0-alpha/migration-guide-0.2.0-alpha/</loc>
+         <lastmod>2026-02-26</lastmod>
+    </url>
+    <url>
+         <loc>https://aouledissa.com/deep-match/0.2.0-alpha/release-notes/0.1.0-alpha/</loc>
+         <lastmod>2026-02-26</lastmod>
+    </url>
+    <url>
+         <loc>https://aouledissa.com/deep-match/0.2.0-alpha/release-notes/0.2.0-alpha/</loc>
+         <lastmod>2026-02-26</lastmod>
+    </url>
+</urlset>
