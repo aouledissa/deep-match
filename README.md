@@ -133,8 +133,8 @@ adb shell am start -W \
 For an end-to-end reference app (Compose UI + generated manifest + ADB tests), see
 [`samples/android-app/README.md`](samples/android-app/README.md).
 
-For full configuration/schema details, see [docs/gradle_plugin.md](docs/gradle_plugin.md) and
-[docs/config_file.md](docs/config_file.md).
+For full configuration/schema details, see [Plugin](docs/plugin.md) and
+[Deeplink Specs](docs/deeplink-specs.md).
 
 ## Testing
 
@@ -149,8 +149,8 @@ can be reused in downstream projects.
 
 ## Documentation
 
-- [docs/gradle_plugin.md](docs/gradle_plugin.md) – Plugin capabilities, setup, and build integration details.
-- [docs/config_file.md](docs/config_file.md) – YAML specification reference with examples.
+- [Plugin](docs/plugin.md) – Plugin capabilities, setup, and build integration details.
+- [Deeplink Specs](docs/deeplink-specs.md) – YAML specification reference with examples.
 - [docs/migration-guide-0.2.0-alpha.md](docs/migration-guide-0.2.0-alpha.md) – Migration steps for the return-based runtime API.
 - [docs/release-notes/0.2.0-alpha.md](docs/release-notes/0.2.0-alpha.md) – Release notes for the latest alpha changes.
 - `deepmatch-testing/src/main/kotlin` – Reusable fakes and fixtures for tests.

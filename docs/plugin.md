@@ -54,7 +54,7 @@ The primary responsibilities and capabilities of the DeepMatch Gradle plugin are
     }
     ```
 
-3. Add a `.deeplinks.yml` file at the module root (or under `src/<variant>/.deeplinks.yml`). See `docs/config_file.md` for the full schema.
+3. Add a `.deeplinks.yml` file at the module root (or under `src/<variant>/.deeplinks.yml`). See `deeplink-specs.md` for the full schema.
 
 During the build the plugin generates Kotlin sources under `build/generated/` and, when enabled, a manifest snippet under `build/generated/manifests/<variant>/AndroidManifest.xml`.
 

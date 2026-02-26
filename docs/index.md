@@ -97,7 +97,7 @@ adb shell am start -W \
 
 For an end-to-end sample app flow, see the repository sample at
 `samples/android-app/README.md`. For schema/plugin details, see
-[YAML Spec](config_file.md) and [Gradle Plugin](gradle_plugin.md).
+[Deeplink Specs](deeplink-specs.md) and [Plugin](plugin.md).
 
 ## Upgrading
 

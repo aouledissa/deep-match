@@ -5,7 +5,7 @@ repo_url: "https://github.com/aouledissa/deep-match"
 repo_name: "aouledissa/DeepMatch"
 docs_dir: docs
 theme:
-  name: material
+  variant: modern
   palette:
     - media: "(prefers-color-scheme: light)"
       scheme: default
@@ -28,8 +28,8 @@ theme:
     - toc.integrate
 nav:
   - Overview: index.md
-  - Gradle Plugin: gradle_plugin.md
-  - YAML Spec: config_file.md
+  - Plugin: plugin.md
+  - Deeplink Specs: deeplink-specs.md
   - Migration Guide: migration-guide-0.2.0-alpha.md
   - Release Notes:
       - v0.2.0-alpha: release-notes/0.2.0-alpha.md
