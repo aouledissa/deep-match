@@ -4,29 +4,74 @@ Each item in the `deeplinkSpecs` list is a deep link configuration object with t
 
 *   **`name`**: (Required, String)
     *   A unique identifier for this deep link specification. This name is used to generate stable spec/params types.
-    *   Example: `userProfile`, `productView`
+    *   Example:
+        ```yaml
+        deeplinkSpecs:
+          - name: "open profile"
+            activity: com.example.app.MainActivity
+            scheme: [app]
+            host: ["example.com"]
+        ```
 
 *   **`activity`**: (Required, String)
     *   The fully qualified name of the Android Activity that will be primarily associated with this deep link in the `AndroidManifest.xml`.
-    *   Example: `com.example.myapp.MainActivity`, `com.example.myapp.ProductDetailsActivity`
+    *   Example:
+        ```yaml
+        deeplinkSpecs:
+          - name: "open product"
+            activity: com.example.app.ProductActivity
+            scheme: [app]
+            host: ["example.com"]
+        ```
 
 *   **`categories`**: (Optional, List of Strings, defaults to `["DEFAULT"]`)
     *   A list of intent filter categories to be added to the generated `<intent-filter>` in the `AndroidManifest.xml`.
     *   Valid values correspond to `IntentFilterCategory` enum (e.g., `DEFAULT`, `BROWSABLE`). The YAML value should be the string representation of the enum constant.
-    *   Example: `categories: [DEFAULT, BROWSABLE]`
+    *   Example:
+        ```yaml
+        deeplinkSpecs:
+          - name: "open article"
+            activity: com.example.app.MainActivity
+            categories: [DEFAULT, BROWSABLE]
+            scheme: [https]
+            host: ["example.com"]
+        ```
     *   If omitted, it defaults to `[DEFAULT]`.
 
 *   **`autoVerify`**: (Optional, Boolean, defaults to `false`)
     *   If set to `true`, the `android:autoVerify="true"` attribute will be added to the generated `<intent-filter>`. This is necessary for Android App Links.
-    *   Example: `autoVerify: true`
+    *   Example:
+        ```yaml
+        deeplinkSpecs:
+          - name: "open app link"
+            activity: com.example.app.MainActivity
+            autoVerify: true
+            categories: [DEFAULT, BROWSABLE]
+            scheme: [https]
+            host: ["example.com"]
+        ```
 
 *   **`scheme`**: (Required, List of Strings)
     *   One or more URI schemes supported by the deeplink.
-    *   Example: `scheme: [myapp, https]`
+    *   Example:
+        ```yaml
+        deeplinkSpecs:
+          - name: "open profile"
+            activity: com.example.app.MainActivity
+            scheme: [app, https]
+            host: ["example.com"]
+        ```
 
 *   **`host`**: (Required, List of Strings)
     *   One or more hosts (domains) that should resolve to this deeplink.
-    *   Example: `host: ["example.com", "m.example.com"]`
+    *   Example:
+        ```yaml
+        deeplinkSpecs:
+          - name: "open profile"
+            activity: com.example.app.MainActivity
+            scheme: [https]
+            host: ["example.com", "m.example.com"]
+        ```
 
 *   **`pathParams`**: (Optional, List of Param objects)
     *   Defines ordered parameters that are part of the URI path. Each item in the list is a `Param` object.
@@ -45,10 +90,17 @@ Each item in the `deeplinkSpecs` list is a deep link configuration object with t
 *   **`queryParams`**: (Optional, List of Param objects)
     *   Mirrors the structure of `pathParams` but for query string parameters.
     *   Query params should declare a `type` so runtime validation and generated parameter classes enforce the expected format and type conversion.
+    *   Query params support **`required`** (Optional, Boolean, default `false`):
+        *   `required: true` means the query param must be present for a match.
+        *   Omitted (or `false`) means optional: if absent, matching still succeeds.
+        *   Optional typed query params are generated as nullable properties in `*DeeplinkParams`.
     *   Query param matching is order-agnostic (`?page=1&ref=promo` and `?ref=promo&page=1` are equivalent).
     *   Example:
         ```yaml
         queryParams:
+          - name: query
+            type: string
+            required: true
           - name: ref
             type: string
           - name: page
@@ -58,9 +110,31 @@ Each item in the `deeplinkSpecs` list is a deep link configuration object with t
 *   **`fragment`**: (Optional, String)
     *   Adds a fragment requirement (`#details`).
     *   When provided, DeepMatch generates a params class (if needed) and exposes `fragment` as a property, even if no typed path/query params are declared.
+    *   Example:
+        ```yaml
+        deeplinkSpecs:
+          - name: "open profile details"
+            activity: com.example.app.MainActivity
+            scheme: [app]
+            host: ["example.com"]
+            pathParams:
+              - name: profile
+              - name: userId
+                type: alphanumeric
+            fragment: "details"
+        ```
 
 *   **`description`**: (Optional, String)
     *   Free-form text to describe the deeplink’s purpose. Currently informational only.
+    *   Example:
+        ```yaml
+        deeplinkSpecs:
+          - name: "open profile"
+            description: "Navigate to profile screen from campaign links"
+            activity: com.example.app.MainActivity
+            scheme: [app]
+            host: ["example.com"]
+        ```
 
 ### Complete Example
 
@@ -78,6 +152,9 @@ deeplinkSpecs:
       - name: userId
         type: alphanumeric
     queryParams:
+      - name: query
+        type: string
+        required: true
       - name: ref
         type: string
     fragment: "details"
@@ -90,5 +167,6 @@ deeplinkSpecs:
 - If `generateManifestFiles` is disabled, remember to replicate the `<intent-filter>` changes manually in your main manifest.
 - When a deeplink declares typed path, query, or fragment values, the plugin also creates a `<Name>DeeplinkParams` class so your app receives strongly typed arguments after calling `match(uri)`.
 - Typed query params are validated by key and type after structural URI matching, so query order does not affect matching.
+- Query params are optional by default; set `required: true` only for values that must be present.
 - All generated params classes implement a module-level sealed interface named from the module name (for example, module `app` -> `AppDeeplinkParams`), enabling exhaustive `when` checks.
 - The plugin also generates a module-level processor object named from the module name (for example, module `app` -> `AppDeeplinkProcessor`) preloaded with all generated specs.

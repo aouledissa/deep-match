@@ -47,7 +47,7 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val uri = intent.data ?: "app://sample.deepmatch.dev/series/42?ref=home".toUri()
+        val uri = intent.data ?: "app://sample.deepmatch.dev/series/42".toUri()
 
         setContent {
             DeeplinkResultScreen(uri = uri)
@@ -67,7 +67,7 @@ private fun DeeplinkResultScreen(uri: Uri) {
             accent = Color(0xFF0E7C66),
             properties = listOf(
                 "userId" to result.userId,
-                "ref" to result.ref,
+                "ref" to (result.ref ?: "absent"),
                 "fragment" to result.fragment
             )
         )
@@ -78,7 +78,7 @@ private fun DeeplinkResultScreen(uri: Uri) {
             accent = Color(0xFF1F6FEB),
             properties = listOf(
                 "seriesId" to result.seriesId.toString(),
-                "ref" to result.ref
+                "ref" to (result.ref ?: "absent")
             )
         )
 
@@ -279,7 +279,7 @@ private enum class DemoUri(
 ) {
     Profile(
         label = "Profile",
-        uri = "app://sample.deepmatch.dev/profile/john123?ref=campaign#details"
+        uri = "app://sample.deepmatch.dev/profile/john123#details"
     ),
     Series(label = "Series", uri = "app://sample.deepmatch.dev/series/42?ref=home"),
     NoMatch(label = "No Match", uri = "app://sample.deepmatch.dev/unknown");

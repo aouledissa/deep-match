@@ -80,6 +80,9 @@ deeplinkSpecs:
       - name: seriesId
         type: numeric
     queryParams:
+      - name: query
+        type: string
+        required: true
       - name: ref
         type: string
     fragment: "details"
@@ -87,6 +90,7 @@ deeplinkSpecs:
 
 Typed query params are validated by key and type, so query ordering does not matter.
 For example, `?ref=promo&page=1` and `?page=1&ref=promo` are treated the same.
+Query params are optional by default; use `required: true` for mandatory keys.
 Path params are ordered and matched by position as declared in YAML.
 Declaring a `fragment` also triggers params-class generation and exposes `fragment` in the generated
 `*DeeplinkParams` type, even when no typed path/query params are present.

@@ -25,7 +25,11 @@ data class DeeplinkSpec(
         if (queryParams.isEmpty()) return true
         return queryParams.filter { it.type != null }.all { param ->
             val value = queryParamResolver(param.name)
-            value != null && param.type!!.regex.matches(value)
+            when {
+                value != null && param.type != null -> param.type.regex.matches(value)
+                param.required -> false
+                else -> true
+            }
         }
     }
 
@@ -78,7 +82,8 @@ private val stringRegex = "[a-zA-Z._~-]+".toRegex()
 @Serializable
 data class Param(
     val name: String,
-    val type: ParamType? = null
+    val type: ParamType? = null,
+    val required: Boolean = false
 ) {
     override fun toString(): String {
         return "Param(name = \"$name\", type = ${
@@ -86,7 +91,7 @@ data class Param(
                 null -> null
                 else -> "${ParamType::class.simpleName}.${type.name}"
             }
-        })"
+        }, required = $required)"
     }
 }
 

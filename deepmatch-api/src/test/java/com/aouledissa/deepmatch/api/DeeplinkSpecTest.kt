@@ -160,22 +160,35 @@ class DeeplinkSpecTest {
     }
 
     @Test
+    fun `matchesQueryParams returns true when optional typed query param is missing`() {
+        // when
+        sut = DeeplinkSpec(
+            scheme = setOf("https"),
+            host = setOf("test.com"),
+            pathParams = emptyList(),
+            queryParams = setOf(Param(name = "page", type = ParamType.NUMERIC)),
+            fragment = null,
+            parametersClass = null
+        )
+
+        // then
+        assertThat(sut.matchesQueryParams(queryParamResolver(""))).isTrue()
+    }
+
+    @Test
     fun `matchesQueryParams returns false when required typed query param is missing`() {
         // when
         sut = DeeplinkSpec(
             scheme = setOf("https"),
             host = setOf("test.com"),
             pathParams = emptyList(),
-            queryParams = setOf(
-                Param(name = "ref", type = ParamType.STRING),
-                Param(name = "page", type = ParamType.NUMERIC)
-            ),
+            queryParams = setOf(Param(name = "page", type = ParamType.NUMERIC, required = true)),
             fragment = null,
             parametersClass = null
         )
 
         // then
-        assertThat(sut.matchesQueryParams(queryParamResolver("ref=promo"))).isFalse()
+        assertThat(sut.matchesQueryParams(queryParamResolver(""))).isFalse()
     }
 
     @Test

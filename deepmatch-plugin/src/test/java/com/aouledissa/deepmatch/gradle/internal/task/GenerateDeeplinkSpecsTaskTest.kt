@@ -48,4 +48,43 @@ class GenerateDeeplinkSpecsTaskTest {
         assertThat(generatedSpecCode).contains("fragment: String")
         assertThat(generatedSpecCode).contains("parametersClass = OpenProfileDeeplinkParams::class")
     }
+
+    @Test
+    fun `query params required flag controls generated nullability`() {
+        val project = ProjectBuilder.builder().build()
+        val specsFile = temporaryFolder.newFile("query-required.deeplinks.yml").apply {
+            writeText(
+                """
+                deeplinkSpecs:
+                  - name: "search"
+                    activity: com.example.app.MainActivity
+                    scheme: [app]
+                    host: ["example.com"]
+                    queryParams:
+                      - name: query
+                        type: string
+                        required: true
+                      - name: ref
+                        type: string
+                """.trimIndent()
+            )
+        }
+        val outputDir = temporaryFolder.newFolder("generated-query")
+        val task = project.tasks.register("generateRequiredSpecs", GenerateDeeplinkSpecsTask::class.java).get()
+
+        task.specsFileProperty.set(project.layout.file(project.provider { specsFile }))
+        task.packageNameProperty.set("com.example.app")
+        task.moduleNameProperty.set("app")
+        task.outputDir.set(project.layout.dir(project.provider { outputDir }))
+
+        task.generateDeeplinkSpecs()
+
+        val generatedSpecFile = File(outputDir, "com/example/app/deeplinks/SearchDeeplinkSpecs.kt")
+        val generatedSpecCode = generatedSpecFile.readText()
+
+        assertThat(generatedSpecCode).contains("query: String")
+        assertThat(generatedSpecCode).contains("ref: String?")
+        assertThat(generatedSpecCode).contains("Param(name = \"query\", type = ParamType.STRING, required = true)")
+        assertThat(generatedSpecCode).contains("Param(name = \"ref\", type = ParamType.STRING, required = false)")
+    }
 }
