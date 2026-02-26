@@ -11,12 +11,13 @@
   segment order is preserved explicitly.
 - Plugin code generation now emits `pathParams = listOf(...)` for generated specs to align with
   the new API shape.
-- Fragment presence is now treated as a params-generation trigger in plugin config evaluation.
-- Fragment-only deeplink specs now generate `*DeeplinkParams` with a `fragment` property and wire
-  `parametersClass` accordingly.
+- Fragment-only deeplink specs generate `*DeeplinkParams` with a `fragment` property and wire
+  `parametersClass` accordingly (alongside the new always-generate params behavior).
 - Added `required` to query params (`Param.required`) to support optional-vs-required query matching.
 - Optional typed query params are now generated as nullable constructor properties; required query
   params remain non-null.
+- Plugin code generation now emits a `*DeeplinkParams` class for every deeplink spec, including
+  static-only specs with no typed path/query/fragment fields.
 
 ### Fixed
 
@@ -25,6 +26,8 @@
   `ref + page` specs correctly).
 - Fixed query matching strictness: typed query params are optional by default, validated only when
   present, and enforced only when marked `required: true`.
+- Fixed match-result ambiguity for generated processors: static deeplink matches no longer collapse
+  to `null` (which was previously indistinguishable from "no match").
 
 ### Documentation
 
@@ -40,6 +43,8 @@
 - Added processor regression coverage to ensure path matching remains positional and order-sensitive.
 - Added query optionality tests for API/processor/plugin generation, including required-missing
   rejection and optional-missing acceptance.
+- Added regression tests ensuring static-only specs generate params classes and return a concrete
+  params instance on successful match.
 
 ## [0.2.0-alpha] - 2026-02-25
 

@@ -71,16 +71,13 @@ internal abstract class GenerateDeeplinkSpecsTask : DefaultTask() {
             val deeplinkName = config.name.toCamelCase().plus("Deeplink")
             val fileName = deeplinkName.plus("Specs").capitalize()
             val specPropertyName = deeplinkName.plus("Specs").capitalize()
-            val deeplinkParamsTypeName =
-                deeplinkName.plus("Params").capitalize().takeIf { config.containsTemplateParams() }
-            val deeplinkParamsType = deeplinkParamsTypeName?.let {
-                generateDeeplinkParamType(
-                    name = it,
-                    config = config,
-                    moduleSealedInterfaceName = moduleSealedInterfaceName,
-                    packageName = packageName
-                )
-            }
+            val deeplinkParamsTypeName = deeplinkName.plus("Params").capitalize()
+            val deeplinkParamsType = generateDeeplinkParamType(
+                name = deeplinkParamsTypeName,
+                config = config,
+                moduleSealedInterfaceName = moduleSealedInterfaceName,
+                packageName = packageName
+            )
             val deeplinkProperty = generateDeeplinkSpecProperty(
                 name = specPropertyName,
                 config = config,
@@ -92,10 +89,10 @@ internal abstract class GenerateDeeplinkSpecsTask : DefaultTask() {
             FileSpec.builder(packageName, fileName)
                 .addImport(Param::class.qualifiedName.orEmpty(), "")
                 .apply {
-                    if (config.containsTemplateParams()) {
+                    if (config.hasTypedParams()) {
                         addImport(ParamType::class.qualifiedName.orEmpty(), "")
                     }
-                    deeplinkParamsType?.let { addType(it) }
+                    addType(deeplinkParamsType)
                 }
                 .addProperty(deeplinkProperty)
                 .build().writeTo(outputFile)
@@ -163,7 +160,7 @@ internal abstract class GenerateDeeplinkSpecsTask : DefaultTask() {
         name: String,
         config: DeeplinkConfig,
         packageName: String,
-        parametersClass: String?,
+        parametersClass: String,
     ): PropertySpec.Builder {
         val deeplinkSpecClass = ClassName(
             DeeplinkSpec::class.java.packageName,
@@ -174,7 +171,7 @@ internal abstract class GenerateDeeplinkSpecsTask : DefaultTask() {
         val hosts = config.host.joinToString(separator = ", ") { "\"$it\"" }
         val pathParams = config.pathParams?.joinToString(separator = ", ").orEmpty()
         val queryParams = config.queryParams?.joinToString(separator = ", ").orEmpty()
-        val parametersClass = parametersClass?.let { ClassName(packageName, it) }
+        val parametersClass = ClassName(packageName, parametersClass)
         val deeplinkExample = generateDeeplinkExample(config)
 
         return PropertySpec.builder(name, deeplinkSpecClass)
@@ -194,7 +191,7 @@ internal abstract class GenerateDeeplinkSpecsTask : DefaultTask() {
                 pathParams = listOf($pathParams),
                 queryParams = setOf($queryParams),
                 fragment = ${config.fragment?.let { "\"$it\"" } ?: "null"},
-                parametersClass = ${parametersClass?.simpleName?.plus("::class")}
+                parametersClass = ${parametersClass.simpleName}::class
                 )
                 """.trimIndent(),
                 deeplinkSpecClass,
@@ -271,7 +268,7 @@ internal abstract class GenerateDeeplinkSpecsTask : DefaultTask() {
         }
 
         return TypeSpec.classBuilder(name)
-            .addModifiers(KModifier.PUBLIC, KModifier.DATA)
+            .addModifiers(KModifier.PUBLIC)
             .addSuperinterface(moduleDeeplinkParamsInterface)
             .primaryConstructor(
                 FunSpec.constructorBuilder()
@@ -280,6 +277,9 @@ internal abstract class GenerateDeeplinkSpecsTask : DefaultTask() {
             )
             .addKdoc("${config.name.toCamelCase().capitalize()} Deeplink Parameters.")
             .apply {
+                if (constructorParams.isNotEmpty()) {
+                    addModifiers(KModifier.DATA)
+                }
                 constructorParams.forEach { param ->
                     addProperty(
                         PropertySpec.builder(param.name, param.type)

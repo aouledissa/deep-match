@@ -97,9 +97,36 @@ class DeeplinkProcessorTest {
         assertThat(params).isNull()
     }
 
+    @Test
+    fun `match returns params instance for static spec with empty params class`() {
+        val spec = DeeplinkSpec(
+            scheme = setOf("app"),
+            host = setOf("example.com"),
+            pathParams = listOf(Param(name = "home")),
+            queryParams = emptySet(),
+            fragment = null,
+            parametersClass = HomeParams::class
+        )
+
+        val uri = mockk<Uri>(relaxed = true)
+        every { uri.scheme } returns "app"
+        every { uri.host } returns "example.com"
+        every { uri.pathSegments } returns listOf("home")
+        every { uri.query } returns null
+        every { uri.fragment } returns null
+        every { uri.getQueryParameter(any()) } returns null
+
+        val processor = DeeplinkProcessor(specs = setOf(spec))
+
+        val params = processor.match(uri)
+        assertThat(params).isInstanceOf(HomeParams::class.java)
+    }
+
     data class SeriesParams(
         val seriesId: Int,
         val ref: String?,
         val fragment: String?
     ) : DeeplinkParams
+
+    class HomeParams : DeeplinkParams
 }

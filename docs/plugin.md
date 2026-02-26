@@ -14,7 +14,7 @@ The primary responsibilities and capabilities of the DeepMatch Gradle plugin are
 
 3.  **Code Generation (`DeeplinkSpecs`):**
     *   The plugin generates Kotlin source code, most notably a class named something like `[DeeplinkName]DeeplinkSpecs` (the exact name might vary based on the deeplink name in the `.yml` file).
-    *   The plugin also generates params classes for deeplinks with typed path/query/fragment values.
+    *   The plugin also generates a params class for every deeplink spec, including static-only specs.
     *   It additionally generates a module-level sealed interface (for example, module `app` -> `AppDeeplinkParams`) implemented by all generated params classes, enabling exhaustive `when` matching in app code.
     *   It generates a module-level processor object (for example, module `app` -> `AppDeeplinkProcessor`) wired with all generated specs so no manual registration is required.
 
@@ -64,7 +64,7 @@ During the build the plugin generates Kotlin sources under `build/generated/` an
 - `<ModuleName>DeeplinkProcessor.kt` — module-level processor object extending `DeeplinkProcessor` and preconfigured with all generated specs.
 - `*DeeplinkSpecs.kt` — exposes a `DeeplinkSpec` property per configuration entry.
   Generated specs use `pathParams` as an ordered list to preserve YAML-declared path segment order.
-- `*DeeplinkParams.kt` — optional data class emitted when a deeplink defines typed template/query params or a fragment requirement (including fragment-only specs).
+- `*DeeplinkParams.kt` — params class emitted for every deeplink spec. When a spec has typed values, generated constructor properties are strongly typed.
   Query params marked `required: true` are generated as non-null properties; optional query params are generated as nullable properties.
 - Generated manifest file — contains `<intent-filter>` definitions that Gradle merges into the final manifest.
 

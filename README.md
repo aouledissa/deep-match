@@ -10,8 +10,7 @@ DeepMatch is an Android deep-linking toolkit that turns a `.deeplinks.yml` file 
 code, optional manifest entries, and runtime routing logic. Point the plugin at your configuration
 and it will:
 
-- Generate strongly-typed deeplink specs (plus parameter classes when the link declares template,
-  query, or fragment values).
+- Generate strongly-typed deeplink specs and one parameter class per deeplink spec.
 - Generate a module-level sealed params interface (for example, module `app` generates
   `AppDeeplinkParams`) that all generated params classes implement.
 - Optionally emit manifest snippets so you never hand-write `<intent-filter>` entries again.
@@ -92,8 +91,8 @@ Typed query params are validated by key and type, so query ordering does not mat
 For example, `?ref=promo&page=1` and `?page=1&ref=promo` are treated the same.
 Query params are optional by default; use `required: true` for mandatory keys.
 Path params are ordered and matched by position as declared in YAML.
-Declaring a `fragment` also triggers params-class generation and exposes `fragment` in the generated
-`*DeeplinkParams` type, even when no typed path/query params are present.
+Each deeplink spec always generates a `*DeeplinkParams` type, so a successful match is never
+ambiguous with "no match". When declared, `fragment` is exposed in the generated params type.
 
 5. Generate sources (or just build normally):
 
@@ -104,7 +103,7 @@ Declaring a `fragment` also triggers params-class generation and exposes `fragme
 DeepMatch generates:
 - `<ModuleName>DeeplinkProcessor` (example: `AppDeeplinkProcessor`)
 - `<ModuleName>DeeplinkParams` sealed interface (example: `AppDeeplinkParams`)
-- `*DeeplinkSpecs` and typed `*DeeplinkParams` classes
+- `*DeeplinkSpecs` and `*DeeplinkParams` classes
 
 6. Use the generated processor at runtime:
 
