@@ -4,7 +4,12 @@ site_url: "https://aouledissa.com/deep-match/"
 repo_url: "https://github.com/aouledissa/deep-match"
 repo_name: "aouledissa/DeepMatch"
 docs_dir: docs
+plugins:
+  - search
+  - mike:
+      alias_type: copy
 theme:
+  name: material
   variant: modern
   palette:
     - media: "(prefers-color-scheme: light)"
@@ -51,6 +56,8 @@ markdown_extensions:
       permalink: true
   - tables
 extra:
+  version:
+    provider: mike
   social:
     - icon: fontawesome/brands/github
       link: https://github.com/aouledissa/DeepMatch
