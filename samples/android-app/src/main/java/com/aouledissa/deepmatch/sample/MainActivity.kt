@@ -44,7 +44,13 @@ import com.aouledissa.deepmatch.sample.deeplinks.AppDeeplinkParams
 import com.aouledissa.deepmatch.sample.deeplinks.AppDeeplinkProcessor
 import com.aouledissa.deepmatch.sample.deeplinks.OpenAboutDeeplinkParams
 import com.aouledissa.deepmatch.sample.deeplinks.OpenHostlessProfileDeeplinkParams
+import com.aouledissa.deepmatch.sample.deeplinks.OpenProfileAchievementsDeeplinkParams
 import com.aouledissa.deepmatch.sample.deeplinks.OpenProfileDeeplinkParams
+import com.aouledissa.deepmatch.sample.deeplinks.OpenProfileFollowersDeeplinkParams
+import com.aouledissa.deepmatch.sample.deeplinks.OpenProfileFollowingDeeplinkParams
+import com.aouledissa.deepmatch.sample.deeplinks.OpenProfileSettingsDeeplinkParams
+import com.aouledissa.deepmatch.sample.deeplinks.OpenProfileSpotlightDeeplinkParams
+import com.aouledissa.deepmatch.sample.deeplinks.OpenProfileTimelineDeeplinkParams
 import com.aouledissa.deepmatch.sample.deeplinks.OpenSeriesDeeplinkParams
 import com.aouledissa.deepmatch.sample.deeplinks.OpenUserPostsDeeplinkParams
 import kotlin.Boolean
@@ -73,9 +79,8 @@ class MainActivity : ComponentActivity() {
 @Composable
 @OptIn(ExperimentalLayoutApi::class)
 private fun DeeplinkResultScreen(uri: Uri) {
-    var selectedUriValue by rememberSaveable { mutableStateOf(uri.toString()) }
     var selectedDemo by rememberSaveable { mutableStateOf(detectDemoUri(uri)) }
-    val selectedUri = selectedUriValue.toUri()
+    val selectedUri = selectedDemo.uri.toUri()
     val result: AppDeeplinkParams? = AppDeeplinkProcessor.match(selectedUri) as? AppDeeplinkParams
     val match = when (result) {
         is OpenProfileDeeplinkParams -> MatchUi(
@@ -197,10 +202,7 @@ private fun DeeplinkResultScreen(uri: Uri) {
                                 UriOptionButton(
                                     label = demo.label,
                                     selected = selectedDemo == demo,
-                                    onClick = {
-                                        selectedDemo = demo
-                                        selectedUriValue = demo.uri
-                                    }
+                                    onClick = { selectedDemo = demo }
                                 )
                             }
                         }
@@ -355,7 +357,19 @@ private enum class DemoUri(
     NoMatch(label = "No Match", uri = "app://sample.deepmatch.dev/unknown");
 }
 
-private fun detectDemoUri(uri: Uri): DemoUri? {
-    val incoming = uri.toString()
-    return DemoUri.entries.firstOrNull { demo -> demo.uri == incoming }
+private fun detectDemoUri(uri: Uri): DemoUri {
+    return when (val params = AppDeeplinkProcessor.match(uri) as? AppDeeplinkParams) {
+        is OpenAboutDeeplinkParams -> DemoUri.About
+        is OpenProfileDeeplinkParams -> DemoUri.Profile
+        is OpenProfileAchievementsDeeplinkParams,
+        is OpenProfileFollowersDeeplinkParams,
+        is OpenProfileFollowingDeeplinkParams,
+        is OpenProfileSettingsDeeplinkParams,
+        is OpenProfileSpotlightDeeplinkParams,
+        is OpenProfileTimelineDeeplinkParams -> DemoUri.Profile
+        is OpenUserPostsDeeplinkParams -> DemoUri.UserPosts
+        is OpenHostlessProfileDeeplinkParams -> DemoUri.Hostless
+        is OpenSeriesDeeplinkParams -> DemoUri.Series
+        null -> DemoUri.NoMatch
+    }
 }
