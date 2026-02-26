@@ -14,6 +14,7 @@ import kotlin.reflect.KClass
 data class DeeplinkSpec(
     val scheme: Set<String>,
     val host: Set<String>,
+    val port: Int? = null,
     val pathParams: List<Param>,
     val queryParams: Set<Param>,
     val fragment: String?,
@@ -36,10 +37,12 @@ data class DeeplinkSpec(
     private fun buildMatcher(): Regex {
         val schemePattern = buildSchemePattern()
         val hostPattern = buildHostPattern()
+        val portPattern = buildPortPattern()
         val pathPattern = buildPathPattern()
         val fragmentPattern = buildFragmentPattern()
 
-        return "$schemePattern://$hostPattern$pathPattern$fragmentPattern".toRegex(RegexOption.IGNORE_CASE)
+        return "$schemePattern://$hostPattern$portPattern$pathPattern$fragmentPattern"
+            .toRegex(RegexOption.IGNORE_CASE)
     }
 
     private fun buildSchemePattern(): String {
@@ -51,6 +54,10 @@ data class DeeplinkSpec(
         if (host.isEmpty()) return ""
         return host.joinToString(separator = "|") { Regex.escape(it) }
             .let { if (host.size > 1) "($it)" else it }
+    }
+
+    private fun buildPortPattern(): String {
+        return port?.let { ":${Regex.escape(it.toString())}" }.orEmpty()
     }
 
     private fun buildPathPattern(): String {

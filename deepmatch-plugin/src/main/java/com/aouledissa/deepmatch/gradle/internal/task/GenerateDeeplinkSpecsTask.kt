@@ -170,6 +170,7 @@ internal abstract class GenerateDeeplinkSpecsTask : DefaultTask() {
         )
         val schemes = config.scheme.joinToString(separator = ", ") { "\"$it\"" }
         val hosts = config.host.joinToString(separator = ", ") { "\"$it\"" }
+        val port = config.port?.toString() ?: "null"
         val pathParams = config.pathParams?.joinToString(separator = ", ").orEmpty()
         val queryParams = config.queryParams?.joinToString(separator = ", ").orEmpty()
         val parametersClass = ClassName(packageName, parametersClass)
@@ -189,6 +190,7 @@ internal abstract class GenerateDeeplinkSpecsTask : DefaultTask() {
                 %T(
                 scheme = setOf($schemes),
                 host = setOf($hosts),
+                port = $port,
                 pathParams = listOf($pathParams),
                 queryParams = setOf($queryParams),
                 fragment = ${config.fragment?.let { "\"$it\"" } ?: "null"},
@@ -204,6 +206,7 @@ internal abstract class GenerateDeeplinkSpecsTask : DefaultTask() {
         append(config.scheme)
         append("://")
         append(config.host)
+        config.port?.let { append(":$it") }
         config.pathParams?.map {
             when (it.type) {
                 ParamType.NUMERIC -> "/1234"

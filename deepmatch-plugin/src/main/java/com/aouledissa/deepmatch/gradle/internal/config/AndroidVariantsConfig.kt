@@ -1,5 +1,6 @@
 package com.aouledissa.deepmatch.gradle.internal.config
 
+import com.android.build.api.dsl.CommonExtension
 import com.android.build.api.variant.AndroidComponentsExtension
 import com.android.build.api.variant.Variant
 import com.aouledissa.deepmatch.gradle.DeepMatchPluginConfig
@@ -12,6 +13,9 @@ import org.gradle.api.file.RegularFile
 
 internal fun configureAndroidVariants(project: Project, config: DeepMatchPluginConfig) {
     val android = project.extensions.getByType(AndroidComponentsExtension::class.java)
+    val compileSdk = (project.extensions.getByName("android") as CommonExtension<*, *, *, *, *, *>)
+        .compileSdk
+        ?: 0
 
     android.onVariants { variant ->
         val specsFile = getSpecsFile(project = project, variant = variant)
@@ -26,6 +30,7 @@ internal fun configureAndroidVariants(project: Project, config: DeepMatchPluginC
             project = project,
             variant = variant,
             specsFile = specsFile,
+            compileSdk = compileSdk,
             generateManifestFiles = config.generateManifestFiles.getOrElse(false)
         )
     }
@@ -65,7 +70,8 @@ private fun registerDeeplinkManifestTask(
     generateManifestFiles: Boolean,
     project: Project,
     variant: Variant,
-    specsFile: RegularFile
+    specsFile: RegularFile,
+    compileSdk: Int
 ) {
     val variantName = variant.name.capitalize()
     val taskName = "generate${variantName}DeeplinksManifest"
@@ -76,6 +82,7 @@ private fun registerDeeplinkManifestTask(
         ) {
             it.specFileProperty.set(specsFile)
             it.outputFile.set(project.layout.buildDirectory.file("generated/manifests/${variantName}"))
+            it.compileSdkProperty.set(compileSdk)
         }
 
         /**

@@ -46,8 +46,23 @@ adb shell am start -W \
   -d "app:///profile/123"
 ```
 
+```bash
+adb shell am start -W \
+  -a android.intent.action.VIEW \
+  -c android.intent.category.BROWSABLE \
+  -d "app://sample.deepmatch.dev/about/"
+```
+
+```bash
+adb shell am start -W \
+  -a android.intent.action.VIEW \
+  -c android.intent.category.BROWSABLE \
+  -d "app://sample.deepmatch.dev/users/42/posts"
+```
+
 The screen should render parsed output for `OpenSeriesDeeplinkParams`, `OpenProfileDeeplinkParams`,
-and `OpenHostlessProfileDeeplinkParams`.
+`OpenHostlessProfileDeeplinkParams`, `OpenAboutDeeplinkParams`, and
+`OpenUserPostsDeeplinkParams`.
 
 In this sample:
 - `open series` keeps `ref` optional.

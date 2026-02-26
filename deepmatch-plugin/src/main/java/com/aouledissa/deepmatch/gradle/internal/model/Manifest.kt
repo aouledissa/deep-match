@@ -8,6 +8,8 @@ import kotlinx.serialization.Serializable
 internal data class AndroidManifest(
     @SerialName("xmlns:android")
     val nameSpace: String = "http://schemas.android.com/apk/res/android",
+    @SerialName("xmlns:tools")
+    val toolsNamespace: String = "http://schemas.android.com/tools",
     val application: AndroidApplication,
 )
 
@@ -22,6 +24,10 @@ internal data class AndroidApplication(
 internal data class AndroidActivity(
     @SerialName("android:name")
     val name: String,
+    @SerialName("android:exported")
+    val exported: Boolean = true,
+    @SerialName("tools:node")
+    val mergeStrategy: String = "merge",
     val intentFilter: List<IntentFilter>
 )
 
@@ -34,8 +40,11 @@ internal data class IntentFilter(
     val category: List<Category>,
     val scheme: List<Scheme>,
     val hosts: List<Host>,
-    val pathPattern: PathPattern?,
-    val fragment: Fragment?
+    val port: Port?,
+    val exactPaths: List<ExactPath>,
+    val prefixPaths: List<PrefixPath>,
+    val patternPaths: List<PatternPath>,
+    val advancedPatternPaths: List<AdvancedPatternPath>,
 )
 
 @Serializable
@@ -66,16 +75,41 @@ internal data class Host(
     val name: String
 )
 
-@Serializable
-@SerialName("data")
-internal data class PathPattern(
-    @SerialName("android:pathPattern")
-    val pattern: String
-)
+internal sealed interface PathData
 
 @Serializable
 @SerialName("data")
-internal data class Fragment(
-    @SerialName("android:fragment")
-    val name: String
+internal data class ExactPath(
+    @SerialName("android:path")
+    val path: String
+) : PathData
+
+@Serializable
+@SerialName("data")
+internal data class PrefixPath(
+    @SerialName("android:pathPrefix")
+    val prefix: String
+) : PathData
+
+@Serializable
+@SerialName("data")
+internal data class PatternPath(
+    @SerialName("android:pathPattern")
+    val pattern: String
+) : PathData
+
+@Serializable
+@SerialName("data")
+internal data class AdvancedPatternPath(
+    @SerialName("android:pathAdvancedPattern")
+    val pattern: String,
+    @SerialName("tools:targetApi")
+    val targetApi: String = "31"
+) : PathData
+
+@Serializable
+@SerialName("data")
+internal data class Port(
+    @SerialName("android:port")
+    val number: String
 )

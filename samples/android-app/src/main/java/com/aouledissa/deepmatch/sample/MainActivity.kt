@@ -42,9 +42,11 @@ import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import com.aouledissa.deepmatch.sample.deeplinks.AppDeeplinkParams
 import com.aouledissa.deepmatch.sample.deeplinks.AppDeeplinkProcessor
+import com.aouledissa.deepmatch.sample.deeplinks.OpenAboutDeeplinkParams
 import com.aouledissa.deepmatch.sample.deeplinks.OpenHostlessProfileDeeplinkParams
 import com.aouledissa.deepmatch.sample.deeplinks.OpenProfileDeeplinkParams
 import com.aouledissa.deepmatch.sample.deeplinks.OpenSeriesDeeplinkParams
+import com.aouledissa.deepmatch.sample.deeplinks.OpenUserPostsDeeplinkParams
 
 class MainActivity : ComponentActivity() {
 
@@ -92,6 +94,24 @@ private fun DeeplinkResultScreen(uri: Uri) {
             accent = Color(0xFF7C3AED),
             properties = listOf(
                 "profileId" to result.profileId.toString()
+            )
+        )
+
+        is OpenAboutDeeplinkParams -> MatchUi(
+            title = "Static Path Deeplink",
+            subtitle = "Matched exact static path",
+            accent = Color(0xFF9A3412),
+            properties = listOf(
+                "path" to "/about"
+            )
+        )
+
+        is OpenUserPostsDeeplinkParams -> MatchUi(
+            title = "Typed-Middle Deeplink",
+            subtitle = "Matched path with typed segment in the middle",
+            accent = Color(0xFF0F766E),
+            properties = listOf(
+                "userId" to result.userId.toString()
             )
         )
 
@@ -295,6 +315,8 @@ private enum class DemoUri(
         label = "Profile",
         uri = "app://sample.deepmatch.dev/profile/john123?ref=demo#details"
     ),
+    About(label = "About", uri = "app://sample.deepmatch.dev/about/"),
+    UserPosts(label = "User Posts", uri = "app://sample.deepmatch.dev/users/42/posts"),
     Hostless(label = "Hostless", uri = "app:///profile/123"),
     Series(label = "Series", uri = "app://sample.deepmatch.dev/series/42?ref=home"),
     NoMatch(label = "No Match", uri = "app://sample.deepmatch.dev/unknown");
@@ -302,7 +324,9 @@ private enum class DemoUri(
 
 private fun detectDemoUri(uri: Uri): DemoUri {
     return when (val params = AppDeeplinkProcessor.match(uri) as? AppDeeplinkParams) {
+        is OpenAboutDeeplinkParams -> DemoUri.About
         is OpenProfileDeeplinkParams -> DemoUri.Profile
+        is OpenUserPostsDeeplinkParams -> DemoUri.UserPosts
         is OpenHostlessProfileDeeplinkParams -> DemoUri.Hostless
         is OpenSeriesDeeplinkParams -> DemoUri.Series
         null -> DemoUri.NoMatch

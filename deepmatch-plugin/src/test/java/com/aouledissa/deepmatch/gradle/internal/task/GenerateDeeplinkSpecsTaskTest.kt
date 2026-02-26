@@ -192,6 +192,41 @@ class GenerateDeeplinkSpecsTaskTest {
     }
 
     @Test
+    fun `port is wired to generated deeplink spec`() {
+        val project = ProjectBuilder.builder().build()
+        val specsFile = temporaryFolder.newFile("port-spec.deeplinks.yml").apply {
+            writeText(
+                """
+                deeplinkSpecs:
+                  - name: "staging profile"
+                    activity: com.example.app.MainActivity
+                    scheme: [https]
+                    host: ["staging.example.com"]
+                    port: 8080
+                    pathParams:
+                      - name: users
+                      - name: userId
+                        type: alphanumeric
+                """.trimIndent()
+            )
+        }
+        val outputDir = temporaryFolder.newFolder("generated-port")
+        val task = project.tasks.register("generatePortSpecs", GenerateDeeplinkSpecsTask::class.java).get()
+
+        task.specsFileProperty.set(project.layout.file(project.provider { specsFile }))
+        task.packageNameProperty.set("com.example.app")
+        task.moduleNameProperty.set("app")
+        task.outputDir.set(project.layout.dir(project.provider { outputDir }))
+
+        task.generateDeeplinkSpecs()
+
+        val generatedSpecFile = File(outputDir, "com/example/app/deeplinks/StagingProfileDeeplinkSpecs.kt")
+        val generatedSpecCode = generatedSpecFile.readText()
+
+        assertThat(generatedSpecCode).contains("port = 8080")
+    }
+
+    @Test
     fun `empty scheme list throws validation error`() {
         val project = ProjectBuilder.builder().build()
         val specsFile = temporaryFolder.newFile("invalid-scheme.deeplinks.yml").apply {

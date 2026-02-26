@@ -35,3 +35,22 @@ deeplinkSpecs:
       - name: profile
       - name: profileId
         type: numeric
+
+  - name: "open about"
+    activity: com.aouledissa.deepmatch.sample.MainActivity
+    categories: [DEFAULT, BROWSABLE]
+    scheme: [app]
+    host: ["sample.deepmatch.dev"]
+    pathParams:
+      - name: about
+
+  - name: "open user posts"
+    activity: com.aouledissa.deepmatch.sample.MainActivity
+    categories: [DEFAULT, BROWSABLE]
+    scheme: [app]
+    host: ["sample.deepmatch.dev"]
+    pathParams:
+      - name: users
+      - name: userId
+        type: numeric
+      - name: posts

@@ -7,6 +7,7 @@
 - Query parameters are no longer part of `DeeplinkSpec`'s structural regex matcher.
 - `DeeplinkProcessor` now validates typed query params separately after structural URI matching.
 - `DeeplinkProcessor` URI normalization no longer includes query string content.
+- `DeeplinkSpec` now supports optional `port` and includes it in URI matching.
 - `DeeplinkSpec.pathParams` now uses `List<Param>` (instead of `Set<Param>`) so declared path
   segment order is preserved explicitly.
 - Plugin code generation now emits `pathParams = listOf(...)` for generated specs to align with
@@ -19,6 +20,11 @@
 - Plugin code generation now emits a `*DeeplinkParams` class for every deeplink spec, including
   static-only specs with no typed path/query/fragment fields.
 - Plugin config model now treats `host` as optional (`[]` by default), enabling hostless specs.
+- Manifest generation now selects tighter path attributes based on path shape (`path`,
+  `pathPrefix`, `pathPattern`, and `pathAdvancedPattern` on API 31+ builds), and emits dual
+  static-path entries to support trailing slash variants.
+- Generated manifests now include `android:exported="true"` and `tools:node="merge"` on deeplink
+  activities.
 
 ### Fixed
 
@@ -30,6 +36,8 @@
 - Fixed match-result ambiguity for generated processors: static deeplink matches no longer collapse
   to `null` (which was previously indistinguishable from "no match").
 - Fixed hostless deeplink matching (`app:///...`) by explicitly supporting empty-host specs.
+- Fixed manifest generation by removing invalid `android:fragment` output and treating fragment/query
+  constraints as processor-only matching rules.
 - Added build-time validation that every spec declares at least one scheme.
 - Added build-time validation for duplicate deeplink spec names with a clear plugin error message.
 
@@ -39,6 +47,8 @@
 - Updated README/docs to clarify ordered path params list semantics in generated specs.
 - Updated docs to cover `queryParams.required` and generated nullability semantics for optional
   query params.
+- Updated docs to document manifest path strategy, optional `port`, and hostless + trailing-slash
+  manifest behavior.
 
 ### Tests
 
@@ -53,6 +63,8 @@
   `HTTPS://Example.COM/...` and `App://EXAMPLE.com/...`).
 - Added coverage for hostless deeplinks, including regex match, params extraction, and manifest output without `android:host`.
 - Added plugin test coverage for duplicate `name` validation in `.deeplinks.yml`.
+- Added manifest generation coverage for smart path attribute selection, API 31+ advanced path
+  patterns, exported/merge activity attributes, and optional port output.
 
 ## [0.2.0-alpha] - 2026-02-25
 

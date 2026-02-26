@@ -13,6 +13,13 @@ The primary responsibilities and capabilities of the DeepMatch Gradle plugin are
 2.  **Android Manifest Generation:**
     *   Based on the parsed `deeplinkSpecs` from your YAML file, the plugin dynamically generates the necessary `<intent-filter>` entries within your app's `AndroidManifest.xml`.
     *   For each `DeeplinkConfig` entry in your YAML, it creates an `<activity>` (or merges with an existing one if the `activity` name matches) and adds an `<intent-filter>` to it.
+    *   Path attributes are selected automatically based on spec shape:
+        *   static paths -> `android:path` (with trailing-slash variant)
+        *   typed-at-end paths -> `android:pathPrefix`
+        *   typed-in-middle paths -> `android:pathPattern` (+ `android:pathAdvancedPattern` when `compileSdk >= 31`)
+    *   Hostless specs omit `android:host`. When `port` is declared, `android:port` is generated.
+    *   Query params and fragment constraints are not emitted in manifest filters (they are runtime-validated by `DeeplinkProcessor`).
+    *   Generated deeplink activities include `android:exported="true"` and `tools:node="merge"` for Android 12+ and merge-friendly behavior.
     *   This automation means you **do not need to manually write or maintain these `<intent-filter>` tags** in your main `AndroidManifest.xml` for the deep links defined in your YAML. The plugin handles keeping them in sync with your YAML configuration.
     *   The generated manifest entries are typically merged into the final manifest during the build process (e.g., visible in `app/build/intermediates/merged_manifests/debug/AndroidManifest.xml`).
 
