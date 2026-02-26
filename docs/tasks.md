@@ -77,6 +77,7 @@ Generates a single self-contained HTML report from local specs plus composed dep
   - Live URI validator.
   - Near-miss diagnostics (for example, missing required query params).
   - Quick test URI buttons generated from specs.
+  - Browser-side URI validation against generated specs without running the app.
 
 Example:
 

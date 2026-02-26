@@ -8,6 +8,10 @@ DeepMatch can generate a standalone HTML report that combines:
 - Near-miss diagnostics (for example, required query param missing).
 - Quick test URI buttons generated from spec examples.
 
+!!! important
+    The validator runs directly in the generated HTML page, so you can validate URIs against specs
+    without building or running the Android app.
+
 ## Enable
 
 ```kotlin
@@ -60,12 +64,3 @@ The report validator mirrors runtime matching semantics:
 - Variant folder: `src/<variant>/.deeplinks.yml` and `src/<variant>/*.deeplinks.yml`
 
 In composed projects, dependency modules that apply DeepMatch are included in the report.
-
-## Catalog Navigation
-
-The report drawer adapts to your project layout:
-
-- Single module + single source file: only the combined Deeplink Catalogue page is shown.
-- Single module + multiple source files: child entries are shown per source file.
-- Multiple modules + single source each: child entries are shown per module.
-- Multiple modules + multiple sources: modules expand to nested source-file entries.

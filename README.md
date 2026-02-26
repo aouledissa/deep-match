@@ -162,6 +162,7 @@ This generates a single self-contained HTML report at `build/reports/deeplinks.h
 - Full catalog merged from discovered local spec files (and composed dependency modules when present).
 - Live URI validator with near-miss diagnostics.
 - Quick test URI buttons generated from specs.
+- URI validation directly in the browser, without building or running the app.
 
 For full configuration/schema details, see [Plugin](docs/plugin.md) and
 [Deeplink Specs](docs/deeplink-specs.md).

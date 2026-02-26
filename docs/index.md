@@ -79,6 +79,7 @@ If `port` is declared, it is matched at runtime and emitted in generated manifes
 
 Need task details or URI validation? See [Tasks](tasks.md).
 Need a human-friendly catalog and browser validator (full catalog + source/module views)? See [Report](report.md).
+The report validates URIs against your specs in-browser, so no app run is required.
 
 6. Use the generated processor:
 
