@@ -50,6 +50,24 @@ internal fun String.toCamelCase(): String {
         }.joinToString("")
 }
 
+internal fun generatedModuleSealedInterfaceName(moduleName: String): String {
+    val normalized = moduleName
+        .replace(Regex("[^A-Za-z0-9_\\-\\s]"), " ")
+        .toCamelCase()
+        .ifBlank { "module" }
+    val typeSafeName = when {
+        normalized.first().isDigit() -> "module${normalized.capitalize()}"
+        else -> normalized
+    }
+    return "${typeSafeName.capitalize()}DeeplinkParams"
+}
+
+internal fun generatedModuleProcessorName(moduleName: String): String {
+    val prefix = generatedModuleSealedInterfaceName(moduleName)
+        .removeSuffix("DeeplinkParams")
+    return "${prefix}DeeplinkProcessor"
+}
+
 internal fun Yaml.deserializeDeeplinkConfigs(file: File): List<DeeplinkConfig> {
     val content = file.readText()
     return decodeFromString(Specs.serializer(), content).deeplinkSpecs

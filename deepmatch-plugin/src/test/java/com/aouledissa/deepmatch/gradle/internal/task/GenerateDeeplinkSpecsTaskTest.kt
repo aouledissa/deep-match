@@ -15,7 +15,7 @@ class GenerateDeeplinkSpecsTaskTest {
     val temporaryFolder = TemporaryFolder()
 
     @Test
-    fun `fragment-only spec generates params class and wires parametersClass`() {
+    fun `fragment-only spec generates params class and wires paramsFactory`() {
         val project = ProjectBuilder.builder().build()
         val specsFile = temporaryFolder.newFile(".deeplinks.yml").apply {
             writeText(
@@ -35,6 +35,7 @@ class GenerateDeeplinkSpecsTaskTest {
         task.specsFileProperty.set(project.layout.file(project.provider { specsFile }))
         task.packageNameProperty.set("com.example.app")
         task.moduleNameProperty.set("app")
+        task.compositeProcessorsProperty.set(emptyList())
         task.outputDir.set(project.layout.dir(project.provider { outputDir }))
 
         task.generateDeeplinkSpecs()
@@ -48,7 +49,8 @@ class GenerateDeeplinkSpecsTaskTest {
         assertThat(generatedSpecCode).doesNotContain("pathParams = setOf(")
         assertThat(generatedSpecCode).contains("data class OpenProfileDeeplinkParams(")
         assertThat(generatedSpecCode).contains("fragment: String")
-        assertThat(generatedSpecCode).contains("parametersClass = OpenProfileDeeplinkParams::class")
+        assertThat(generatedSpecCode).contains("paramsFactory = OpenProfileDeeplinkParams.Companion::fromMap")
+        assertThat(generatedSpecCode).contains("internal fun fromMap")
     }
 
     @Test
@@ -77,6 +79,7 @@ class GenerateDeeplinkSpecsTaskTest {
         task.specsFileProperty.set(project.layout.file(project.provider { specsFile }))
         task.packageNameProperty.set("com.example.app")
         task.moduleNameProperty.set("app")
+        task.compositeProcessorsProperty.set(emptyList())
         task.outputDir.set(project.layout.dir(project.provider { outputDir }))
 
         task.generateDeeplinkSpecs()
@@ -91,7 +94,7 @@ class GenerateDeeplinkSpecsTaskTest {
     }
 
     @Test
-    fun `static-only spec still generates params class and parametersClass`() {
+    fun `static-only spec still generates params class and paramsFactory`() {
         val project = ProjectBuilder.builder().build()
         val specsFile = temporaryFolder.newFile("static-only.deeplinks.yml").apply {
             writeText(
@@ -112,6 +115,7 @@ class GenerateDeeplinkSpecsTaskTest {
         task.specsFileProperty.set(project.layout.file(project.provider { specsFile }))
         task.packageNameProperty.set("com.example.app")
         task.moduleNameProperty.set("app")
+        task.compositeProcessorsProperty.set(emptyList())
         task.outputDir.set(project.layout.dir(project.provider { outputDir }))
 
         task.generateDeeplinkSpecs()
@@ -121,7 +125,8 @@ class GenerateDeeplinkSpecsTaskTest {
 
         assertThat(generatedSpecFile.exists()).isTrue()
         assertThat(generatedSpecCode).contains("class OpenHomeDeeplinkParams()")
-        assertThat(generatedSpecCode).contains("parametersClass = OpenHomeDeeplinkParams::class")
+        assertThat(generatedSpecCode).contains("paramsFactory = OpenHomeDeeplinkParams.Companion::fromMap")
+        assertThat(generatedSpecCode).contains("internal fun fromMap")
     }
 
     @Test
@@ -148,6 +153,7 @@ class GenerateDeeplinkSpecsTaskTest {
         task.specsFileProperty.set(project.layout.file(project.provider { specsFile }))
         task.packageNameProperty.set("com.example.app")
         task.moduleNameProperty.set("app")
+        task.compositeProcessorsProperty.set(emptyList())
         task.outputDir.set(project.layout.dir(project.provider { outputDir }))
 
         task.generateDeeplinkSpecs()
@@ -156,6 +162,9 @@ class GenerateDeeplinkSpecsTaskTest {
         val generatedSpecCode = generatedSpecFile.readText()
 
         assertThat(generatedSpecCode).contains("host = setOf()")
+        assertThat(generatedSpecCode).contains("profileId = params[\"profileid\"]!!.toInt()")
+        assertThat(generatedSpecCode).contains("= try")
+        assertThat(generatedSpecCode).contains("catch (e: Exception)")
     }
 
     @Test
@@ -181,6 +190,7 @@ class GenerateDeeplinkSpecsTaskTest {
         task.specsFileProperty.set(project.layout.file(project.provider { specsFile }))
         task.packageNameProperty.set("com.example.app")
         task.moduleNameProperty.set("app")
+        task.compositeProcessorsProperty.set(emptyList())
         task.outputDir.set(project.layout.dir(project.provider { outputDir }))
 
         task.generateDeeplinkSpecs()
@@ -216,6 +226,7 @@ class GenerateDeeplinkSpecsTaskTest {
         task.specsFileProperty.set(project.layout.file(project.provider { specsFile }))
         task.packageNameProperty.set("com.example.app")
         task.moduleNameProperty.set("app")
+        task.compositeProcessorsProperty.set(emptyList())
         task.outputDir.set(project.layout.dir(project.provider { outputDir }))
 
         task.generateDeeplinkSpecs()
@@ -246,6 +257,7 @@ class GenerateDeeplinkSpecsTaskTest {
         task.specsFileProperty.set(project.layout.file(project.provider { specsFile }))
         task.packageNameProperty.set("com.example.app")
         task.moduleNameProperty.set("app")
+        task.compositeProcessorsProperty.set(emptyList())
         task.outputDir.set(project.layout.dir(project.provider { outputDir }))
 
         val error = assertThrows(GradleException::class.java) {
@@ -279,6 +291,7 @@ class GenerateDeeplinkSpecsTaskTest {
         task.specsFileProperty.set(project.layout.file(project.provider { specsFile }))
         task.packageNameProperty.set("com.example.app")
         task.moduleNameProperty.set("app")
+        task.compositeProcessorsProperty.set(emptyList())
         task.outputDir.set(project.layout.dir(project.provider { outputDir }))
 
         val error = assertThrows(GradleException::class.java) {
@@ -286,5 +299,47 @@ class GenerateDeeplinkSpecsTaskTest {
         }
         assertThat(error).hasMessageThat()
             .contains("Duplicate deeplink spec names found: open profile")
+    }
+
+    @Test
+    fun `composite processors config generates processor extending composite processor`() {
+        val project = ProjectBuilder.builder().build()
+        val specsFile = temporaryFolder.newFile("composite.deeplinks.yml").apply {
+            writeText(
+                """
+                deeplinkSpecs:
+                  - name: "open profile"
+                    activity: com.example.app.MainActivity
+                    scheme: [app]
+                    host: ["example.com"]
+                    pathParams:
+                      - name: profile
+                      - name: userId
+                        type: alphanumeric
+                """.trimIndent()
+            )
+        }
+        val outputDir = temporaryFolder.newFolder("generated-composite")
+        val task = project.tasks.register("generateCompositeSpecs", GenerateDeeplinkSpecsTask::class.java).get()
+
+        task.specsFileProperty.set(project.layout.file(project.provider { specsFile }))
+        task.packageNameProperty.set("com.example.app")
+        task.moduleNameProperty.set("app")
+        task.compositeProcessorsProperty.set(
+            listOf(
+                "com.example.feature.profile.deeplinks.ProfileDeeplinkProcessor",
+                "com.example.feature.series.deeplinks.SeriesDeeplinkProcessor"
+            )
+        )
+        task.outputDir.set(project.layout.dir(project.provider { outputDir }))
+
+        task.generateDeeplinkSpecs()
+
+        val processorFile = File(outputDir, "com/example/app/deeplinks/AppDeeplinkProcessor.kt")
+        val processorCode = processorFile.readText()
+
+        assertThat(processorCode).contains("object AppDeeplinkProcessor : CompositeDeeplinkProcessor(")
+        assertThat(processorCode).contains("ProfileDeeplinkProcessor")
+        assertThat(processorCode).contains("SeriesDeeplinkProcessor")
     }
 }

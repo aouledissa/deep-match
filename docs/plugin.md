@@ -32,6 +32,7 @@ The primary responsibilities and capabilities of the DeepMatch Gradle plugin are
 4.  **Integration with Build Process:**
     *   The plugin hooks into the Android Gradle Plugin's build lifecycle.
     *   Its tasks (like YAML parsing, manifest generation, code generation) typically run before Java/Kotlin compilation, ensuring that the generated code and manifest entries are available when the rest of your app's code (including the codegen process) is processed.
+    *   For composed multi-module setups, the plugin also validates URI-shape collisions and fails fast when two modules define the same normalized deeplink shape.
 
 5.  **Configuration Options:**
     *   The plugin provides a DSL (Domain Specific Language) extension in your `build.gradle` (`deepMatch { ... }` block) to customize its behavior:
@@ -68,11 +69,13 @@ The primary responsibilities and capabilities of the DeepMatch Gradle plugin are
 3. Add a `.deeplinks.yml` file at the module root (or under `src/<variant>/.deeplinks.yml`). See `deeplink-specs.md` for the full schema.
 
 During the build the plugin generates Kotlin sources under `build/generated/` and, when enabled, a manifest snippet under `build/generated/manifests/<variant>/AndroidManifest.xml`.
+For multi-module behavior and precedence, see [Composite Specs](composite-specs.md).
 
 ### Generated Artifacts
 
 - `<ModuleName>DeeplinkParams.kt` — module-level sealed interface implemented by generated params classes.
 - `<ModuleName>DeeplinkProcessor.kt` — module-level processor object extending `DeeplinkProcessor` and preconfigured with all generated specs.
+  When dependent modules also apply DeepMatch, this generated object extends `CompositeDeeplinkProcessor` and composes local specs with discovered module processors in order.
 - `*DeeplinkSpecs.kt` — exposes a `DeeplinkSpec` property per configuration entry.
   Generated specs use `pathParams` as an ordered list to preserve YAML-declared path segment order.
 - `*DeeplinkParams.kt` — params class emitted for every deeplink spec. When a spec has typed values, generated constructor properties are strongly typed.
@@ -81,16 +84,11 @@ During the build the plugin generates Kotlin sources under `build/generated/` an
 
 ### Available Tasks
 
-Each Android variant gets two dedicated tasks:
+Task details are documented in [Tasks](tasks.md), including:
 
-- `generate<Variant>DeeplinkSpecs` — parses YAML and produces Kotlin sources.
-- `generate<Variant>DeeplinksManifest` — writes the manifest file when `generateManifestFiles` is `true`.
-
-Inspect the generated output with:
-
-```bash
-./gradlew :app:generateDebugDeeplinkSpecs
-``` 
+- `generate<Variant>DeeplinkSpecs`
+- `generate<Variant>DeeplinksManifest`
+- `validateDeeplinks`
 
 ### Testing & CI
 

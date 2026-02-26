@@ -1,3 +1,9 @@
+public class com/aouledissa/deepmatch/processor/CompositeDeeplinkProcessor : com/aouledissa/deepmatch/processor/DeeplinkProcessor {
+	public fun <init> (Ljava/util/List;)V
+	public fun <init> ([Lcom/aouledissa/deepmatch/processor/DeeplinkProcessor;)V
+	public fun match (Landroid/net/Uri;)Lcom/aouledissa/deepmatch/api/DeeplinkParams;
+}
+
 public class com/aouledissa/deepmatch/processor/DeeplinkProcessor {
 	public fun <init> (Ljava/util/Set;)V
 	public fun match (Landroid/net/Uri;)Lcom/aouledissa/deepmatch/api/DeeplinkParams;

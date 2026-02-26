@@ -63,6 +63,8 @@ deepMatch {
 }
 ```
 
+DeepMatch automatically composes processors from project dependencies that also apply the plugin.
+
 Set `generateManifestFiles = false` if you want to manage `<intent-filter>` entries manually.
 
 4. Create `.deeplinks.yml` in your module root (or `src/<variant>/.deeplinks.yml`):
@@ -123,6 +125,9 @@ intent.data?.let { uri ->
 }
 ```
 
+Advanced runtime APIs:
+- `CompositeDeeplinkProcessor` to chain multiple processors and return the first match.
+
 7. Optional real-device smoke test via ADB:
 
 ```bash
@@ -153,6 +158,8 @@ can be reused in downstream projects.
 
 - [Plugin](docs/plugin.md) – Plugin capabilities, setup, and build integration details.
 - [Deeplink Specs](docs/deeplink-specs.md) – YAML specification reference with examples.
+- [Composite Specs](docs/composite-specs.md) – How module-level processors are auto-composed and how match precedence works.
+- [Tasks](docs/tasks.md) – Generated Gradle tasks including `validateDeeplinks`.
 - [docs/migration-guide-0.2.0-alpha.md](docs/migration-guide-0.2.0-alpha.md) – Migration steps for the return-based runtime API.
 - [docs/release-notes/0.2.0-alpha.md](docs/release-notes/0.2.0-alpha.md) – Release notes for the latest alpha changes.
 - `deepmatch-testing/src/main/kotlin` – Reusable fakes and fixtures for tests.

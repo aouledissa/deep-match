@@ -7,7 +7,12 @@ import com.aouledissa.deepmatch.api.ParamType
 import com.aouledissa.deepmatch.gradle.LOG_TAG
 import com.aouledissa.deepmatch.gradle.internal.capitalize
 import com.aouledissa.deepmatch.gradle.internal.deserializeDeeplinkConfigs
+import com.aouledissa.deepmatch.gradle.internal.generatedModuleProcessorName
+import com.aouledissa.deepmatch.gradle.internal.generatedModuleSealedInterfaceName
+import com.aouledissa.deepmatch.gradle.internal.model.CompositeSpecShape
+import com.aouledissa.deepmatch.gradle.internal.model.CompositeSpecsMetadata
 import com.aouledissa.deepmatch.gradle.internal.model.DeeplinkConfig
+import com.aouledissa.deepmatch.gradle.internal.model.toCollisionSignature
 import com.aouledissa.deepmatch.gradle.internal.toCamelCase
 import com.charleskorn.kaml.Yaml
 import com.charleskorn.kaml.YamlConfiguration
@@ -16,18 +21,24 @@ import com.squareup.kotlinpoet.CodeBlock
 import com.squareup.kotlinpoet.FileSpec
 import com.squareup.kotlinpoet.FunSpec
 import com.squareup.kotlinpoet.KModifier
+import com.squareup.kotlinpoet.MAP
 import com.squareup.kotlinpoet.ParameterSpec
+import com.squareup.kotlinpoet.ParameterizedTypeName.Companion.parameterizedBy
 import com.squareup.kotlinpoet.PropertySpec
+import com.squareup.kotlinpoet.STRING
 import com.squareup.kotlinpoet.TypeSpec
 import com.squareup.kotlinpoet.asTypeName
+import kotlinx.serialization.json.Json
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
+import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.OutputDirectory
+import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 
 internal abstract class GenerateDeeplinkSpecsTask : DefaultTask() {
@@ -41,10 +52,31 @@ internal abstract class GenerateDeeplinkSpecsTask : DefaultTask() {
     @get:Input
     abstract val moduleNameProperty: Property<String>
 
+    @get:Input
+    abstract val projectPathProperty: Property<String>
+
+    @get:Input
+    abstract val variantNameProperty: Property<String>
+
+    @get:Input
+    abstract val compositeProcessorsProperty: ListProperty<String>
+
     @get:OutputDirectory
     abstract val outputDir: DirectoryProperty
 
+    @get:OutputFile
+    abstract val metadataOutputFile: RegularFileProperty
+
     private val yamlSerializer by lazy { Yaml(configuration = YamlConfiguration(strictMode = false)) }
+    private val jsonSerializer by lazy { Json { prettyPrint = false } }
+
+    init {
+        projectPathProperty.convention(project.path)
+        variantNameProperty.convention("main")
+        metadataOutputFile.convention(
+            project.layout.buildDirectory.file("generated/deepmatch/specs/${name}/spec-shapes.json")
+        )
+    }
 
     @TaskAction
     fun generateDeeplinkSpecs() {
@@ -56,8 +88,9 @@ internal abstract class GenerateDeeplinkSpecsTask : DefaultTask() {
         logger.quiet("$LOG_TAG processing specs file in ${specsFile.path}")
 
         val packageName = "${packageNameProperty.get()}.deeplinks"
-        val moduleSealedInterfaceName = generateModuleSealedInterfaceName(moduleNameProperty.get())
-        val moduleProcessorName = generateModuleProcessorName(moduleSealedInterfaceName)
+        val moduleSealedInterfaceName = generatedModuleSealedInterfaceName(moduleNameProperty.get())
+        val moduleProcessorName = generatedModuleProcessorName(moduleNameProperty.get())
+        val compositeProcessors = compositeProcessorsProperty.getOrElse(emptyList())
         val deeplinkConfigs = yamlSerializer.deserializeDeeplinkConfigs(specsFile)
         assertUniqueNames(deeplinkConfigs)
         val generatedSpecPropertyNames = mutableListOf<String>()
@@ -84,7 +117,7 @@ internal abstract class GenerateDeeplinkSpecsTask : DefaultTask() {
                 name = specPropertyName,
                 config = config,
                 packageName = packageName,
-                parametersClass = deeplinkParamsTypeName
+                paramsType = deeplinkParamsTypeName
             ).build()
             generatedSpecPropertyNames.add(specPropertyName)
 
@@ -103,21 +136,17 @@ internal abstract class GenerateDeeplinkSpecsTask : DefaultTask() {
         }
 
         FileSpec.builder(packageName, moduleProcessorName)
-            .addType(generateModuleProcessorType(moduleProcessorName, generatedSpecPropertyNames))
+            .addType(
+                generateModuleProcessorType(
+                    name = moduleProcessorName,
+                    generatedSpecPropertyNames = generatedSpecPropertyNames,
+                    compositeProcessorNames = compositeProcessors
+                )
+            )
             .build()
             .writeTo(outputFile)
-    }
 
-    private fun generateModuleSealedInterfaceName(moduleName: String): String {
-        val normalized = moduleName
-            .replace(Regex("[^A-Za-z0-9_\\-\\s]"), " ")
-            .toCamelCase()
-            .ifBlank { "module" }
-        val typeSafeName = when {
-            normalized.first().isDigit() -> "module${normalized.capitalize()}"
-            else -> normalized
-        }
-        return "${typeSafeName.capitalize()}DeeplinkParams"
+        writeSpecsMetadata(deeplinkConfigs)
     }
 
     private fun generateModuleDeeplinkParamsType(name: String): TypeSpec {
@@ -132,37 +161,75 @@ internal abstract class GenerateDeeplinkSpecsTask : DefaultTask() {
             .build()
     }
 
-    private fun generateModuleProcessorName(moduleSealedInterfaceName: String): String {
-        val prefix = moduleSealedInterfaceName.removeSuffix("DeeplinkParams")
-        return "${prefix}DeeplinkProcessor"
-    }
-
     private fun generateModuleProcessorType(
         name: String,
-        generatedSpecPropertyNames: List<String>
+        generatedSpecPropertyNames: List<String>,
+        compositeProcessorNames: List<String>
     ): TypeSpec {
         val processorClass = ClassName(
             "com.aouledissa.deepmatch.processor",
             "DeeplinkProcessor"
         )
-        val specsSetInitializer = CodeBlock.of(
-            "setOf(%L)",
-            generatedSpecPropertyNames.joinToString(", ")
+        val localSpecsSetInitializer = if (generatedSpecPropertyNames.isEmpty()) {
+            CodeBlock.of("emptySet()")
+        } else {
+            CodeBlock.of("setOf(%L)", generatedSpecPropertyNames.joinToString(", "))
+        }
+
+        if (compositeProcessorNames.isEmpty()) {
+            return TypeSpec.objectBuilder(name)
+                .addModifiers(KModifier.PUBLIC)
+                .superclass(processorClass)
+                .addSuperclassConstructorParameter("specs = %L", localSpecsSetInitializer)
+                .addKdoc("Generated deeplink processor for this module.")
+                .build()
+        }
+
+        val compositeProcessorClass = ClassName(
+            "com.aouledissa.deepmatch.processor",
+            "CompositeDeeplinkProcessor"
         )
+        val constructorArgs = CodeBlock.builder()
+            .add("%T(specs = %L)", processorClass, localSpecsSetInitializer)
+            .apply {
+                compositeProcessorNames.forEach { fqcn ->
+                    add(", %T", ClassName.bestGuess(fqcn))
+                }
+            }
+            .build()
 
         return TypeSpec.objectBuilder(name)
             .addModifiers(KModifier.PUBLIC)
-            .superclass(processorClass)
-            .addSuperclassConstructorParameter("specs = %L", specsSetInitializer)
-            .addKdoc("Generated deeplink processor for this module.")
+            .superclass(compositeProcessorClass)
+            .addSuperclassConstructorParameter("%L", constructorArgs)
+            .addKdoc("Generated deeplink processor composed from local and discovered module processors.")
             .build()
+    }
+
+    private fun writeSpecsMetadata(configs: List<DeeplinkConfig>) {
+        val metadataFile = metadataOutputFile.get().asFile
+        metadataFile.parentFile.mkdirs()
+
+        val metadata = CompositeSpecsMetadata(
+            modulePath = projectPathProperty.get(),
+            variant = variantNameProperty.get(),
+            specs = configs.map { config ->
+                CompositeSpecShape(
+                    name = config.name,
+                    signature = config.toCollisionSignature(),
+                    example = generateDeeplinkExample(config)
+                )
+            }
+        )
+
+        metadataFile.writeText(jsonSerializer.encodeToString(CompositeSpecsMetadata.serializer(), metadata))
     }
 
     private fun generateDeeplinkSpecProperty(
         name: String,
         config: DeeplinkConfig,
         packageName: String,
-        parametersClass: String,
+        paramsType: String,
     ): PropertySpec.Builder {
         val deeplinkSpecClass = ClassName(
             DeeplinkSpec::class.java.packageName,
@@ -173,8 +240,9 @@ internal abstract class GenerateDeeplinkSpecsTask : DefaultTask() {
         val port = config.port?.toString() ?: "null"
         val pathParams = config.pathParams?.joinToString(separator = ", ").orEmpty()
         val queryParams = config.queryParams?.joinToString(separator = ", ").orEmpty()
-        val parametersClass = ClassName(packageName, parametersClass)
+        val paramsTypeClass = ClassName(packageName, paramsType)
         val deeplinkExample = generateDeeplinkExample(config)
+        val escapedName = config.name.replace("\"", "\\\"")
 
         return PropertySpec.builder(name, deeplinkSpecClass)
             .addModifiers(KModifier.PUBLIC)
@@ -188,13 +256,14 @@ internal abstract class GenerateDeeplinkSpecsTask : DefaultTask() {
             .initializer(
                 """
                 %T(
+                name = "$escapedName",
                 scheme = setOf($schemes),
                 host = setOf($hosts),
                 port = $port,
                 pathParams = listOf($pathParams),
                 queryParams = setOf($queryParams),
                 fragment = ${config.fragment?.let { "\"$it\"" } ?: "null"},
-                parametersClass = ${parametersClass.simpleName}::class
+                paramsFactory = ${paramsTypeClass.simpleName}.Companion::fromMap
                 )
                 """.trimIndent(),
                 deeplinkSpecClass,
@@ -243,33 +312,79 @@ internal abstract class GenerateDeeplinkSpecsTask : DefaultTask() {
         packageName: String,
         moduleSealedInterfaceName: String
     ): TypeSpec {
+        val paramsClassName = ClassName(packageName, name)
         val moduleDeeplinkParamsInterface = ClassName(packageName, moduleSealedInterfaceName)
-        val constructorParams = buildList {
-            config.pathParams?.filter { it.type != null }?.forEach {
-                add(
-                    ParameterSpec.builder(
-                        it.name.toCamelCase(),
-                        it.type!!.getType()
-                    ).build()
+        val constructorParams = mutableListOf<ParameterSpec>()
+        val constructorArgFactories = mutableListOf<CodeBlock>()
+
+        config.pathParams?.filter { it.type != null }?.forEach { param ->
+            val constructorName = param.name.toCamelCase()
+            constructorParams += ParameterSpec.builder(
+                constructorName,
+                param.type!!.getType()
+            ).build()
+            constructorArgFactories += CodeBlock.of(
+                "%N = %L",
+                constructorName,
+                fromMapValueFactory(
+                    sourceKey = param.name.lowercase(),
+                    type = param.type!!,
+                    required = true
                 )
-            }
-            config.queryParams?.filter { it.type != null }?.forEach {
-                add(
-                    ParameterSpec.builder(
-                        it.name.toCamelCase(),
-                        it.type!!.getType().asTypeName().copy(nullable = !it.required)
-                    ).build()
-                )
-            }
-            config.fragment?.let {
-                add(
-                    ParameterSpec.builder(
-                        "fragment",
-                        String::class
-                    ).build()
-                )
-            }
+            )
         }
+        config.queryParams?.filter { it.type != null }?.forEach { param ->
+            val constructorName = param.name.toCamelCase()
+            constructorParams += ParameterSpec.builder(
+                constructorName,
+                param.type!!.getType().asTypeName().copy(nullable = !param.required)
+            ).build()
+            constructorArgFactories += CodeBlock.of(
+                "%N = %L",
+                constructorName,
+                fromMapValueFactory(
+                    sourceKey = param.name.lowercase(),
+                    type = param.type!!,
+                    required = param.required
+                )
+            )
+        }
+        config.fragment?.let {
+            constructorParams += ParameterSpec.builder("fragment", String::class).build()
+            constructorArgFactories += CodeBlock.of("fragment = params[%S]!!", "fragment")
+        }
+
+        val fromMapFun = FunSpec.builder("fromMap")
+            .addModifiers(KModifier.INTERNAL)
+            .addParameter(
+                "params",
+                MAP.parameterizedBy(STRING, STRING.copy(nullable = true))
+            )
+            .returns(paramsClassName.copy(nullable = true))
+            .addCode(
+                CodeBlock.builder()
+                    .beginControlFlow("return try")
+                    .apply {
+                        if (constructorArgFactories.isEmpty()) {
+                            addStatement("%T()", paramsClassName)
+                        } else {
+                            add("  %T(\n", paramsClassName)
+                            constructorArgFactories.forEachIndexed { index, argument ->
+                                add("    %L", argument)
+                                if (index != constructorArgFactories.lastIndex) {
+                                    add(",")
+                                }
+                                add("\n")
+                            }
+                            add("  )\n")
+                        }
+                    }
+                    .nextControlFlow("catch (e: Exception)")
+                    .addStatement("null")
+                    .endControlFlow()
+                    .build()
+            )
+            .build()
 
         return TypeSpec.classBuilder(name)
             .addModifiers(KModifier.PUBLIC)
@@ -291,8 +406,35 @@ internal abstract class GenerateDeeplinkSpecsTask : DefaultTask() {
                             .build()
                     )
                 }
+                addType(
+                    TypeSpec.companionObjectBuilder()
+                        .addModifiers(KModifier.INTERNAL)
+                        .addFunction(fromMapFun)
+                        .build()
+                )
             }
             .build()
+    }
+
+    private fun fromMapValueFactory(
+        sourceKey: String,
+        type: ParamType,
+        required: Boolean
+    ): CodeBlock {
+        return when (type) {
+            ParamType.NUMERIC -> if (required) {
+                CodeBlock.of("params[%S]!!.toInt()", sourceKey)
+            } else {
+                CodeBlock.of("params[%S]?.toInt()", sourceKey)
+            }
+
+            ParamType.ALPHANUMERIC,
+            ParamType.STRING -> if (required) {
+                CodeBlock.of("params[%S]!!", sourceKey)
+            } else {
+                CodeBlock.of("params[%S]", sourceKey)
+            }
+        }
     }
 
     private fun assertValidQueryParams(config: DeeplinkConfig) {

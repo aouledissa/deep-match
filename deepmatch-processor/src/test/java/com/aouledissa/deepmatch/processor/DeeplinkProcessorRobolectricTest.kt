@@ -18,6 +18,7 @@ class DeeplinkProcessorRobolectricTest {
     @Test
     fun deeplinkWithTypedParameters_returnsParsedValues() {
         val spec = DeeplinkSpec(
+            name = "open series",
             scheme = setOf("app"),
             host = setOf("example.com"),
             pathParams = listOf(
@@ -26,12 +27,11 @@ class DeeplinkProcessorRobolectricTest {
             ),
             queryParams = setOf(Param(name = "ref", type = ParamType.STRING)),
             fragment = "details",
-            parametersClass = SeriesParams::class
+            paramsFactory = ::seriesFactory
         )
         val processor = DeeplinkProcessor(specs = setOf(spec))
 
-        val uri = Uri.parse("app://example.com/series/42?ref=promo#details")
-        val params = processor.match(uri) as SeriesParams?
+        val params = processor.match(Uri.parse("app://example.com/series/42?ref=promo#details")) as SeriesParams?
         assertThat(params?.seriesId).isEqualTo(42)
         assertThat(params?.ref).isEqualTo("promo")
         assertThat(params?.fragment).isEqualTo("details")
@@ -40,22 +40,23 @@ class DeeplinkProcessorRobolectricTest {
     @Test
     fun nonMatchingDeeplink_returnsNull() {
         val spec = DeeplinkSpec(
+            name = "open home",
             scheme = setOf("app"),
             host = setOf("example.com"),
             pathParams = emptyList(),
             queryParams = emptySet(),
             fragment = null,
-            parametersClass = null
+            paramsFactory = null
         )
         val processor = DeeplinkProcessor(specs = setOf(spec))
 
-        val params = processor.match(Uri.parse("app://other.com"))
-        assertThat(params).isNull()
+        assertThat(processor.match(Uri.parse("app://other.com"))).isNull()
     }
 
     @Test
     fun deeplinkWithOutOfOrderQueryParams_matchesAndReturnsParsedValues() {
         val spec = DeeplinkSpec(
+            name = "open paged series",
             scheme = setOf("app"),
             host = setOf("example.com"),
             pathParams = listOf(
@@ -67,12 +68,11 @@ class DeeplinkProcessorRobolectricTest {
                 Param(name = "page", type = ParamType.NUMERIC)
             ),
             fragment = null,
-            parametersClass = PagedSeriesParams::class
+            paramsFactory = ::pagedSeriesFactory
         )
         val processor = DeeplinkProcessor(specs = setOf(spec))
 
-        val uri = Uri.parse("app://example.com/series/42?page=1&ref=promo")
-        val params = processor.match(uri) as PagedSeriesParams?
+        val params = processor.match(Uri.parse("app://example.com/series/42?page=1&ref=promo")) as PagedSeriesParams?
         assertThat(params?.seriesId).isEqualTo(42)
         assertThat(params?.page).isEqualTo(1)
         assertThat(params?.ref).isEqualTo("promo")
@@ -81,6 +81,7 @@ class DeeplinkProcessorRobolectricTest {
     @Test
     fun deeplinkMatchesWhenOptionalQueryParamIsAbsent() {
         val spec = DeeplinkSpec(
+            name = "open optional ref",
             scheme = setOf("app"),
             host = setOf("example.com"),
             pathParams = listOf(
@@ -89,12 +90,11 @@ class DeeplinkProcessorRobolectricTest {
             ),
             queryParams = setOf(Param(name = "ref", type = ParamType.STRING)),
             fragment = null,
-            parametersClass = OptionalRefParams::class
+            paramsFactory = ::optionalRefFactory
         )
         val processor = DeeplinkProcessor(specs = setOf(spec))
 
-        val uri = Uri.parse("app://example.com/series/42")
-        val params = processor.match(uri) as OptionalRefParams?
+        val params = processor.match(Uri.parse("app://example.com/series/42")) as OptionalRefParams?
         assertThat(params?.seriesId).isEqualTo(42)
         assertThat(params?.ref).isNull()
     }
@@ -102,6 +102,7 @@ class DeeplinkProcessorRobolectricTest {
     @Test
     fun deeplinkDoesNotMatchWhenRequiredQueryParamIsAbsent() {
         val spec = DeeplinkSpec(
+            name = "open required ref",
             scheme = setOf("app"),
             host = setOf("example.com"),
             pathParams = listOf(
@@ -110,18 +111,17 @@ class DeeplinkProcessorRobolectricTest {
             ),
             queryParams = setOf(Param(name = "ref", type = ParamType.STRING, required = true)),
             fragment = null,
-            parametersClass = RequiredRefParams::class
+            paramsFactory = ::requiredRefFactory
         )
         val processor = DeeplinkProcessor(specs = setOf(spec))
 
-        val uri = Uri.parse("app://example.com/series/42")
-        val params = processor.match(uri)
-        assertThat(params).isNull()
+        assertThat(processor.match(Uri.parse("app://example.com/series/42"))).isNull()
     }
 
     @Test
     fun deeplinkWithDifferentPathOrder_doesNotMatch() {
         val spec = DeeplinkSpec(
+            name = "series order",
             scheme = setOf("app"),
             host = setOf("example.com"),
             pathParams = listOf(
@@ -130,50 +130,49 @@ class DeeplinkProcessorRobolectricTest {
             ),
             queryParams = emptySet(),
             fragment = null,
-            parametersClass = SeriesOnlyParams::class
+            paramsFactory = ::seriesOnlyFactory
         )
         val processor = DeeplinkProcessor(specs = setOf(spec))
 
-        val uri = Uri.parse("app://example.com/42/series")
-        val params = processor.match(uri)
-        assertThat(params).isNull()
+        assertThat(processor.match(Uri.parse("app://example.com/42/series"))).isNull()
     }
 
     @Test
     fun staticDeeplinkMatch_returnsEmptyParamsInstance() {
         val spec = DeeplinkSpec(
+            name = "open home",
             scheme = setOf("app"),
             host = setOf("example.com"),
             pathParams = listOf(Param(name = "home")),
             queryParams = emptySet(),
             fragment = null,
-            parametersClass = HomeParams::class
+            paramsFactory = { HomeParams() }
         )
         val processor = DeeplinkProcessor(specs = setOf(spec))
 
-        val params = processor.match(Uri.parse("app://example.com/home"))
-        assertThat(params).isInstanceOf(HomeParams::class.java)
+        assertThat(processor.match(Uri.parse("app://example.com/home"))).isInstanceOf(HomeParams::class.java)
     }
 
     @Test
     fun uppercaseHttpsAndHost_matchesLowercaseSpec() {
         val spec = DeeplinkSpec(
+            name = "open path",
             scheme = setOf("https"),
             host = setOf("example.com"),
             pathParams = listOf(Param(name = "path")),
             queryParams = emptySet(),
             fragment = null,
-            parametersClass = HomeParams::class
+            paramsFactory = { HomeParams() }
         )
         val processor = DeeplinkProcessor(specs = setOf(spec))
 
-        val params = processor.match(Uri.parse("HTTPS://Example.COM/path"))
-        assertThat(params).isInstanceOf(HomeParams::class.java)
+        assertThat(processor.match(Uri.parse("HTTPS://Example.COM/path"))).isInstanceOf(HomeParams::class.java)
     }
 
     @Test
     fun uppercaseAppAndHost_matchesTypedSpec() {
         val spec = DeeplinkSpec(
+            name = "open profile",
             scheme = setOf("app"),
             host = setOf("example.com"),
             pathParams = listOf(
@@ -182,7 +181,7 @@ class DeeplinkProcessorRobolectricTest {
             ),
             queryParams = emptySet(),
             fragment = null,
-            parametersClass = ProfileParams::class
+            paramsFactory = ::profileFactory
         )
         val processor = DeeplinkProcessor(specs = setOf(spec))
 
@@ -193,6 +192,7 @@ class DeeplinkProcessorRobolectricTest {
     @Test
     fun trailingSlashAndNonTrailingSlash_matchSameSpec() {
         val spec = DeeplinkSpec(
+            name = "open numeric profile",
             scheme = setOf("app"),
             host = setOf("example.com"),
             pathParams = listOf(
@@ -201,7 +201,7 @@ class DeeplinkProcessorRobolectricTest {
             ),
             queryParams = emptySet(),
             fragment = null,
-            parametersClass = NumericProfileParams::class
+            paramsFactory = ::numericProfileFactory
         )
         val processor = DeeplinkProcessor(specs = setOf(spec))
 
@@ -215,6 +215,7 @@ class DeeplinkProcessorRobolectricTest {
     @Test
     fun pathParamsAreExtractedForTrailingSlashAndNonTrailingSlashForms() {
         val spec = DeeplinkSpec(
+            name = "open numeric profile",
             scheme = setOf("app"),
             host = setOf("example.com"),
             pathParams = listOf(
@@ -223,7 +224,7 @@ class DeeplinkProcessorRobolectricTest {
             ),
             queryParams = emptySet(),
             fragment = null,
-            parametersClass = NumericProfileParams::class
+            paramsFactory = ::numericProfileFactory
         )
         val processor = DeeplinkProcessor(specs = setOf(spec))
 
@@ -237,6 +238,7 @@ class DeeplinkProcessorRobolectricTest {
     @Test
     fun hostlessDeeplink_matchesAndExtractsPathParams() {
         val spec = DeeplinkSpec(
+            name = "hostless profile",
             scheme = setOf("app"),
             host = emptySet(),
             pathParams = listOf(
@@ -245,7 +247,7 @@ class DeeplinkProcessorRobolectricTest {
             ),
             queryParams = emptySet(),
             fragment = null,
-            parametersClass = HostlessProfileParams::class
+            paramsFactory = ::hostlessProfileFactory
         )
         val processor = DeeplinkProcessor(specs = setOf(spec))
 
@@ -256,13 +258,14 @@ class DeeplinkProcessorRobolectricTest {
     @Test
     fun deeplinkWithPort_matchesOnlyWhenPortMatchesSpec() {
         val spec = DeeplinkSpec(
+            name = "port profile",
             scheme = setOf("https"),
             host = setOf("example.com"),
             port = 8080,
             pathParams = listOf(Param(name = "profile")),
             queryParams = emptySet(),
             fragment = null,
-            parametersClass = HomeParams::class
+            paramsFactory = { HomeParams() }
         )
         val processor = DeeplinkProcessor(specs = setOf(spec))
 
@@ -271,6 +274,56 @@ class DeeplinkProcessorRobolectricTest {
 
         assertThat(matching).isInstanceOf(HomeParams::class.java)
         assertThat(nonMatching).isNull()
+    }
+
+    @Test
+    fun emptyUri_returnsNullWithoutCrash() {
+        val processor = DeeplinkProcessor(specs = emptySet())
+        assertThat(processor.match(Uri.EMPTY)).isNull()
+    }
+
+    @Test
+    fun blankUri_returnsNullWithoutCrash() {
+        val processor = DeeplinkProcessor(specs = emptySet())
+        assertThat(processor.match(Uri.parse(""))).isNull()
+    }
+
+    @Test
+    fun uriWithoutScheme_returnsNullWithoutCrash() {
+        val spec = DeeplinkSpec(
+            name = "open profile",
+            scheme = setOf("app"),
+            host = setOf("example.com"),
+            pathParams = listOf(
+                Param(name = "profile"),
+                Param(name = "userId", type = ParamType.ALPHANUMERIC)
+            ),
+            queryParams = emptySet(),
+            fragment = null,
+            paramsFactory = ::profileFactory
+        )
+        val processor = DeeplinkProcessor(specs = setOf(spec))
+
+        assertThat(processor.match(Uri.parse("//example.com/profile/abc"))).isNull()
+    }
+
+    @Test
+    fun malformedNumericValue_returnsNullWithoutCrash() {
+        val spec = DeeplinkSpec(
+            name = "open series",
+            scheme = setOf("app"),
+            host = setOf("example.com"),
+            pathParams = listOf(
+                Param(name = "series"),
+                Param(name = "seriesId", type = ParamType.NUMERIC)
+            ),
+            queryParams = emptySet(),
+            fragment = null,
+            paramsFactory = ::seriesOnlyFactory
+        )
+        val processor = DeeplinkProcessor(specs = setOf(spec))
+
+        assertThat(processor.match(Uri.parse("app://example.com/series/abc"))).isNull()
     }
 
     data class SeriesParams(
@@ -312,4 +365,66 @@ class DeeplinkProcessorRobolectricTest {
     data class HostlessProfileParams(
         val profileId: Int
     ) : DeeplinkParams
+
+    private fun seriesFactory(params: Map<String, String?>): DeeplinkParams? = try {
+        SeriesParams(
+            seriesId = params["seriesid"]!!.toInt(),
+            ref = params["ref"],
+            fragment = params["fragment"]
+        )
+    } catch (e: Exception) {
+        null
+    }
+
+    private fun pagedSeriesFactory(params: Map<String, String?>): DeeplinkParams? = try {
+        PagedSeriesParams(
+            seriesId = params["seriesid"]!!.toInt(),
+            ref = params["ref"],
+            page = params["page"]?.toInt()
+        )
+    } catch (e: Exception) {
+        null
+    }
+
+    private fun seriesOnlyFactory(params: Map<String, String?>): DeeplinkParams? = try {
+        SeriesOnlyParams(seriesId = params["seriesid"]!!.toInt())
+    } catch (e: Exception) {
+        null
+    }
+
+    private fun optionalRefFactory(params: Map<String, String?>): DeeplinkParams? = try {
+        OptionalRefParams(
+            seriesId = params["seriesid"]!!.toInt(),
+            ref = params["ref"]
+        )
+    } catch (e: Exception) {
+        null
+    }
+
+    private fun requiredRefFactory(params: Map<String, String?>): DeeplinkParams? = try {
+        RequiredRefParams(
+            seriesId = params["seriesid"]!!.toInt(),
+            ref = params["ref"]!!
+        )
+    } catch (e: Exception) {
+        null
+    }
+
+    private fun profileFactory(params: Map<String, String?>): DeeplinkParams? = try {
+        ProfileParams(userId = params["userid"]!!)
+    } catch (e: Exception) {
+        null
+    }
+
+    private fun numericProfileFactory(params: Map<String, String?>): DeeplinkParams? = try {
+        NumericProfileParams(userId = params["userid"]!!.toInt())
+    } catch (e: Exception) {
+        null
+    }
+
+    private fun hostlessProfileFactory(params: Map<String, String?>): DeeplinkParams? = try {
+        HostlessProfileParams(profileId = params["profileid"]!!.toInt())
+    } catch (e: Exception) {
+        null
+    }
 }
