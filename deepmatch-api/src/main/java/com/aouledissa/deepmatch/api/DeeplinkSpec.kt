@@ -39,7 +39,7 @@ data class DeeplinkSpec(
         val pathPattern = buildPathPattern()
         val fragmentPattern = buildFragmentPattern()
 
-        return "$schemePattern://$hostPattern$pathPattern$fragmentPattern".toRegex()
+        return "$schemePattern://$hostPattern$pathPattern$fragmentPattern".toRegex(RegexOption.IGNORE_CASE)
     }
 
     private fun buildSchemePattern(): String {

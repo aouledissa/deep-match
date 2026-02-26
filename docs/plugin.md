@@ -3,7 +3,9 @@
 The primary responsibilities and capabilities of the DeepMatch Gradle plugin are:
 
 1.  **YAML Configuration Parsing:**
-    *   The plugin automatically locates and reads your `.deeplinks.yml` file (by default, from the root of the module, e.g., `app/.deeplinks.yml`, but this is configurable).
+    *   The plugin automatically locates and reads your `.deeplinks.yml` file from one of these locations:
+        *   `src/<variant>/.deeplinks.yml` (variant-specific)
+        *   `.deeplinks.yml` at the module root (fallback)
     *   It parses the YAML content, validating its structure against the expected format (implicitly defined by how it generates code and manifest entries, aligning with the `DeeplinkConfig` structure).
 
 2.  **Android Manifest Generation:**
@@ -42,7 +44,7 @@ The primary responsibilities and capabilities of the DeepMatch Gradle plugin are
     plugins {
         id("com.android.application")
         id("org.jetbrains.kotlin.android")
-        id("com.aouledissa.deepmatch.gradle") version "0.1.0"
+        id("com.aouledissa.deepmatch.gradle") version "<DEEPMATCH_VERSION>"
     }
     ```
 

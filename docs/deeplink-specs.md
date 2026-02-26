@@ -181,5 +181,6 @@ deeplinkSpecs:
 - The plugin creates a `<Name>DeeplinkParams` class for every deeplink spec. This avoids ambiguity between "no match" and "matched static deeplink".
 - Typed query params are validated by key and type after structural URI matching, so query order does not affect matching.
 - Query params are optional by default; set `required: true` only for values that must be present.
+- Scheme and host matching are case-insensitive, so values like `HTTPS://Example.COM/...` still match `scheme: [https]` and `host: ["example.com"]`.
 - All generated params classes implement a module-level sealed interface named from the module name (for example, module `app` -> `AppDeeplinkParams`), enabling exhaustive `when` checks.
 - The plugin also generates a module-level processor object named from the module name (for example, module `app` -> `AppDeeplinkProcessor`) preloaded with all generated specs.

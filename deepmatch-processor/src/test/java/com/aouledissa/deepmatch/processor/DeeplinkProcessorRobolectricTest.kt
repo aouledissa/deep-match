@@ -155,6 +155,41 @@ class DeeplinkProcessorRobolectricTest {
         assertThat(params).isInstanceOf(HomeParams::class.java)
     }
 
+    @Test
+    fun uppercaseHttpsAndHost_matchesLowercaseSpec() {
+        val spec = DeeplinkSpec(
+            scheme = setOf("https"),
+            host = setOf("example.com"),
+            pathParams = listOf(Param(name = "path")),
+            queryParams = emptySet(),
+            fragment = null,
+            parametersClass = HomeParams::class
+        )
+        val processor = DeeplinkProcessor(specs = setOf(spec))
+
+        val params = processor.match(Uri.parse("HTTPS://Example.COM/path"))
+        assertThat(params).isInstanceOf(HomeParams::class.java)
+    }
+
+    @Test
+    fun uppercaseAppAndHost_matchesTypedSpec() {
+        val spec = DeeplinkSpec(
+            scheme = setOf("app"),
+            host = setOf("example.com"),
+            pathParams = listOf(
+                Param(name = "profile"),
+                Param(name = "userId", type = ParamType.ALPHANUMERIC)
+            ),
+            queryParams = emptySet(),
+            fragment = null,
+            parametersClass = ProfileParams::class
+        )
+        val processor = DeeplinkProcessor(specs = setOf(spec))
+
+        val params = processor.match(Uri.parse("App://EXAMPLE.com/profile/abc")) as ProfileParams?
+        assertThat(params?.userId).isEqualTo("abc")
+    }
+
     data class SeriesParams(
         val seriesId: Int,
         val ref: String?,
@@ -182,4 +217,8 @@ class DeeplinkProcessorRobolectricTest {
     ) : DeeplinkParams
 
     class HomeParams : DeeplinkParams
+
+    data class ProfileParams(
+        val userId: String
+    ) : DeeplinkParams
 }

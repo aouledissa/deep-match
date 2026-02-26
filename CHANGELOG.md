@@ -45,6 +45,8 @@
   rejection and optional-missing acceptance.
 - Added regression tests ensuring static-only specs generate params classes and return a concrete
   params instance on successful match.
+- Added processor coverage for case-insensitive scheme/host matching (for example,
+  `HTTPS://Example.COM/...` and `App://EXAMPLE.com/...`).
 
 ## [0.2.0-alpha] - 2026-02-25
 
