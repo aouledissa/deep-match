@@ -1,0 +1,5 @@
+zensical
+mkdocs<2
+mkdocs-material
+pymdown-extensions>=10.7
+mike>=2.1
