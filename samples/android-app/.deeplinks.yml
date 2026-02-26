@@ -26,3 +26,12 @@ deeplinkSpecs:
     queryParams:
       - name: ref
         type: string
+
+  - name: "open hostless profile"
+    activity: com.aouledissa.deepmatch.sample.MainActivity
+    categories: [DEFAULT, BROWSABLE]
+    scheme: [app]
+    pathParams:
+      - name: profile
+      - name: profileId
+        type: numeric

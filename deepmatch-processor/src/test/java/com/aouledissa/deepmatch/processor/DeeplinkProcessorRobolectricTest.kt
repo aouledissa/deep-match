@@ -234,6 +234,25 @@ class DeeplinkProcessorRobolectricTest {
         assertThat(withTrailingSlash?.userId).isEqualTo(123)
     }
 
+    @Test
+    fun hostlessDeeplink_matchesAndExtractsPathParams() {
+        val spec = DeeplinkSpec(
+            scheme = setOf("app"),
+            host = emptySet(),
+            pathParams = listOf(
+                Param(name = "profile"),
+                Param(name = "profileId", type = ParamType.NUMERIC)
+            ),
+            queryParams = emptySet(),
+            fragment = null,
+            parametersClass = HostlessProfileParams::class
+        )
+        val processor = DeeplinkProcessor(specs = setOf(spec))
+
+        val params = processor.match(Uri.parse("app:///profile/123")) as HostlessProfileParams?
+        assertThat(params?.profileId).isEqualTo(123)
+    }
+
     data class SeriesParams(
         val seriesId: Int,
         val ref: String?,
@@ -268,5 +287,9 @@ class DeeplinkProcessorRobolectricTest {
 
     data class NumericProfileParams(
         val userId: Int
+    ) : DeeplinkParams
+
+    data class HostlessProfileParams(
+        val profileId: Int
     ) : DeeplinkParams
 }

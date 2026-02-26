@@ -30,7 +30,7 @@ open class DeeplinkProcessor(
             .trimEnd('/')
             .let { if (pathSegments.isNullOrEmpty().not()) "/$it" else it }
         val decodedFragment = fragment?.let { "#$it" }.orEmpty()
-        return "$scheme://$host$decodedPathSegments$decodedFragment"
+        return "$scheme://${host.orEmpty()}$decodedPathSegments$decodedFragment"
     }
 
     private fun buildDeeplinkParams(

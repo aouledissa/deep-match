@@ -18,6 +18,7 @@
   params remain non-null.
 - Plugin code generation now emits a `*DeeplinkParams` class for every deeplink spec, including
   static-only specs with no typed path/query/fragment fields.
+- Plugin config model now treats `host` as optional (`[]` by default), enabling hostless specs.
 
 ### Fixed
 
@@ -28,6 +29,8 @@
   present, and enforced only when marked `required: true`.
 - Fixed match-result ambiguity for generated processors: static deeplink matches no longer collapse
   to `null` (which was previously indistinguishable from "no match").
+- Fixed hostless deeplink matching (`app:///...`) by explicitly supporting empty-host specs.
+- Added build-time validation that every spec declares at least one scheme.
 
 ### Documentation
 
@@ -47,6 +50,7 @@
   params instance on successful match.
 - Added processor coverage for case-insensitive scheme/host matching (for example,
   `HTTPS://Example.COM/...` and `App://EXAMPLE.com/...`).
+- Added coverage for hostless deeplinks, including regex match, params extraction, and manifest output without `android:host`.
 
 ## [0.2.0-alpha] - 2026-02-25
 

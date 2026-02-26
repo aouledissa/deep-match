@@ -7,6 +7,7 @@ The primary responsibilities and capabilities of the DeepMatch Gradle plugin are
         *   `src/<variant>/.deeplinks.yml` (variant-specific)
         *   `.deeplinks.yml` at the module root (fallback)
     *   It parses the YAML content, validating its structure against the expected format (implicitly defined by how it generates code and manifest entries, aligning with the `DeeplinkConfig` structure).
+    *   Each spec must define at least one `scheme`; `host` is optional and can be omitted for hostless deeplinks.
 
 2.  **Android Manifest Generation:**
     *   Based on the parsed `deeplinkSpecs` from your YAML file, the plugin dynamically generates the necessary `<intent-filter>` entries within your app's `AndroidManifest.xml`.

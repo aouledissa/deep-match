@@ -48,6 +48,7 @@ data class DeeplinkSpec(
     }
 
     private fun buildHostPattern(): String {
+        if (host.isEmpty()) return ""
         return host.joinToString(separator = "|") { Regex.escape(it) }
             .let { if (host.size > 1) "($it)" else it }
     }
