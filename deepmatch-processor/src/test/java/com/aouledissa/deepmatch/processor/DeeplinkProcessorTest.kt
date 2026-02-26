@@ -30,6 +30,7 @@ class DeeplinkProcessorTest {
         val uri = mockk<Uri>(relaxed = true)
         every { uri.scheme } returns "app"
         every { uri.host } returns "example.com"
+        every { uri.port } returns -1
         every { uri.pathSegments } returns listOf("series", "42")
         every { uri.query } returns "ref=promo"
         every { uri.fragment } returns "trailer-tab"
@@ -61,6 +62,7 @@ class DeeplinkProcessorTest {
         val uri = mockk<Uri>(relaxed = true)
         every { uri.scheme } returns "app"
         every { uri.host } returns "other.com"
+        every { uri.port } returns -1
         every { uri.pathSegments } returns emptyList()
         every { uri.query } returns null
         every { uri.fragment } returns null
@@ -86,6 +88,7 @@ class DeeplinkProcessorTest {
         val uri = mockk<Uri>(relaxed = true)
         every { uri.scheme } returns "app"
         every { uri.host } returns "example.com"
+        every { uri.port } returns -1
         every { uri.pathSegments } returns emptyList()
         every { uri.query } returns null
         every { uri.fragment } returns null
@@ -111,6 +114,7 @@ class DeeplinkProcessorTest {
         val uri = mockk<Uri>(relaxed = true)
         every { uri.scheme } returns "app"
         every { uri.host } returns "example.com"
+        every { uri.port } returns -1
         every { uri.pathSegments } returns listOf("home")
         every { uri.query } returns null
         every { uri.fragment } returns null

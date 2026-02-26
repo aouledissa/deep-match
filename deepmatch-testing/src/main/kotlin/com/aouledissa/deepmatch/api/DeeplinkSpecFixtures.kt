@@ -7,6 +7,7 @@ object DeeplinkSpecFixtures {
     fun create(
         scheme: Set<String> = setOf(),
         host: Set<String> = setOf(),
+        port: Int? = null,
         pathParams: List<Param> = emptyList(),
         queryParams: Set<Param> = setOf(),
         fragment: String? = null,
@@ -15,6 +16,7 @@ object DeeplinkSpecFixtures {
         return DeeplinkSpec(
             scheme = scheme,
             host = host,
+            port = port,
             pathParams = pathParams,
             queryParams = queryParams,
             fragment = fragment,

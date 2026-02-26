@@ -253,6 +253,26 @@ class DeeplinkProcessorRobolectricTest {
         assertThat(params?.profileId).isEqualTo(123)
     }
 
+    @Test
+    fun deeplinkWithPort_matchesOnlyWhenPortMatchesSpec() {
+        val spec = DeeplinkSpec(
+            scheme = setOf("https"),
+            host = setOf("example.com"),
+            port = 8080,
+            pathParams = listOf(Param(name = "profile")),
+            queryParams = emptySet(),
+            fragment = null,
+            parametersClass = HomeParams::class
+        )
+        val processor = DeeplinkProcessor(specs = setOf(spec))
+
+        val matching = processor.match(Uri.parse("https://example.com:8080/profile"))
+        val nonMatching = processor.match(Uri.parse("https://example.com/profile"))
+
+        assertThat(matching).isInstanceOf(HomeParams::class.java)
+        assertThat(nonMatching).isNull()
+    }
+
     data class SeriesParams(
         val seriesId: Int,
         val ref: String?,

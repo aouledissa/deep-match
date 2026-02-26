@@ -16,6 +16,7 @@ internal data class DeeplinkConfig(
     val autoVerify: Boolean = false,
     val scheme: List<String>,
     val host: List<String> = emptyList(),
+    val port: Int? = null,
     val pathParams: List<Param>? = null,
     val queryParams: List<Param>? = null,
     val fragment: String? = null

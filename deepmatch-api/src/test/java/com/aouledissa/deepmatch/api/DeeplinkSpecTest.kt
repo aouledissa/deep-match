@@ -157,6 +157,22 @@ class DeeplinkSpecTest {
     }
 
     @Test
+    fun `deeplink pattern includes port when provided`() {
+        sut = DeeplinkSpec(
+            scheme = setOf("https"),
+            host = setOf("example.com"),
+            port = 8080,
+            pathParams = listOf(Param(name = "profile")),
+            queryParams = emptySet(),
+            fragment = null,
+            parametersClass = null
+        )
+
+        assertThat(sut.matcher.matches("https://example.com:8080/profile")).isTrue()
+        assertThat(sut.matcher.matches("https://example.com/profile")).isFalse()
+    }
+
+    @Test
     fun `matchesQueryParams returns true regardless of query params order`() {
         // when
         sut = DeeplinkSpec(

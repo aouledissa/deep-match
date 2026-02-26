@@ -31,7 +31,7 @@ dependencies {
 }
 
 gradlePlugin {
-    website = "https://deepmatch.aouledissa.com"
+    website = "https://aouledissa.com/deep-match/"
     vcsUrl = "https://github.com/aouledissa/deep-match"
     plugins {
         create("DeepMatchPlugin") {

@@ -56,6 +56,15 @@ Each item in the deeplinkSpecs list is a deep link configuration object with the
       host: ["example.com", "m.example.com"]
       ```
 
+- `port`
+    - Type: Integer
+    - Required: No
+    - Description: Optional URI port filter (for example staging links on `:8080`).
+    - Example:
+      ```yaml
+      port: 8080
+      ```
+
 - `pathParams`
     - Type: List of Param
     - Required: No
@@ -134,7 +143,7 @@ Each item in the deeplinkSpecs list is a deep link configuration object with the
 - `fragment`
     - Type: String
     - Required: No
-    - Description: Required URI fragment (#...). Exposed in generated params when declared.
+    - Description: Required URI fragment (#...). Exposed in generated params when declared. Fragment matching is runtime-only (not manifest-level).
     - Example:
       ```yaml
       fragment: "details"
@@ -160,6 +169,7 @@ deeplinkSpecs:
     categories: [DEFAULT, BROWSABLE]
     scheme: [https, app]
     host: ["example.com"]
+    port: 8080
     pathParams:
       - name: users
       - name: userId
@@ -183,5 +193,6 @@ deeplinkSpecs:
 - Query params are optional by default; set `required: true` only for values that must be present.
 - Scheme and host matching are case-insensitive, so values like `HTTPS://Example.COM/...` still match `scheme: [https]` and `host: ["example.com"]`.
 - `scheme` must contain at least one value. `host` can be omitted (or set to `[]`) for hostless URIs.
+- Manifest generation does not filter by query params or fragment; those are validated by the runtime processor.
 - All generated params classes implement a module-level sealed interface named from the module name (for example, module `app` -> `AppDeeplinkParams`), enabling exhaustive `when` checks.
 - The plugin also generates a module-level processor object named from the module name (for example, module `app` -> `AppDeeplinkProcessor`) preloaded with all generated specs.

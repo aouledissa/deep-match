@@ -1,7 +1,7 @@
 public final class com/aouledissa/deepmatch/api/DeeplinkSpecFixtures {
 	public static final field INSTANCE Lcom/aouledissa/deepmatch/api/DeeplinkSpecFixtures;
-	public final fun create (Ljava/util/Set;Ljava/util/Set;Ljava/util/List;Ljava/util/Set;Ljava/lang/String;Lkotlin/reflect/KClass;)Lcom/aouledissa/deepmatch/api/DeeplinkSpec;
-	public static synthetic fun create$default (Lcom/aouledissa/deepmatch/api/DeeplinkSpecFixtures;Ljava/util/Set;Ljava/util/Set;Ljava/util/List;Ljava/util/Set;Ljava/lang/String;Lkotlin/reflect/KClass;ILjava/lang/Object;)Lcom/aouledissa/deepmatch/api/DeeplinkSpec;
+	public final fun create (Ljava/util/Set;Ljava/util/Set;Ljava/lang/Integer;Ljava/util/List;Ljava/util/Set;Ljava/lang/String;Lkotlin/reflect/KClass;)Lcom/aouledissa/deepmatch/api/DeeplinkSpec;
+	public static synthetic fun create$default (Lcom/aouledissa/deepmatch/api/DeeplinkSpecFixtures;Ljava/util/Set;Ljava/util/Set;Ljava/lang/Integer;Ljava/util/List;Ljava/util/Set;Ljava/lang/String;Lkotlin/reflect/KClass;ILjava/lang/Object;)Lcom/aouledissa/deepmatch/api/DeeplinkSpec;
 }
 
 public final class com/aouledissa/deepmatch/processor/FakeDeeplinkProcessor : com/aouledissa/deepmatch/processor/DeeplinkProcessor {

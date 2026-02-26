@@ -3,7 +3,7 @@ package com.aouledissa.deepmatch.convention
 import org.gradle.api.publish.maven.MavenPom
 
 fun MavenPom.configureDeepMatchPom() {
-    url.set("https://www.deepmatch.aouledissa.com")
+    url.set("https://aouledissa.com/deep-match/")
     licenses {
         license {
             name.set("The Apache License, Version 2.0")
