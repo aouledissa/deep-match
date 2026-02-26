@@ -56,7 +56,8 @@ Each item in the `deeplinkSpecs` list is a deep link configuration object with t
         ```
 
 *   **`fragment`**: (Optional, String)
-    *   Adds a fragment requirement (`#details`). When provided, the generated parameter class exposes it as a property.
+    *   Adds a fragment requirement (`#details`).
+    *   When provided, DeepMatch generates a params class (if needed) and exposes `fragment` as a property, even if no typed path/query params are declared.
 
 *   **`description`**: (Optional, String)
     *   Free-form text to describe the deeplink’s purpose. Currently informational only.

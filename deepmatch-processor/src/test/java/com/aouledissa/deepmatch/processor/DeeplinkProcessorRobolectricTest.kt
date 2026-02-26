@@ -78,6 +78,26 @@ class DeeplinkProcessorRobolectricTest {
         assertThat(params?.ref).isEqualTo("promo")
     }
 
+    @Test
+    fun deeplinkWithDifferentPathOrder_doesNotMatch() {
+        val spec = DeeplinkSpec(
+            scheme = setOf("app"),
+            host = setOf("example.com"),
+            pathParams = listOf(
+                Param(name = "series"),
+                Param(name = "seriesId", type = ParamType.NUMERIC)
+            ),
+            queryParams = emptySet(),
+            fragment = null,
+            parametersClass = SeriesOnlyParams::class
+        )
+        val processor = DeeplinkProcessor(specs = setOf(spec))
+
+        val uri = Uri.parse("app://example.com/42/series")
+        val params = processor.match(uri)
+        assertThat(params).isNull()
+    }
+
     data class SeriesParams(
         val seriesId: Int,
         val ref: String?,
@@ -88,5 +108,9 @@ class DeeplinkProcessorRobolectricTest {
         val seriesId: Int,
         val ref: String?,
         val page: Int?
+    ) : DeeplinkParams
+
+    data class SeriesOnlyParams(
+        val seriesId: Int
     ) : DeeplinkParams
 }

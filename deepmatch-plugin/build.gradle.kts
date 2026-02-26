@@ -25,6 +25,9 @@ dependencies {
     implementation(libs.squareup.kotlinpoet)
     implementation(libs.kaml)
     implementation(libs.xmlUtil.serialization)
+    testImplementation(gradleTestKit())
+    testImplementation(libs.junit)
+    testImplementation(libs.google.truth)
 }
 
 gradlePlugin {

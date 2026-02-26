@@ -22,6 +22,8 @@ internal data class DeeplinkConfig(
 ) {
 
     fun containsTemplateParams(): Boolean {
-        return pathParams?.any { it.type != null } == true || queryParams.isNullOrEmpty().not()
+        return pathParams?.any { it.type != null } == true
+                || queryParams.isNullOrEmpty().not()
+                || fragment != null
     }
 }

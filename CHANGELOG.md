@@ -11,6 +11,9 @@
   segment order is preserved explicitly.
 - Plugin code generation now emits `pathParams = listOf(...)` for generated specs to align with
   the new API shape.
+- Fragment presence is now treated as a params-generation trigger in plugin config evaluation.
+- Fragment-only deeplink specs now generate `*DeeplinkParams` with a `fragment` property and wire
+  `parametersClass` accordingly.
 
 ### Fixed
 
@@ -22,6 +25,12 @@
 
 - Updated README and docs pages to document order-agnostic typed query param matching semantics.
 - Updated README/docs to clarify ordered path params list semantics in generated specs.
+
+### Tests
+
+- Added plugin tests to validate fragment-only specs generate params classes and that generated
+  specs emit `pathParams = listOf(...)`.
+- Added processor regression coverage to ensure path matching remains positional and order-sensitive.
 
 ## [0.2.0-alpha] - 2026-02-25
 
