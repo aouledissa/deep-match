@@ -20,7 +20,11 @@ The primary responsibilities and capabilities of the DeepMatch Gradle plugin are
         *   static paths -> `android:path` (with trailing-slash variant)
         *   typed-at-end paths -> `android:pathPrefix`
         *   typed-in-middle paths -> `android:pathPattern` (+ `android:pathAdvancedPattern` when `compileSdk >= 31`)
+    *   For `autoVerify: true` specs that mix web and custom schemes (for example, `[https, app]`), generated
+        manifest output is split into separate intent filters so only web schemes are auto-verified.
     *   Hostless specs omit `android:host`. When `port` is declared, `android:port` is generated.
+        Hostless custom-scheme entries include targeted lint suppression (`tools:ignore="AppLinkUrlError"`)
+        for AGP 9+ lint compatibility.
     *   Query params and fragment constraints are not emitted in manifest filters (they are runtime-validated by `DeeplinkProcessor`).
     *   Generated deeplink activities include `android:exported="true"` and `tools:node="merge"` for Android 12+ and merge-friendly behavior.
     *   This automation means you **do not need to manually write or maintain these `<intent-filter>` tags** in your main `AndroidManifest.xml` for the deep links defined in your YAML. The plugin handles keeping them in sync with your YAML configuration.
@@ -53,12 +57,13 @@ The primary responsibilities and capabilities of the DeepMatch Gradle plugin are
 
 ### Getting Started
 
-1. Apply the plugin alongside your usual Android and Kotlin plugins:
+1. Apply the plugin alongside your Android plugin:
 
     ```kotlin
     plugins {
         id("com.android.application")
-        id("org.jetbrains.kotlin.android")
+        // AGP 9+: Kotlin is built into AGP (do not apply org.jetbrains.kotlin.android)
+        // AGP 8.x and below: add id("org.jetbrains.kotlin.android")
         id("com.aouledissa.deepmatch.gradle") version "<DEEPMATCH_VERSION>"
     }
     ```

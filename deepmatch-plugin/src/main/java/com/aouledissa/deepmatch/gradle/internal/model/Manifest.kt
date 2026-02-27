@@ -65,7 +65,9 @@ internal data class Category(
 @Serializable
 internal data class Scheme(
     @SerialName("android:scheme")
-    val name: String
+    val name: String,
+    @SerialName("tools:ignore")
+    val ignore: String? = null
 )
 
 @Serializable

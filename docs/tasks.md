@@ -26,6 +26,10 @@ Generates deeplink `<intent-filter>` entries for a variant.
 - Available when `deepMatch { generateManifestFiles = true }`.
 - Writes a generated manifest file under `build/generated/manifests/<Variant>/`.
 - Output is merged by AGP into the final app manifest.
+- For `autoVerify: true` specs that mix web + custom schemes, output is split into separate intent filters
+  so only web schemes are auto-verified.
+- For hostless custom-scheme specs, generated `<data>` entries include targeted lint suppression for
+  `AppLinkUrlError` on AGP 9+ lint.
 
 Example:
 

@@ -66,25 +66,41 @@ internal abstract class GenerateDeeplinkManifestFile : DefaultTask() {
         val activities = deeplinkConfigs.groupBy { it.activity }.map { activity ->
             AndroidActivity(
                 name = activity.key,
-                intentFilter = activity.value.map { config ->
+                intentFilter = activity.value.flatMap { config ->
                     val pathData = buildPathData(config.pathParams.orEmpty())
-                    IntentFilter(
-                        autoVerify = config.autoVerify.takeIf { it == true },
-                        action = listOf(Action("android.intent.action.VIEW")),
-                        category = getFilterCategories(
-                            categories = config.categories,
-                            autoVerify = config.autoVerify
-                        ).toList(),
-                        scheme = config.scheme.map { Scheme(name = it) },
-                        hosts = config.host
-                            .filter { it.isNotEmpty() }
-                            .map { Host(name = it) },
-                        port = config.port?.let { Port(number = it.toString()) },
-                        exactPaths = pathData.exactPaths,
-                        prefixPaths = pathData.prefixPaths,
-                        patternPaths = pathData.patternPaths,
-                        advancedPatternPaths = pathData.advancedPatternPaths
+                    val schemeFilters = buildSchemeFilters(
+                        schemes = config.scheme,
+                        autoVerify = config.autoVerify
                     )
+                    val hosts = config.host
+                        .filter { it.isNotEmpty() }
+                        .map { Host(name = it) }
+                    schemeFilters.map { schemeFilter ->
+                        IntentFilter(
+                            autoVerify = schemeFilter.autoVerify.takeIf { it },
+                            action = listOf(Action("android.intent.action.VIEW")),
+                            category = getFilterCategories(
+                                categories = config.categories,
+                                autoVerify = config.autoVerify
+                            ).toList(),
+                            scheme = schemeFilter.schemes.map { scheme ->
+                                Scheme(
+                                    name = scheme,
+                                    ignore = if (hosts.isEmpty() && !isWebScheme(scheme)) {
+                                        "AppLinkUrlError"
+                                    } else {
+                                        null
+                                    }
+                                )
+                            },
+                            hosts = hosts,
+                            port = config.port?.let { Port(number = it.toString()) },
+                            exactPaths = pathData.exactPaths,
+                            prefixPaths = pathData.prefixPaths,
+                            patternPaths = pathData.patternPaths,
+                            advancedPatternPaths = pathData.advancedPatternPaths
+                        )
+                    }
                 }
             )
         }
@@ -108,6 +124,32 @@ internal abstract class GenerateDeeplinkManifestFile : DefaultTask() {
             }
             .map { Category(it.manifestName) }
             .toSet()
+    }
+
+    private fun buildSchemeFilters(
+        schemes: List<String>,
+        autoVerify: Boolean
+    ): List<SchemeFilter> {
+        if (!autoVerify) return listOf(SchemeFilter(schemes = schemes, autoVerify = false))
+
+        val webSchemes = schemes.filter(::isWebScheme)
+        if (webSchemes.isEmpty()) {
+            return listOf(SchemeFilter(schemes = schemes, autoVerify = false))
+        }
+
+        val customSchemes = schemes.filterNot(::isWebScheme)
+
+        return buildList {
+            add(SchemeFilter(schemes = webSchemes, autoVerify = true))
+            if (customSchemes.isNotEmpty()) {
+                add(SchemeFilter(schemes = customSchemes, autoVerify = false))
+            }
+        }
+    }
+
+    private fun isWebScheme(scheme: String): Boolean {
+        return scheme.equals(other = "http", ignoreCase = true) ||
+            scheme.equals(other = "https", ignoreCase = true)
     }
 
     private fun buildPathData(pathParams: List<Param>): PathDataGroups {
@@ -182,5 +224,10 @@ internal abstract class GenerateDeeplinkManifestFile : DefaultTask() {
         val prefixPaths: List<PrefixPath> = emptyList(),
         val patternPaths: List<PatternPath> = emptyList(),
         val advancedPatternPaths: List<AdvancedPatternPath> = emptyList()
+    )
+
+    private data class SchemeFilter(
+        val schemes: List<String>,
+        val autoVerify: Boolean
     )
 }

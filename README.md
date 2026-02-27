@@ -43,7 +43,8 @@ For full documentation please visit our [official docs page](https://aouledissa.
 ```kotlin
 plugins {
     id("com.android.application")
-    id("org.jetbrains.kotlin.android")
+    // AGP 9+: Kotlin is built into AGP (do not apply org.jetbrains.kotlin.android)
+    // AGP 8.x and below: add id("org.jetbrains.kotlin.android")
     id("com.aouledissa.deepmatch.gradle") version "<DEEPMATCH_VERSION>"
 }
 ```
@@ -107,6 +108,10 @@ For example, `?ref=promo&page=1` and `?page=1&ref=promo` are treated the same.
 - Scheme and host matching are case-insensitive (for example, `HTTPS://Example.COM/...` matches
 `scheme: [https]` + `host: ["example.com"]`).
 - Host is optional; omit it (or set `host: []`) for hostless URIs such as `app:///profile/123`.
+- For `autoVerify: true` specs that mix web + custom schemes (for example, `[https, app]`), generated
+  manifests split web and custom schemes into separate intent filters so app-link verification remains valid.
+- For hostless custom-scheme specs, generated manifest data entries include targeted lint suppression for
+  `AppLinkUrlError` to keep AGP 9 lint checks passing.
 - Path params are ordered and matched by position as declared in YAML.
 - Each deeplink spec always generates a `*DeeplinkParams` type, so a successful match is never
 ambiguous with "no match". When declared, `fragment` is exposed in the generated params type.

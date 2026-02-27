@@ -1,21 +1,14 @@
+import com.android.build.api.dsl.LibraryExtension
 import com.aouledissa.deepmatch.convention.configureDeepMatchPom
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
     alias(libs.plugins.android.library)
-    alias(libs.plugins.kotlin.android)
     alias(libs.plugins.maven.publish)
     alias(libs.plugins.gradleup.nmcp)
     signing
 }
 
-kotlin {
-    compilerOptions {
-        jvmTarget = JvmTarget.JVM_11
-    }
-}
-
-android {
+configure<LibraryExtension> {
     namespace = "com.aouledissa.deepmatch.processor"
     compileSdk = 36
 

@@ -48,6 +48,12 @@
   generated processors implicitly.
 - Plugin now emits per-module spec-shape metadata during codegen and wires collision validation into
   variant build/check for composed projects.
+- Updated AGP API usage in plugin variant configuration to align with AGP `9.0.x` (`CommonExtension`
+  no longer generic).
+- Updated the sample app to AGP 9 built-in Kotlin setup by removing `org.jetbrains.kotlin.android`
+  from `samples/android-app/build.gradle.kts`.
+- Manifest generation now splits mixed web + custom schemes into separate `<intent-filter>` entries
+  when `autoVerify: true`, so only web schemes (`http`/`https`) are auto-verified.
 
 ### Fixed
 
@@ -63,6 +69,10 @@
   constraints as processor-only matching rules.
 - Added build-time validation that every spec declares at least one scheme.
 - Added build-time validation for duplicate deeplink spec names with a clear plugin error message.
+- Fixed AGP 9 lint failure (`AppLinkSplitToWebAndCustom`) by emitting separate auto-verified and
+  custom-scheme filters for mixed-scheme deeplinks.
+- Fixed AGP 9 lint failure (`AppLinkUrlError`) for hostless custom schemes by adding targeted
+  `tools:ignore="AppLinkUrlError"` on generated hostless custom-scheme `<data>` entries.
 
 ### Documentation
 
@@ -82,6 +92,10 @@
   overview, plugin, and tasks docs.
 - Updated README/docs to document multi-file spec discovery (`.deeplinks.yml` + `*.deeplinks.yml`),
   root/variant merge precedence, and report catalog grouping across modules/source files.
+- Updated README/docs plugin setup snippets to clarify AGP 9 built-in Kotlin usage (do not apply
+  `org.jetbrains.kotlin.android` on AGP 9+).
+- Updated plugin/specs/tasks docs to document mixed-scheme `autoVerify` filter splitting and
+  hostless custom-scheme lint handling in generated manifests.
 
 ### Tests
 
@@ -108,6 +122,10 @@
 - Added runtime tests for `CompositeDeeplinkProcessor` first-match behavior and null fallback.
 - Expanded processor tests with error-path handling (safe null on exceptions).
 - Expanded Robolectric coverage for empty/blank/scheme-less URIs and malformed typed values.
+- Added manifest-generation regression tests ensuring mixed web/custom schemes with
+  `autoVerify: true` are split into separate intent filters.
+- Added manifest-generation regression tests ensuring hostless custom schemes include targeted
+  `tools:ignore="AppLinkUrlError"` output.
 
 ## [0.2.0-alpha] - 2026-02-25
 

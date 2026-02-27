@@ -32,7 +32,9 @@ Each item in the deeplinkSpecs list is a deep link configuration object with the
 - `autoVerify`
     - Type: Boolean
     - Required: No (default: false)
-    - Description: Enables android:autoVerify="true" for app links.
+    - Description: Enables `android:autoVerify="true"` for app links.
+      If a spec mixes web + custom schemes (for example, `[https, app]`), generated manifest output
+      is split into separate intent filters so only web schemes are auto-verified.
     - Example:
       ```yaml
       autoVerify: true
@@ -193,6 +195,8 @@ deeplinkSpecs:
 - Query params are optional by default; set `required: true` only for values that must be present.
 - Scheme and host matching are case-insensitive, so values like `HTTPS://Example.COM/...` still match `scheme: [https]` and `host: ["example.com"]`.
 - `scheme` must contain at least one value. `host` can be omitted (or set to `[]`) for hostless URIs.
+- For hostless custom-scheme specs, generated manifest data entries include targeted lint suppression
+  (`tools:ignore="AppLinkUrlError"`) to satisfy AGP 9+ lint checks while keeping hostless custom deeplinks valid.
 - Manifest generation does not filter by query params or fragment; those are validated by the runtime processor.
 - All generated params classes implement a module-level sealed interface named from the module name (for example, module `app` -> `AppDeeplinkParams`), enabling exhaustive `when` checks.
 - The plugin also generates a module-level processor object named from the module name (for example, module `app` -> `AppDeeplinkProcessor`) preloaded with all generated specs.

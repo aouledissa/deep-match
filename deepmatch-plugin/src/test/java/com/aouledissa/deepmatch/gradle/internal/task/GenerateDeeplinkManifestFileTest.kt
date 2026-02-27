@@ -162,6 +162,7 @@ class GenerateDeeplinkManifestFileTest {
 
         assertThat(xml).contains("android:scheme=\"app\"")
         assertThat(xml).doesNotContain("android:host=")
+        assertThat(xml).contains("tools:ignore=\"AppLinkUrlError\"")
     }
 
     @Test
@@ -205,6 +206,34 @@ class GenerateDeeplinkManifestFileTest {
         assertThat(xml).contains("android:autoVerify=\"true\"")
         assertThat(xml).contains("android:name=\"android.intent.category.DEFAULT\"")
         assertThat(xml).contains("android:name=\"android.intent.category.BROWSABLE\"")
+    }
+
+    @Test
+    fun `autoVerify true splits mixed web and custom schemes into separate intent filters`() {
+        val xml = generateManifest(
+            """
+            deeplinkSpecs:
+              - name: "profile spotlight"
+                activity: com.example.app.MainActivity
+                scheme: [https, app]
+                host: ["example.com"]
+                autoVerify: true
+            """.trimIndent()
+        )
+
+        val autoVerifyFilter = Regex(
+            "<intent-filter[^>]*android:autoVerify=\"true\"[\\s\\S]*?</intent-filter>"
+        ).find(xml)?.value
+        val customSchemeFilter = Regex(
+            "<intent-filter(?![^>]*android:autoVerify=\"true\")[\\s\\S]*?android:scheme=\"app\"[\\s\\S]*?</intent-filter>"
+        ).find(xml)?.value
+
+        assertThat(Regex("<intent-filter").findAll(xml).count()).isEqualTo(2)
+        assertThat(Regex("android:autoVerify=\"true\"").findAll(xml).count()).isEqualTo(1)
+        assertThat(autoVerifyFilter).isNotNull()
+        assertThat(autoVerifyFilter).contains("android:scheme=\"https\"")
+        assertThat(autoVerifyFilter).doesNotContain("android:scheme=\"app\"")
+        assertThat(customSchemeFilter).isNotNull()
     }
 
     @Test

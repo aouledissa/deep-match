@@ -33,7 +33,8 @@ Apply the plugin in each participating module:
 ```kotlin
 plugins {
     id("com.android.library") // or com.android.application
-    id("org.jetbrains.kotlin.android")
+    // AGP 9+: Kotlin is built into AGP (do not apply org.jetbrains.kotlin.android)
+    // AGP 8.x and below: add id("org.jetbrains.kotlin.android")
     id("com.aouledissa.deepmatch.gradle")
 }
 ```

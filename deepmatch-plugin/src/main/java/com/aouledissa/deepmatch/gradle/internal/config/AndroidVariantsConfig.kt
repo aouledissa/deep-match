@@ -20,7 +20,7 @@ import org.gradle.api.tasks.TaskProvider
 
 internal fun configureAndroidVariants(project: Project, config: DeepMatchPluginConfig) {
     val android = project.extensions.getByType(AndroidComponentsExtension::class.java)
-    val compileSdk = (project.extensions.getByName("android") as CommonExtension<*, *, *, *, *, *>)
+    val compileSdk = (project.extensions.getByName("android") as CommonExtension)
         .compileSdk
         ?: 0
 

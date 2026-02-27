@@ -1,8 +1,5 @@
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget
-
 plugins {
-    id("com.android.application") version "8.13.0"
-    id("org.jetbrains.kotlin.android") version "2.3.10"
+    id("com.android.application") version "9.0.1"
     id("org.jetbrains.kotlin.plugin.compose") version "2.3.10"
     id("com.aouledissa.deepmatch.gradle")
 }
@@ -36,12 +33,6 @@ android {
 
     buildFeatures {
         compose = true
-    }
-}
-
-kotlin {
-    compilerOptions {
-        jvmTarget = JvmTarget.JVM_11
     }
 }
 
