@@ -1,228 +1,206 @@
-![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/aouledissa/deep-match/unit-tests.yml?branch=main)
-![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/aouledissa/deep-match/docs.yml?branch=main&label=docs)
-![Maven Central Version](https://img.shields.io/maven-central/v/com.aouledissa.deepmatch/deepmatch-processor)
-![Gradle Plugin Portal Version](https://img.shields.io/gradle-plugin-portal/v/com.aouledissa.deepmatch.gradle)
-
+![Build](https://img.shields.io/github/actions/workflow/status/aouledissa/deep-match/unit-tests.yml?branch=main)
+![Docs](https://img.shields.io/github/actions/workflow/status/aouledissa/deep-match/docs.yml?branch=main&label=docs)
+![Maven Central](https://img.shields.io/maven-central/v/com.aouledissa.deepmatch/deepmatch-processor)
+![Gradle Plugin Portal](https://img.shields.io/gradle-plugin-portal/v/com.aouledissa.deepmatch.gradle)
+![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)
 
 # DeepMatch
 
-DeepMatch is an Android deep-linking toolkit that turns deeplink YAML spec files into typed Kotlin
-code, optional manifest entries, and runtime routing logic. Point the plugin at your configuration
-and it will:
+DeepMatch is a Gradle plugin and Android library that automates deep link handling: describe your links once in YAML, and it generates the manifest intent filters, type-safe parameter classes, and runtime routing logic for you.
 
-- Generate strongly-typed deeplink specs and one parameter class per deeplink spec.
-- Generate a module-level sealed params interface (for example, module `app` generates
-  `AppDeeplinkParams`) that all generated params classes implement.
-- Optionally emit manifest snippets so you never hand-write `<intent-filter>` entries again.
-- Optionally generate a standalone HTML deeplink report with a live URI validator.
-- Provide a lightweight runtime (`deepmatch-processor`) that matches URIs against the generated
-  specs and returns typed params.
+## Why DeepMatch?
 
-The YAML file becomes the single source of truth for everything deeplink-related.
+Android deep linking has a fundamental synchronization problem. Every deep link must be declared in at least two places: the `AndroidManifest.xml` as an `<intent-filter>`, and your Kotlin code as string-based URI parsing logic. When one changes without the other, links break silently at runtime.
 
-## Documentation
-For full documentation please visit our [official docs page](https://aouledissa.com/deep-match/)
+**DeepMatch eliminates this entirely.** You declare your deep links once in a YAML spec file. The Gradle plugin reads that file and automatically generates:
 
-## Modules
+- `<intent-filter>` entries in your `AndroidManifest.xml`
+- Strongly-typed Kotlin parameter classes (one per deep link)
+- A ready-to-use runtime processor for URI matching
 
-- `deepmatch-plugin` – Gradle plugin (`com.aouledissa.deepmatch.gradle`) that parses specs,
-  generates Kotlin sources, and (optionally) produces manifest entries for each variant.
-- `deepmatch-processor` – Android library that provides `DeeplinkProcessor` for runtime URI
-  matching and typed params extraction.
-- `deepmatch-api` – Shared model classes (`DeeplinkSpec`, `Param`, `ParamType`, `DeeplinkParams`).
-- `deepmatch-testing` – Shared test fixtures (fake processors and spec builders) used by the runtime
-  and plugin tests.
-- `samples/android-app` – Composite-build sample app demonstrating generated processor usage,
-  manifest generation, and ADB deeplink testing. See
-  [`samples/android-app/README.md`](samples/android-app/README.md).
+The YAML file becomes the single source of truth for everything deep link-related.
 
-## Quick Start
+## Key Features
 
-1. Add the plugin to your Android module:
+**Automatic manifest generation** — The plugin generates all `<intent-filter>` entries for you. It picks the right path attribute (`path`, `pathPrefix`, `pathPattern`), correctly handles mixed schemes for App Links verification, and suppresses AGP 9 lint warnings for hostless URIs. You never touch the manifest XML for deep links again.
+
+**Type-safe routing** — Instead of extracting strings from a `Uri` and casting manually, you get generated data classes with typed fields. A `numeric` path param becomes an `Int`. A missing optional query param becomes `null`. A successful match is never ambiguous with no-match.
+
+**Build-time validation** — The plugin catches broken configurations before they ship: missing schemes, duplicate spec names, and URI-shape collisions across composed modules all fail the build with a clear error.
+
+**Multi-module composition** — Library modules declare their own `.deeplinks.yml`. App modules automatically discover and compose all dependency processors into a single unified `CompositeDeeplinkProcessor`. Collision detection runs at build time.
+
+**URI validation task** — Run `./gradlew validateDeeplinks --uri "..."` to test any URI against your specs locally and get a per-spec `[MATCH]` / `[MISS]` diagnostic with extracted params.
+
+**HTML report** — Optionally generate a self-contained HTML deeplink catalog with a live in-browser URI validator, auto-generated example URIs, and near-miss diagnostics.
+
+## Setup
+
+### 1. Apply the plugin
 
 ```kotlin
+// app/build.gradle.kts
 plugins {
     id("com.android.application")
-    // AGP 9+: Kotlin is built into AGP (do not apply org.jetbrains.kotlin.android)
-    // AGP 8.x and below: add id("org.jetbrains.kotlin.android")
-    id("com.aouledissa.deepmatch.gradle") version "<DEEPMATCH_VERSION>"
+    // AGP 9+: Kotlin is built into AGP, do not apply org.jetbrains.kotlin.android
+    id("com.aouledissa.deepmatch.gradle") version "<version>"
 }
 ```
 
-2. Add the runtime dependency:
+### 2. Add the runtime dependency
 
 ```kotlin
 dependencies {
-    implementation("com.aouledissa.deepmatch:deepmatch-processor:<DEEPMATCH_VERSION>")
+    implementation("com.aouledissa.deepmatch:deepmatch-processor:<version>")
 }
 ```
 
-3. Configure plugin behavior:
+### 3. Create a spec file
 
-```kotlin
-deepMatch {
-    generateManifestFiles = true
-    report {
-        enabled = true
-        // Optional override (default: build/reports/deeplinks.html)
-        // output = layout.buildDirectory.file("reports/deeplinks.html")
-    }
-}
-```
-
-DeepMatch automatically composes processors from project dependencies that also apply the plugin.
-
-Set `generateManifestFiles = false` if you want to manage `<intent-filter>` entries manually.
-
-4. Create one or more spec files in your module:
-- Module root: `.deeplinks.yml` or `*.deeplinks.yml`
-- Variant folder: `src/<variant>/.deeplinks.yml` or `src/<variant>/*.deeplinks.yml`
-- Merge precedence is deterministic: root files first, then variant files. If two files define the
-  same spec `name`, the later source overrides the earlier one.
-- Explicitly: when a build-type/variant file and a module-root file define the same spec `name`,
-  the build-type/variant definition wins.
+Create `.deeplinks.yml` in your module root:
 
 ```yaml
 deeplinkSpecs:
+  - name: "open profile"
+    activity: com.example.app.ProfileActivity
+    categories: [DEFAULT, BROWSABLE]
+    scheme: [https, app]
+    host: ["example.com"]
+    pathParams:
+      - name: profile
+      - name: userId
+        type: alphanumeric
+    queryParams:
+      - name: ref
+        type: string
+        required: true
+    fragment: "details"
+
   - name: "open series"
     activity: com.example.app.MainActivity
     categories: [DEFAULT, BROWSABLE]
-    scheme: [https, app]
+    scheme: [app]
     host: ["example.com"]
     pathParams:
       - name: series
       - name: seriesId
         type: numeric
     queryParams:
-      - name: query
-        type: string
-        required: true
       - name: ref
         type: string
-    fragment: "details"
 ```
 
-- Typed query params are validated by key and type, so query ordering does not matter.
-For example, `?ref=promo&page=1` and `?page=1&ref=promo` are treated the same.
-- Query params are optional by default; use `required: true` for mandatory keys.
-- Scheme and host matching are case-insensitive (for example, `HTTPS://Example.COM/...` matches
-`scheme: [https]` + `host: ["example.com"]`).
-- Host is optional; omit it (or set `host: []`) for hostless URIs such as `app:///profile/123`.
-- For `autoVerify: true` specs that mix web + custom schemes (for example, `[https, app]`), generated
-  manifests split web and custom schemes into separate intent filters so app-link verification remains valid.
-- For hostless custom-scheme specs, generated manifest data entries include targeted lint suppression for
-  `AppLinkUrlError` to keep AGP 9 lint checks passing.
-- Path params are ordered and matched by position as declared in YAML.
-- Each deeplink spec always generates a `*DeeplinkParams` type, so a successful match is never
-ambiguous with "no match". When declared, `fragment` is exposed in the generated params type.
+**Path params** are matched positionally and in order. **Query params** are matched by name, order-independent. Untyped params act as literal path segments. Host is optional — omit it for hostless URIs like `app:///home`.
 
-5. Generate sources (or just build normally):
+### 4. Build
 
 ```bash
-./gradlew :app:generateDebugDeeplinkSpecs
+./gradlew build
 ```
 
-DeepMatch generates:
-- `<ModuleName>DeeplinkProcessor` (example: `AppDeeplinkProcessor`)
-- `<ModuleName>DeeplinkParams` sealed interface (example: `AppDeeplinkParams`)
-- `*DeeplinkSpecs` and `*DeeplinkParams` classes
+The plugin generates intent filters in your manifest, a typed `AppDeeplinkParams` sealed interface, one `*DeeplinkParams` class per spec, and an `AppDeeplinkProcessor` ready for use at runtime.
 
-6. Use the generated processor at runtime:
+### 5. Handle deep links
 
 ```kotlin
-intent.data?.let { uri ->
-    when (val params = AppDeeplinkProcessor.match(uri) as? AppDeeplinkParams) {
-        is OpenSeriesDeeplinkParams -> {
-            // Navigate using params.seriesId / params.ref
-        }
-        null -> {
-            // No deeplink matched
+class MainActivity : AppCompatActivity() {
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        when (val params = AppDeeplinkProcessor.match(intent.data) as? AppDeeplinkParams) {
+            is OpenProfileDeeplinkParams -> openProfile(params.userId, params.ref)
+            is OpenSeriesDeeplinkParams  -> openSeries(params.seriesId)
+            null -> showHome()
         }
     }
 }
 ```
 
-Advanced runtime APIs:
-- `CompositeDeeplinkProcessor` to chain multiple processors and return the first match.
+No string extraction. No manual casting. No runtime surprises.
 
-7. Optional real-device smoke test via ADB:
+## Configuration
 
-```bash
-adb shell am start -W \
-  -a android.intent.action.VIEW \
-  -c android.intent.category.BROWSABLE \
-  -d "app://example.com/series/42?ref=promo"
+```kotlin
+deepMatch {
+    generateManifestFiles = true   // default: true
+    report {
+        enabled = true             // default: false
+        // output = layout.buildDirectory.file("reports/deeplinks.html")
+    }
+}
 ```
 
-For an end-to-end reference app (Compose UI + generated manifest + ADB tests), see
-[`samples/android-app/README.md`](samples/android-app/README.md).
+## Gradle Tasks
 
-8. Optional report generation:
+| Task | Description |
+|------|-------------|
+| `generate<Variant>DeeplinkSpecs` | Generate Kotlin sources from YAML specs |
+| `generate<Variant>DeeplinkManifest` | Generate manifest intent filter entries |
+| `generate<Variant>DeeplinkReport` | Generate the HTML deeplink report (if enabled) |
+| `validateDeeplinks --uri "..."` | Validate a URI against all declared specs |
+| `validate<Variant>CompositeSpecsCollisions` | Detect URI-shape collisions across composed modules |
 
-```bash
-./gradlew :app:generateDeeplinkReport
+Required query params generate non-null properties. Optional query params generate nullable ones.
+
+## Multi-Module Projects
+
+Each module declares its own `.deeplinks.yml`. The plugin auto-discovers any Gradle dependency that also applies DeepMatch and composes all their processors into a `CompositeDeeplinkProcessor` in the consuming app. The first processor in dependency order that matches a URI wins.
+
+```kotlin
+// No manual wiring needed. This is generated automatically.
+val result = AppDeeplinkProcessor.match(uri)  // Searches all composed modules
 ```
 
-This generates a single self-contained HTML report at `build/reports/deeplinks.html` with:
-- Full catalog merged from discovered local spec files (and composed dependency modules when present).
-- Live URI validator with near-miss diagnostics.
-- Quick test URI buttons generated from specs.
-- URI validation directly in the browser, without building or running the app.
+Collision detection across composed modules runs as part of the build.
 
-For full configuration/schema details, see [Plugin](docs/plugin.md) and
-[Deeplink Specs](docs/deeplink-specs.md).
+## Modules
+
+| Module | Description |
+|--------|-------------|
+| `deepmatch-plugin` | Gradle plugin that parses YAML specs, generates Kotlin sources, and produces manifest entries |
+| `deepmatch-processor` | Android library with `DeeplinkProcessor` and `CompositeDeeplinkProcessor` for runtime URI matching |
+| `deepmatch-api` | Shared model classes: `DeeplinkSpec`, `Param`, `ParamType`, `DeeplinkParams` |
+| `deepmatch-testing` | Reusable test fixtures: fake processors and spec builders |
+| `samples/android-app` | End-to-end sample with Compose UI, generated manifest, and ADB test URIs |
+
+## Documentation
+
+Full documentation is available at **[aouledissa.com/deep-match](https://aouledissa.com/deep-match/)**.
+
+| Page                                                         | Description                                                |
+|--------------------------------------------------------------|------------------------------------------------------------|
+| [Plugin](docs/plugin.md)                                     | Plugin setup, configuration, and build integration         |
+| [Deeplink Specs](docs/deeplink-specs.md)                     | Full YAML spec reference with examples                     |
+| [Composite Specs](docs/composite-specs.md)                   | Multi-module processor composition and match precedence    |
+| [Tasks](docs/tasks.md)                                       | All generated Gradle tasks and the `validateDeeplinks` CLI |
+| [Report](docs/report.md)                                     | HTML catalog and live URI validator                        |
+| [Migration 0.3.0-beta](docs/migration-guide-0.3.0-beta.md)   | Migration guide for 0.3.0-beta                             |
+| [Migration 0.2.0-alpha](docs/migration-guide-0.2.0-alpha.md) | Migration guide for 0.2.0-alpha                            |
 
 ## Testing
 
 ```bash
-./gradlew publishToMavenLocal  # (Optional) publish plugin + libraries to ~/.m2 for downstream testing
-./gradlew test                 # JVM unit tests for all modules (includes Robolectric coverage)
+./gradlew test                  # Run all unit and Robolectric tests
+./gradlew publishToMavenLocal   # Publish locally for downstream testing
 ```
 
-Runtime behaviour is exercised with Robolectric tests in `deepmatch-processor/src/test`. Shared
-fixtures (fake processors and spec builders) live in the `deepmatch-testing` module and
-can be reused in downstream projects.
-
-## Documentation
-
-- [Plugin](docs/plugin.md) – Plugin capabilities, setup, and build integration details.
-- [Deeplink Specs](docs/deeplink-specs.md) – YAML specification reference with examples.
-- [Composite Specs](docs/composite-specs.md) – How module-level processors are auto-composed and how match precedence works.
-- [Tasks](docs/tasks.md) – Generated Gradle tasks including `validateDeeplinks`.
-- [Report](docs/report.md) – Standalone deeplink catalog + live URI validator output.
-- [Migration-guide-0.3.0-beta.md](docs/migration-guide-0.3.0-beta.md) – Migration steps for multi-file specs, report generation, and override precedence.
-- [Migration-guide-0.2.0-alpha.md](docs/migration-guide-0.2.0-alpha.md) – Migration steps for the return-based runtime API.
-- [Release-notes/0.3.0-beta.md](docs/release-notes/0.3.0-beta.md) – Release notes for the latest beta changes.
-- [Release-notes/0.2.0-alpha.md](docs/release-notes/0.2.0-alpha.md) – Release notes for the previous alpha changes.
-- `deepmatch-testing/src/main/kotlin` – Reusable fakes and fixtures for tests.
-- Documentation site powered by Zensical. Serve locally with:
-
-  ```bash
-  pip install -r docs/requirements.txt
-  zensical serve
-  ```
-
-  The `Docs` GitHub Action publishes the site automatically to GitHub Pages (branch `gh-pages`) on
-  every push to `main` and tagged release. Once Pages is enabled in the repository settings, the
-  documentation is available at `https://<owner>.github.io/DeepMatch/`.
+Shared test fixtures live in `deepmatch-testing` and can be used in downstream projects.
 
 ## Contributing
 
-Issues and pull requests are welcome. Please ensure `./gradlew test` passes locally (plus any
-project-specific checks) before opening a PR.
+Issues and pull requests are welcome. Please ensure `./gradlew test` passes before opening a PR.
 
 ## License
 
-DeepMatch is licensed under the Apache License, Version 2.0. See the [LICENSE](LICENSE) file for details.
-
 ```
-Copyright 2024 DeepMatch Contributors
+Copyright 2026 DeepMatch Contributors
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
-   http://www.apache.org/licenses/LICENSE-2.0
+    http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
