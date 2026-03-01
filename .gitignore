@@ -13,3 +13,4 @@ sample-app/
 site/
 .venv/
 .venv-docs/
+.cache
