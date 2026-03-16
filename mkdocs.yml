@@ -54,5 +54,5 @@ markdown_extensions:
 extra:
   social:
     - icon: fontawesome/brands/github
-      link: https://github.com/aouledissa/DeepMatch
+      link: https://github.com/aouledissa/deep-match
       name: GitHub
