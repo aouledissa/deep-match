@@ -1,8 +1,10 @@
 ![Build](https://img.shields.io/github/actions/workflow/status/aouledissa/deep-match/unit-tests.yml?branch=main)
-![Docs](https://img.shields.io/github/actions/workflow/status/aouledissa/deep-match/docs.yml?branch=main&label=docs)
-![Maven Central](https://img.shields.io/maven-central/v/com.aouledissa.deepmatch/deepmatch-processor)
-![Gradle Plugin Portal](https://img.shields.io/gradle-plugin-portal/v/com.aouledissa.deepmatch.gradle)
-![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)
+[![Docs](https://img.shields.io/github/actions/workflow/status/aouledissa/deep-match/docs.yml?branch=main&label=docs)](https://aouledissa.com/deep-match/)
+[![Maven Central](https://img.shields.io/maven-central/v/com.aouledissa.deepmatch/deepmatch-processor)](https://github.com/aouledissa/deep-match/releases)
+[![Gradle Plugin Portal](https://img.shields.io/gradle-plugin-portal/v/com.aouledissa.deepmatch.gradle)](https://plugins.gradle.org/plugin/com.aouledissa.deepmatch.gradle)
+![Kotlin library](https://img.shields.io/badge/Kotlin-white?logo=Kotlin)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0)
+[![AndroidWeekly](https://androidweekly.net/issues/issue-717/badge)](https://androidweekly.net/issues/issue-717)
 
 # DeepMatch
 

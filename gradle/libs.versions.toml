@@ -20,6 +20,7 @@ androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = 
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 android-gradle-api = { group = "com.android.tools.build", name = "gradle", version.ref = "agp" }
 kotlin-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "ktxSerializationVersion" }
+kotlin-serialization-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-core", version.ref = "ktxSerializationVersion" }
 kaml = { group = "com.charleskorn.kaml", name = "kaml", version.ref = "kamlVersion" }
 squareup-kotlinpoet = { group = "com.squareup", name = "kotlinpoet", version.ref = "kotlinPoetVersion" }
 xmlUtil-serialization = { group = "io.github.pdvrieze.xmlutil", name = "serialization", version.ref = "xmlUtilSerializationVersion" }

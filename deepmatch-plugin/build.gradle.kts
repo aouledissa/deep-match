@@ -22,6 +22,7 @@ dependencies {
     implementation(project(":deepmatch-api"))
     compileOnly(libs.android.gradle.api)
     implementation(libs.kotlin.serialization.json)
+    implementation(libs.kotlin.serialization.core)
     implementation(libs.squareup.kotlinpoet)
     implementation(libs.kaml)
     implementation(libs.xmlUtil.serialization)
