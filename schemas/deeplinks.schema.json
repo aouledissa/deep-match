@@ -1,0 +1,133 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://raw.githubusercontent.com/aouledissa/deep-match/main/schemas/deeplinks.schema.json",
+  "title": "DeepMatch Deeplinks Specification",
+  "description": "JSON Schema for DeepMatch .deeplinks.yml and .deeplinks.yaml configuration files",
+  "type": "object",
+  "properties": {
+    "deeplinkSpecs": {
+      "type": "array",
+      "description": "List of deeplink specifications",
+      "items": {
+        "$ref": "#/$defs/DeeplinkConfig"
+      }
+    }
+  },
+  "required": ["deeplinkSpecs"],
+  "additionalProperties": false,
+  "$defs": {
+    "DeeplinkConfig": {
+      "type": "object",
+      "description": "A deeplink configuration object",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Unique identifier for the deeplink spec. Used for generated names and must be unique across all specs in the file."
+        },
+        "description": {
+          "type": "string",
+          "description": "Free-form description for the deeplink spec"
+        },
+        "activity": {
+          "type": "string",
+          "description": "Fully qualified name of the activity eligible to resolve this deeplink",
+          "pattern": "^[a-zA-Z0-9_.]+$"
+        },
+        "categories": {
+          "type": "array",
+          "description": "Intent filter categories",
+          "items": {
+            "type": "string",
+            "enum": ["DEFAULT", "BROWSABLE", "LAUNCHER", "APP_OPENABLE"]
+          },
+          "default": ["DEFAULT"]
+        },
+        "autoVerify": {
+          "type": "boolean",
+          "description": "Enables android:autoVerify=\"true\" for app links. If a spec mixes web + custom schemes, generated manifest output is split into separate intent filters so only web schemes are auto-verified.",
+          "default": false
+        },
+        "scheme": {
+          "type": "array",
+          "description": "Allowed URI schemes",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "examples": [["app"], ["https"], ["app", "https"]]
+        },
+        "host": {
+          "type": "array",
+          "description": "Allowed URI hosts/domains. Leave empty or omit for hostless URIs such as app:///profile/123.",
+          "items": {
+            "type": "string"
+          },
+          "default": []
+        },
+        "port": {
+          "type": "integer",
+          "description": "Optional URI port filter (e.g., staging links on :8080)"
+        },
+        "pathParams": {
+          "type": "array",
+          "description": "Ordered path segments/templates. Order is positional and preserved.",
+          "items": {
+            "$ref": "#/$defs/Param"
+          }
+        },
+        "queryParams": {
+          "type": "array",
+          "description": "Typed query definitions. Matching is order-agnostic.",
+          "items": {
+            "$ref": "#/$defs/QueryParam"
+          }
+        },
+        "fragment": {
+          "type": "string",
+          "description": "Required URI fragment (#...). Exposed in generated params when declared. Fragment matching is runtime-only (not manifest-level)."
+        }
+      },
+      "required": ["name", "activity", "scheme"],
+      "additionalProperties": false
+    },
+    "Param": {
+      "type": "object",
+      "description": "A path parameter definition",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Path segment label or typed placeholder key"
+        },
+        "type": {
+          "type": "string",
+          "description": "Path parameter value type",
+          "enum": ["numeric", "alphanumeric", "string"]
+        }
+      },
+      "required": ["name"],
+      "additionalProperties": false
+    },
+    "QueryParam": {
+      "type": "object",
+      "description": "A query parameter definition",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "Query key name"
+        },
+        "type": {
+          "type": "string",
+          "description": "Query parameter value type used for runtime validation and typed generation",
+          "enum": ["numeric", "alphanumeric", "string"]
+        },
+        "required": {
+          "type": "boolean",
+          "description": "If true, key must be present to match. Optional typed query params are generated nullable.",
+          "default": false
+        }
+      },
+      "required": ["name"],
+      "additionalProperties": false
+    }
+  }
+}

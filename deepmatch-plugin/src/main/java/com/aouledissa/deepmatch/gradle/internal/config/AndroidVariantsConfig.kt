@@ -186,7 +186,8 @@ private fun registerDeeplinkSpecsSourcesTask(
         it.metadataOutputFile.set(deeplinkSpecsMetadataFile(project, variant.name))
         it.compositeProcessorsProperty.set(compositeProcessors)
         it.group = "deepmatch"
-        it.description = "Generates deeplink specs, params, and processor for the ${variant.name} variant."
+        it.description =
+            "Generates deeplink specs, params, and processor for the ${variant.name} variant."
     }
 
     /**
@@ -224,7 +225,8 @@ private fun registerCompositeSpecsCollisionTask(
             it.metadataFiles.from(deeplinkSpecsMetadataFile(dependencyProject, variantName))
         }
         it.group = "deepmatch"
-        it.description = "Validates deeplink URI-shape collisions across composed specs for the ${variant.name} variant."
+        it.description =
+            "Validates deeplink URI-shape collisions across composed specs for the ${variant.name} variant."
         it.dependsOn(generateVariantDeeplinkSpecsTask)
     }
 
@@ -305,7 +307,8 @@ private fun registerDeeplinkReportTask(
         it.additionalModuleSourcesProperty.set(moduleSourceEntries)
         it.outputFile.set(outputFileProvider)
         it.group = "deepmatch"
-        it.description = "Generates a standalone deeplink catalog and live URI validator HTML report."
+        it.description =
+            "Generates a standalone deeplink catalog and live URI validator HTML report."
     }
 
     project.tasks.matching { it.name == "check" }.configureEach { checkTask ->
@@ -333,7 +336,8 @@ private fun registerDeeplinkManifestTask(
             it.outputFile.set(project.layout.buildDirectory.file("generated/manifests/${variantName}"))
             it.compileSdkProperty.set(compileSdk)
             it.group = "deepmatch"
-            it.description = "Generates deeplink intent-filter manifest entries for the ${variant.name} variant."
+            it.description =
+                "Generates deeplink intent-filter manifest entries for the ${variant.name} variant."
         }
 
         /**
@@ -382,7 +386,12 @@ private fun listSpecFiles(directory: java.io.File): List<java.io.File> {
     return directory.listFiles()
         .orEmpty()
         .filter { file ->
-            file.isFile && (file.name == ".deeplinks.yml" || file.name.endsWith(".deeplinks.yml"))
+            file.isFile && (
+                    file.name == ".deeplinks.yml" ||
+                            file.name == ".deeplinks.yaml" ||
+                            file.name.endsWith(".deeplinks.yml") ||
+                            file.name.endsWith(".deeplinks.yaml")
+                    )
         }
         .sortedBy { it.name }
 }
