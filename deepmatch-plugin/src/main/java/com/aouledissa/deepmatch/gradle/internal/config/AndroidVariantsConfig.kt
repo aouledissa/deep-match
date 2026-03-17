@@ -71,7 +71,7 @@ internal fun configureAndroidVariants(project: Project, config: DeepMatchPluginC
             composedDependencyProjects = composedDependencyProjects,
             enabled = config.report.enabled.getOrElse(false),
             outputFileProvider = config.report.output.orElse(
-                project.layout.buildDirectory.file("reports/deeplinks.html")
+                project.layout.buildDirectory.file("reports/deepmatch/deeplinks-catalogue.html")
             )
         )
 
