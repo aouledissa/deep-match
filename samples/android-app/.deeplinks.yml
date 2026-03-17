@@ -1,5 +1,6 @@
 deeplinkSpecs:
   - name: "open profile"
+    description: "opens user's profile page"
     activity: com.aouledissa.deepmatch.sample.MainActivity
     categories: [DEFAULT, BROWSABLE]
     scheme: [app, https]

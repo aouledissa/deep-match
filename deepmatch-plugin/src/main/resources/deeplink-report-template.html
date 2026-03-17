@@ -1180,11 +1180,13 @@ function renderCatalog(searchValue = "") {
     const queryParamText = formatParams(spec.queryParams || []);
     const hostText = (spec.hosts || []).length ? spec.hosts.join(", ") : "(hostless)";
     const portText = spec.port !== null ? String(spec.port) : "-";
+    const descriptionText = spec.description || "-";
 
     return (
       "<article class='spec-card'>" +
         "<div class='spec-name'>" + escapeHtml(spec.name) + "</div>" +
         "<div class='spec-meta'>" +
+          "<div><strong>Description:</strong> " + escapeHtml(descriptionText) + "</div>" +
           "<div><strong>Module:</strong> " + escapeHtml(spec.module || "-") + "</div>" +
           "<div><strong>Source:</strong> <span class='code'>" + escapeHtml(fileNameFromPath(spec.source || "")) + "</span></div>" +
           "<div><strong>Schemes:</strong> " + escapeHtml((spec.schemes || []).join(", ")) + "</div>" +

@@ -143,6 +143,7 @@ internal abstract class GenerateDeeplinkReportTask : DefaultTask() {
     ): DeeplinkReportSpec {
         return DeeplinkReportSpec(
             name = name,
+            description = description.orEmpty(),
             module = module,
             source = source,
             schemes = scheme,
@@ -268,6 +269,7 @@ internal data class DeeplinkReportSource(
 @Serializable
 internal data class DeeplinkReportSpec(
     val name: String,
+    val description: String,
     val module: String,
     val source: String,
     val schemes: List<String>,
