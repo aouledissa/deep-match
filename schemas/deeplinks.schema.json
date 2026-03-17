@@ -2,7 +2,7 @@
   "$schema": "http://json-schema.org/draft-07/schema#",
   "$id": "https://raw.githubusercontent.com/aouledissa/deep-match/main/schemas/deeplinks.schema.json",
   "title": "DeepMatch Deeplinks Specification",
-  "description": "JSON Schema for DeepMatch .deeplinks.yml configuration files",
+  "description": "JSON Schema for DeepMatch .deeplinks.yml and .deeplinks.yaml configuration files",
   "type": "object",
   "properties": {
     "deeplinkSpecs": {
