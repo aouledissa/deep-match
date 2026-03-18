@@ -38,11 +38,13 @@ import com.charleskorn.kaml.YamlConfiguration
 import nl.adaptivity.xmlutil.serialization.XML
 import org.gradle.api.DefaultTask
 import org.gradle.api.file.ConfigurableFileCollection
+import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.Property
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.InputFiles
+import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
 
@@ -56,6 +58,9 @@ internal abstract class GenerateDeeplinkManifestFile : DefaultTask() {
 
     @get:OutputFile
     abstract val outputFile: RegularFileProperty
+
+    @get:OutputDirectory
+    abstract val outputDir: DirectoryProperty
 
     @get:Input
     abstract val compileSdkProperty: Property<Int>
@@ -124,7 +129,8 @@ internal abstract class GenerateDeeplinkManifestFile : DefaultTask() {
         val manifest = AndroidManifest(application = AndroidApplication(activity = activities))
         val manifestXmlCode = xmlSerializer.encodeToString(AndroidManifest.serializer(), manifest)
         val manifestFile = outputFile.asFile.get()
-        manifestFile.writeText(manifestXmlCode)
+        val xmlWithHeader = "<?xml version=\"1.0\" encoding=\"utf-8\"?>\n$manifestXmlCode"
+        manifestFile.writeText(xmlWithHeader)
     }
 
     private fun getFilterCategories(

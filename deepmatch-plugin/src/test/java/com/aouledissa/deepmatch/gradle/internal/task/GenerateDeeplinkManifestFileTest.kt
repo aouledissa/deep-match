@@ -270,6 +270,21 @@ class GenerateDeeplinkManifestFileTest {
     }
 
     @Test
+    fun `generated manifest includes xml declaration`() {
+        val xml = generateManifest(
+            """
+            deeplinkSpecs:
+              - name: "open profile"
+                activity: com.example.app.MainActivity
+                scheme: [app]
+                host: ["example.com"]
+            """.trimIndent()
+        )
+
+        assertThat(xml).startsWith("<?xml version=\"1.0\" encoding=\"utf-8\"?>")
+    }
+
+    @Test
     fun `port is generated when provided and omitted otherwise`() {
         val withPort = generateManifest(
             """
@@ -321,6 +336,7 @@ class GenerateDeeplinkManifestFileTest {
             )
         }
         val outputManifest = temporaryFolder.newFile("AndroidManifest-${System.nanoTime()}.xml")
+        val outputDir = outputManifest.parentFile
         val task = project.tasks.register(
             "generateManifestMultiFile${System.nanoTime()}",
             GenerateDeeplinkManifestFile::class.java
@@ -331,6 +347,7 @@ class GenerateDeeplinkManifestFileTest {
             project.layout.file(project.provider { extraSpecsFile })
         )
         task.outputFile.set(project.layout.file(project.provider { outputManifest }))
+        task.outputDir.set(project.layout.dir(project.provider { outputDir }))
         task.compileSdkProperty.set(34)
 
         task.generateDeeplinkManifest()
@@ -346,6 +363,7 @@ class GenerateDeeplinkManifestFileTest {
             writeText(yaml)
         }
         val outputManifest = temporaryFolder.newFile("AndroidManifest-${System.nanoTime()}.xml")
+        val outputDir = outputManifest.parentFile
         val task = project.tasks.register(
             "generateManifest${System.nanoTime()}",
             GenerateDeeplinkManifestFile::class.java
@@ -353,6 +371,7 @@ class GenerateDeeplinkManifestFileTest {
 
         task.specFileProperty.set(project.layout.file(project.provider { specsFile }))
         task.outputFile.set(project.layout.file(project.provider { outputManifest }))
+        task.outputDir.set(project.layout.dir(project.provider { outputDir }))
         task.compileSdkProperty.set(compileSdk)
 
         task.generateDeeplinkManifest()
