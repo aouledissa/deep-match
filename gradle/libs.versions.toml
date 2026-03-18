@@ -14,6 +14,10 @@ robolectricVersion = "4.16.1"
 binaryCompatibilityValidator = "0.18.1"
 gradleupNmcp = "1.4.4"
 gradlePublish = "2.0.0"
+appcompatVersion = "1.7.1"
+activityComposeVersion = "1.12.4"
+composeUiVersion = "1.10.4"
+composeMaterial3Version = "1.4.0"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -28,6 +32,12 @@ google-truth = { group = "com.google.truth", name = "truth", version.ref = "goog
 mockk-core = { group = "io.mockk", name = "mockk", version.ref = "mockkVersion" }
 kotlin-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-test", version.ref = "kotlinCoroutineTestVersion" }
 robolectric = { group = "org.robolectric", name = "robolectric", version.ref = "robolectricVersion" }
+androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompatVersion" }
+androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activityComposeVersion" }
+androidx-compose-ui = { group = "androidx.compose.ui", name = "ui", version.ref = "composeUiVersion" }
+androidx-compose-material3 = { group = "androidx.compose.material3", name = "material3", version.ref = "composeMaterial3Version" }
+androidx-compose-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview", version.ref = "composeUiVersion" }
+androidx-compose-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling", version.ref = "composeUiVersion" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
