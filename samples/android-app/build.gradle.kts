@@ -1,6 +1,6 @@
 plugins {
-    id("com.android.application") version "9.0.1"
-    id("org.jetbrains.kotlin.plugin.compose") version "2.3.10"
+    alias(libs.plugins.android.application)
+    alias(libs.plugins.kotlin.compose)
     id("com.aouledissa.deepmatch.gradle")
 }
 
@@ -37,13 +37,13 @@ android {
 }
 
 dependencies {
-    implementation("androidx.core:core-ktx:1.17.0")
-    implementation("androidx.appcompat:appcompat:1.7.1")
-    implementation("androidx.activity:activity-compose:1.12.4")
-    implementation("androidx.compose.ui:ui:1.10.4")
-    implementation("androidx.compose.material3:material3:1.4.0")
-    implementation("androidx.compose.ui:ui-tooling-preview:1.10.4")
-    debugImplementation("androidx.compose.ui:ui-tooling:1.10.4")
+    implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.appcompat)
+    implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.compose.ui)
+    implementation(libs.androidx.compose.material3)
+    implementation(libs.androidx.compose.ui.tooling.preview)
+    debugImplementation(libs.androidx.compose.ui.tooling)
     implementation("com.aouledissa.deepmatch:deepmatch-processor:0.0.0-local")
 }
 
