@@ -89,9 +89,6 @@ internal abstract class GenerateDeeplinkSpecsTask : DefaultTask() {
     @get:OutputFile
     abstract val metadataOutputFile: RegularFileProperty
 
-    private val yamlSerializer by lazy { Yaml(configuration = YamlConfiguration(strictMode = false)) }
-    private val jsonSerializer by lazy { Json { prettyPrint = false } }
-
     init {
         projectPathProperty.convention(project.path)
         variantNameProperty.convention("main")
@@ -103,6 +100,9 @@ internal abstract class GenerateDeeplinkSpecsTask : DefaultTask() {
 
     @TaskAction
     fun generateDeeplinkSpecs() {
+        val yamlSerializer = Yaml(configuration = YamlConfiguration(strictMode = false))
+        val jsonSerializer = Json { prettyPrint = false }
+
         val specsFiles = buildList {
             add(specsFileProperty.get().asFile)
             addAll(additionalSpecsFilesProperty.files.sortedBy { it.absolutePath })
@@ -175,7 +175,7 @@ internal abstract class GenerateDeeplinkSpecsTask : DefaultTask() {
             .build()
             .writeTo(outputFile)
 
-        writeSpecsMetadata(deeplinkConfigs)
+        writeSpecsMetadata(deeplinkConfigs, jsonSerializer)
     }
 
     private fun generateModuleDeeplinkParamsType(name: String): TypeSpec {
@@ -235,7 +235,7 @@ internal abstract class GenerateDeeplinkSpecsTask : DefaultTask() {
             .build()
     }
 
-    private fun writeSpecsMetadata(configs: List<DeeplinkConfig>) {
+    private fun writeSpecsMetadata(configs: List<DeeplinkConfig>, jsonSerializer: Json) {
         val metadataFile = metadataOutputFile.get().asFile
         metadataFile.parentFile.mkdirs()
 

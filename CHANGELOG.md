@@ -1,5 +1,21 @@
 # Changelog
 
+## [0.3.2-beta] (draft)
+
+### Fixed
+
+- Fixed Gradle configuration cache compatibility by deferring serializer initialization:
+    - Moved YAML and JSON serializer initialization from lazy properties to task action execution
+    - Prevents configuration cache from attempting to serialize non-cacheable xmlutil lock objects
+    - Resolves `nl.adaptivity.xmlutil.serialization.impl.CompatLock` serialization errors
+
+## [0.3.1-beta] - 2026-03-16
+
+### Fixed
+
+- Added explicit Kotlin Serialization dependency on `kotlinx-serialization-core:1.10.0` to properly
+  override xmlutil's transitive 1.9.0 dependency.
+
 ## [0.3.0-beta]
 
 ### Added
@@ -25,7 +41,8 @@
   the new API shape.
 - Fragment-only deeplink specs generate `*DeeplinkParams` with a `fragment` property and wire
   `paramsFactory` accordingly (alongside the new always-generate params behavior).
-- Added `required` to query params (`Param.required`) to support optional-vs-required query matching.
+- Added `required` to query params (`Param.required`) to support optional-vs-required query
+  matching.
 - Optional typed query params are now generated as nullable constructor properties; required query
   params remain non-null.
 - Plugin code generation now emits a `*DeeplinkParams` class for every deeplink spec, including
@@ -65,7 +82,8 @@
 - Fixed match-result ambiguity for generated processors: static deeplink matches no longer collapse
   to `null` (which was previously indistinguishable from "no match").
 - Fixed hostless deeplink matching (`app:///...`) by explicitly supporting empty-host specs.
-- Fixed manifest generation by removing invalid `android:fragment` output and treating fragment/query
+- Fixed manifest generation by removing invalid `android:fragment` output and treating
+  fragment/query
   constraints as processor-only matching rules.
 - Added build-time validation that every spec declares at least one scheme.
 - Added build-time validation for duplicate deeplink spec names with a clear plugin error message.
@@ -88,7 +106,8 @@
   dependencies.
 - Added multi-module documentation (`docs/composite-specs.md`) covering multi-spec layout, automatic
   processor composition, and URI match resolution order/precedence.
-- Added report documentation (`docs/report.md`) and linked report generation/configuration in README,
+- Added report documentation (`docs/report.md`) and linked report generation/configuration in
+  README,
   overview, plugin, and tasks docs.
 - Updated README/docs to document multi-file spec discovery (`.deeplinks.yml` + `*.deeplinks.yml`),
   root/variant merge precedence, and report catalog grouping across modules/source files.
@@ -101,14 +120,16 @@
 
 - Added plugin tests to validate fragment-only specs generate params classes and that generated
   specs emit `pathParams = listOf(...)`.
-- Added processor regression coverage to ensure path matching remains positional and order-sensitive.
+- Added processor regression coverage to ensure path matching remains positional and
+  order-sensitive.
 - Added query optionality tests for API/processor/plugin generation, including required-missing
   rejection and optional-missing acceptance.
 - Added regression tests ensuring static-only specs generate params classes and return a concrete
   params instance on successful match.
 - Added processor coverage for case-insensitive scheme/host matching (for example,
   `HTTPS://Example.COM/...` and `App://EXAMPLE.com/...`).
-- Added coverage for hostless deeplinks, including regex match, params extraction, and manifest output without `android:host`.
+- Added coverage for hostless deeplinks, including regex match, params extraction, and manifest
+  output without `android:host`.
 - Added plugin test coverage for duplicate `name` validation in `.deeplinks.yml`.
 - Added manifest generation coverage for smart path attribute selection, API 31+ advanced path
   patterns, exported/merge activity attributes, and optional port output.
@@ -118,7 +139,8 @@
 - Added unit coverage for `ValidateDeeplinksTask` (`--uri` required, malformed URI handling,
   successful match flow).
 - Added plugin task coverage for `GenerateDeeplinkReportTask`, including embedded JSON correctness,
-  required/optional param metadata, example URI validity, idempotent output, and no external asset usage.
+  required/optional param metadata, example URI validity, idempotent output, and no external asset
+  usage.
 - Added runtime tests for `CompositeDeeplinkProcessor` first-match behavior and null fallback.
 - Expanded processor tests with error-path handling (safe null on exceptions).
 - Expanded Robolectric coverage for empty/blank/scheme-less URIs and malformed typed values.
@@ -133,7 +155,8 @@
 
 - Added `samples/android-app`, a composite-build Android sample that consumes the local plugin and
   artifacts without publishing first.
-- Added a Compose-based sample UI that demonstrates deeplink matching results for profile/series/no-match flows.
+- Added a Compose-based sample UI that demonstrates deeplink matching results for
+  profile/series/no-match flows.
 - Added sample-level documentation for real-device deeplink validation via `adb`.
 
 ### Changed
@@ -158,11 +181,11 @@
 ### Migration
 
 - Replace manual runtime setup:
-  - Before: `DeeplinkProcessor.Builder().register(...).build()`
-  - Now: use the generated `<ModuleName>DeeplinkProcessor`.
+    - Before: `DeeplinkProcessor.Builder().register(...).build()`
+    - Now: use the generated `<ModuleName>DeeplinkProcessor`.
 - Replace handler-based dispatch with caller-controlled branching:
-  - Before: `processor.match(uri, activity = this)`
-  - Now: `when (val params = <ModuleName>DeeplinkProcessor.match(uri)) { ... }`
+    - Before: `processor.match(uri, activity = this)`
+    - Now: `when (val params = <ModuleName>DeeplinkProcessor.match(uri)) { ... }`
 - For local integration testing, use the composite sample build in `samples/android-app`
   (plugin resolved via `includeBuild("../..")`).
 
