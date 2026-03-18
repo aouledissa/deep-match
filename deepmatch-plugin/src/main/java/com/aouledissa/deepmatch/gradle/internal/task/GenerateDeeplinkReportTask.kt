@@ -57,12 +57,11 @@ internal abstract class GenerateDeeplinkReportTask : DefaultTask() {
     @get:OutputFile
     abstract val outputFile: RegularFileProperty
 
-    private val yamlSerializer by lazy { Yaml(configuration = YamlConfiguration(strictMode = false)) }
-    private val jsonSerializer by lazy { Json { prettyPrint = false } }
-
     @TaskAction
     fun generate() {
-        val specsJson = buildSpecsJson()
+        val yamlSerializer = Yaml(configuration = YamlConfiguration(strictMode = false))
+        val jsonSerializer = Json { prettyPrint = false }
+        val specsJson = buildSpecsJson(yamlSerializer, jsonSerializer)
 
         val template = javaClass.classLoader
             .getResourceAsStream(REPORT_TEMPLATE_RESOURCE)
@@ -80,7 +79,7 @@ internal abstract class GenerateDeeplinkReportTask : DefaultTask() {
         logger.quiet("$LOG_TAG generated deeplink report at ${destination.path}")
     }
 
-    private fun buildSpecsJson(): String {
+    private fun buildSpecsJson(yamlSerializer: Yaml, jsonSerializer: Json): String {
         val moduleSources = linkedMapOf(
             moduleNameProperty.get() to mutableListOf(specsFileProperty.get().asFile.absolutePath)
         )

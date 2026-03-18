@@ -65,13 +65,13 @@ internal abstract class GenerateDeeplinkManifestFile : DefaultTask() {
     @get:Input
     abstract val compileSdkProperty: Property<Int>
 
-    private val yamlSerializer by lazy { Yaml(configuration = YamlConfiguration(strictMode = false)) }
-    private val xmlSerializer by lazy { XML { indentString = " " } }
     private val useAdvancedPattern: Boolean
         get() = compileSdkProperty.get() >= 31
 
     @TaskAction
     fun generateDeeplinkManifest() {
+        val yamlSerializer = Yaml(configuration = YamlConfiguration(strictMode = false))
+        val xmlSerializer = XML { indentString = " " }
         val specsFiles = buildList {
             add(specFileProperty.asFile.get())
             addAll(additionalSpecsFilesProperty.files.sortedBy { it.absolutePath })

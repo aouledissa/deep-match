@@ -47,10 +47,10 @@ internal abstract class ValidateDeeplinksTask : DefaultTask() {
     @get:Option(option = "uri", description = "URI to validate against deeplink specs")
     abstract val uriProperty: Property<String>
 
-    private val yamlSerializer by lazy { Yaml(configuration = YamlConfiguration(strictMode = false)) }
-
     @TaskAction
     fun validate() {
+        val yamlSerializer = Yaml(configuration = YamlConfiguration(strictMode = false))
+
         val uriValue = uriProperty.orNull?.takeIf { it.isNotBlank() }
             ?: throw GradleException("DeepMatch: --uri option is required for validateDeeplinks")
         val uri = try {

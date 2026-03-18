@@ -35,10 +35,9 @@ internal abstract class ValidateCompositeSpecsCollisionsTask : DefaultTask() {
     @get:Input
     abstract val variantNameProperty: Property<String>
 
-    private val jsonSerializer by lazy { Json { ignoreUnknownKeys = true } }
-
     @TaskAction
     fun validate() {
+        val jsonSerializer = Json { ignoreUnknownKeys = true }
         val existingMetadataFiles = metadataFiles.files
             .filter { it.exists() }
             .sortedBy { it.path }
