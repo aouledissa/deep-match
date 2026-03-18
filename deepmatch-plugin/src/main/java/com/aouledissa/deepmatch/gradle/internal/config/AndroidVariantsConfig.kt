@@ -36,9 +36,7 @@ import org.gradle.api.tasks.TaskProvider
 
 internal fun configureAndroidVariants(project: Project, config: DeepMatchPluginConfig) {
     val android = project.extensions.getByType(AndroidComponentsExtension::class.java)
-    val compileSdk = (project.extensions.getByName("android") as CommonExtension)
-        .compileSdk
-        ?: 0
+    val compileSdk = (project.extensions.getByName("android") as CommonExtension).compileSdk ?: 0
 
     android.onVariants { variant ->
         val specsFiles = getSpecsFiles(project = project, variant = variant)
@@ -194,7 +192,7 @@ private fun registerDeeplinkSpecsSourcesTask(
      * This api will automatically add the sources to the variant's main sourceSet,
      * and also make the variant build pipeline depend on this task.
      */
-    variant.sources.java?.addGeneratedSourceDirectory(
+    variant.sources.kotlin?.addGeneratedSourceDirectory(
         generateVariantDeeplinkSpecsTask,
         GenerateDeeplinkSpecsTask::outputDir
     )
@@ -333,7 +331,8 @@ private fun registerDeeplinkManifestTask(
         ) {
             it.specFileProperty.set(specsFile)
             it.additionalSpecsFilesProperty.setFrom(additionalSpecsFiles)
-            it.outputFile.set(project.layout.buildDirectory.file("generated/manifests/${variantName}"))
+            it.outputFile.set(project.layout.buildDirectory.file("generated/manifests/${taskName}/AndroidManifest.xml"))
+            it.outputDir.set(project.layout.buildDirectory.dir("generated/manifests/$taskName"))
             it.compileSdkProperty.set(compileSdk)
             it.group = "deepmatch"
             it.description =
@@ -347,6 +346,10 @@ private fun registerDeeplinkManifestTask(
         variant.sources.manifests.addGeneratedManifestFile(
             generateVariantManifestFile,
             GenerateDeeplinkManifestFile::outputFile
+        )
+        variant.sources.kotlin?.addGeneratedSourceDirectory(
+            generateVariantManifestFile,
+            GenerateDeeplinkManifestFile::outputDir
         )
     } else {
         val fileToDelete = project.layout.buildDirectory.dir("generated/manifests/$taskName")
