@@ -29,10 +29,12 @@ theme:
 nav:
   - Overview: index.md
   - Plugin: plugin.md
-  - Tasks: tasks.md
-  - Report: report.md
   - Deeplink Specs: deeplink-specs.md
   - Composite Specs: composite-specs.md
+  - AndroidManifest: android-manifest.md
+  - Tasks: tasks.md
+  - Report: report.md
+  - Misc: misc.md
   - Migration Guides:
       - v0.3.0-beta: migration-guide-0.3.0-beta.md
       - v0.2.0-alpha: migration-guide-0.2.0-alpha.md

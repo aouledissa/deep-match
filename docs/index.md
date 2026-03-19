@@ -36,7 +36,20 @@ dependencies {
 
 ```kotlin
 deepMatch {
+    // Generate <intent-filter> entries automatically (recommended).
+    // Set to false to maintain intent filters manually — the plugin will
+    // then check the merged manifest and warn about any missing filters.
     generateManifestFiles = true
+
+    // Only relevant when generateManifestFiles = false.
+    // WARN (default): log missing intent filters as warnings.
+    // FAIL: fail the build when intent filters are out of sync.
+    manifestSyncViolation = ManifestSyncViolation.WARN
+
+    report {
+        enabled = true  // off by default
+        // output = layout.buildDirectory.file("reports/deeplinks.html")
+    }
 }
 ```
 
@@ -127,5 +140,3 @@ For an end-to-end sample app flow, see the repository sample at
 pip install -r docs/requirements.txt  # once
 zensical serve                          # start live-reloading docs site
 ```
-
-The documentation is built with [Zensical](https://zensical.io/).
