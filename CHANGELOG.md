@@ -1,6 +1,6 @@
 # Changelog
 
-## [0.3.2-beta] (draft)
+## [0.3.2-beta] 2026-03-18
 
 ### Fixed
 
