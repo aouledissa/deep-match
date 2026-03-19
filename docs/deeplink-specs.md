@@ -51,6 +51,8 @@ Each item in the deeplinkSpecs list is a deep link configuration object with the
     - Description: Enables `android:autoVerify="true"` for app links.
       If a spec mixes web + custom schemes (for example, `[https, app]`), generated manifest output
       is split into separate intent filters so only web schemes are auto-verified.
+      Per Android documentation, when you specify multiple hosts or schemes, each combination
+      gets its own separate intent filter for finer control over deeplink routing.
     - Example:
       ```yaml
       autoVerify: true
@@ -69,6 +71,9 @@ Each item in the deeplinkSpecs list is a deep link configuration object with the
     - Type: List<String>
     - Required: No (default: [])
     - Description: Allowed URI hosts/domains. Leave empty (or omit) for hostless URIs such as app:///profile/123.
+      When you specify multiple hosts, a separate intent filter is generated for each host.
+      Combined with multiple schemes, this creates (scheme count) × (host count) intent filters,
+      providing granular control per Android documentation.
     - Example:
       ```yaml
       host: ["example.com", "m.example.com"]

@@ -96,31 +96,37 @@ internal abstract class GenerateDeeplinkManifestFile : DefaultTask() {
                     val hosts = config.host
                         .filter { it.isNotEmpty() }
                         .map { Host(name = it) }
-                    schemeFilters.map { schemeFilter ->
-                        IntentFilter(
-                            autoVerify = schemeFilter.autoVerify.takeIf { it },
-                            action = listOf(Action("android.intent.action.VIEW")),
-                            category = getFilterCategories(
-                                categories = config.categories,
-                                autoVerify = config.autoVerify
-                            ).toList(),
-                            scheme = schemeFilter.schemes.map { scheme ->
-                                Scheme(
-                                    name = scheme,
-                                    ignore = if (hosts.isEmpty() && !isWebScheme(scheme)) {
-                                        "AppLinkUrlError"
-                                    } else {
-                                        null
-                                    }
-                                )
-                            },
-                            hosts = hosts,
-                            port = config.port?.let { Port(number = it.toString()) },
-                            exactPaths = pathData.exactPaths,
-                            prefixPaths = pathData.prefixPaths,
-                            patternPaths = pathData.patternPaths,
-                            advancedPatternPaths = pathData.advancedPatternPaths
-                        )
+                    schemeFilters.flatMap { schemeFilter ->
+                        val hostsToUse = hosts.map(::listOf)
+                            .takeIf { it.isNotEmpty() }
+                            ?: listOf(emptyList()) // in case we have host-less urls we still generate an intent filter
+
+                        hostsToUse.map { hostList ->
+                            IntentFilter(
+                                autoVerify = schemeFilter.autoVerify.takeIf { it },
+                                action = listOf(Action("android.intent.action.VIEW")),
+                                category = getFilterCategories(
+                                    categories = config.categories,
+                                    autoVerify = config.autoVerify
+                                ).toList(),
+                                scheme = schemeFilter.schemes.map { scheme ->
+                                    Scheme(
+                                        name = scheme,
+                                        ignore = if (hostList.isEmpty() && !isWebScheme(scheme)) {
+                                            "AppLinkUrlError"
+                                        } else {
+                                            null
+                                        }
+                                    )
+                                },
+                                hosts = hostList,
+                                port = config.port?.let { Port(number = it.toString()) },
+                                exactPaths = pathData.exactPaths,
+                                prefixPaths = pathData.prefixPaths,
+                                patternPaths = pathData.patternPaths,
+                                advancedPatternPaths = pathData.advancedPatternPaths
+                            )
+                        }
                     }
                 }
             )
@@ -171,7 +177,7 @@ internal abstract class GenerateDeeplinkManifestFile : DefaultTask() {
 
     private fun isWebScheme(scheme: String): Boolean {
         return scheme.equals(other = "http", ignoreCase = true) ||
-            scheme.equals(other = "https", ignoreCase = true)
+                scheme.equals(other = "https", ignoreCase = true)
     }
 
     private fun buildPathData(pathParams: List<Param>): PathDataGroups {
