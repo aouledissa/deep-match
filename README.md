@@ -24,7 +24,7 @@ The YAML file becomes the single source of truth for everything deep link-relate
 
 ## Key Features
 
-**Automatic manifest generation** — The plugin generates all `<intent-filter>` entries for you. It picks the right path attribute (`path`, `pathPrefix`, `pathPattern`), correctly handles mixed schemes for App Links verification, and suppresses AGP 9 lint warnings for hostless URIs. You never touch the manifest XML for deep links again.
+**Automatic manifest generation** — The plugin generates all `<intent-filter>` entries for you. It picks the right path attribute (`path`, `pathPrefix`, `pathPattern`), correctly handles mixed schemes for App Links verification, generates separate intent filters for each host and scheme combination for granular routing control, and suppresses AGP 9 lint warnings for hostless URIs. You never touch the manifest XML for deep links again.
 
 **Type-safe routing** — Instead of extracting strings from a `Uri` and casting manually, you get generated data classes with typed fields. A `numeric` path param becomes an `Int`. A missing optional query param becomes `null`. A successful match is never ambiguous with no-match.
 
