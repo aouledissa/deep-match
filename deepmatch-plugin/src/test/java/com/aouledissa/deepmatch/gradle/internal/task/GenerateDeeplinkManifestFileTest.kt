@@ -253,6 +253,55 @@ class GenerateDeeplinkManifestFileTest {
     }
 
     @Test
+    fun `multiple hosts generate separate intent filters for each host`() {
+        val xml = generateManifest(
+            """
+            deeplinkSpecs:
+              - name: "multi-host deeplink"
+                activity: com.example.app.MainActivity
+                scheme: [https, app]
+                host: ["example.com", "test.com"]
+            """.trimIndent()
+        )
+
+        // With autoVerify=false (default), schemes are not split, so we get 1 filter per host = 2 filters
+        val intentFilterCount = Regex("<intent-filter").findAll(xml).count()
+        assertThat(intentFilterCount).isEqualTo(2)
+        assertThat(xml).contains("android:host=\"example.com\"")
+        assertThat(xml).contains("android:host=\"test.com\"")
+        // Check that https appears 2 times (once for each host)
+        assertThat(Regex("android:scheme=\"https\"").findAll(xml).count()).isEqualTo(2)
+        // Check that app appears 2 times (once for each host)
+        assertThat(Regex("android:scheme=\"app\"").findAll(xml).count()).isEqualTo(2)
+    }
+
+    @Test
+    fun `multiple hosts with autoVerify generate separate intent filters for each host and scheme combination`() {
+        val xml = generateManifest(
+            """
+            deeplinkSpecs:
+              - name: "multi-host deeplink with verify"
+                activity: com.example.app.MainActivity
+                scheme: [https, app]
+                host: ["example.com", "test.com"]
+                autoVerify: true
+            """.trimIndent()
+        )
+
+        // With autoVerify=true, schemes are split (https vs app), so we get (2 scheme groups) * (2 hosts) = 4 filters
+        val intentFilterCount = Regex("<intent-filter").findAll(xml).count()
+        assertThat(intentFilterCount).isEqualTo(4)
+        assertThat(xml).contains("android:host=\"example.com\"")
+        assertThat(xml).contains("android:host=\"test.com\"")
+        // https should appear in 2 filters (one autoVerify=true with example.com, one with test.com)
+        assertThat(Regex("android:scheme=\"https\"").findAll(xml).count()).isEqualTo(2)
+        // app should appear in 2 filters (one with example.com, one with test.com)
+        assertThat(Regex("android:scheme=\"app\"").findAll(xml).count()).isEqualTo(2)
+        // autoVerify should appear twice (once for each https host: example.com and test.com)
+        assertThat(Regex("android:autoVerify=\"true\"").findAll(xml).count()).isEqualTo(2)
+    }
+
+    @Test
     fun `activity includes exported true and merge strategy`() {
         val xml = generateManifest(
             """
