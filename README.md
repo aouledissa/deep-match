@@ -133,6 +133,38 @@ deepMatch {
 }
 ```
 
+## Deeplink Report
+
+Enable the report to generate a self-contained HTML dashboard for viewing, testing, and sharing your deeplinks:
+
+### Deeplink Catalogue
+
+Browse all your deep links in a searchable, organized catalogue with full spec details:
+
+![Deeplink Catalogue](images/catalogue.png)
+
+The catalogue displays:
+- Spec name, description, and module/source
+- Schemes, hosts, ports, and path templates
+- Path and query parameters with types and requirements
+- Example URIs with sample values
+- **ADB commands for terminal testing** — Copy-to-clipboard commands to quickly test deeplinks using `adb shell am start`
+- Generated Kotlin class names and regex patterns
+
+### Interactive URI Validator
+
+Test any URI against your specs in the browser with live validation and near-miss diagnostics:
+
+![URL Validator](images/url-validator.png)
+
+The validator shows:
+- Matching spec with extracted parameters
+- Near-miss diagnostics (e.g., missing required query params)
+- Quick-test buttons for each spec's example URI
+- Full URI parsing without leaving the browser
+
+The report is a single self-contained HTML file — no external dependencies, no server required. Share it via email, upload as a CI artifact, or host as a static page.
+
 ## Gradle Tasks
 
 | Task | Description |

@@ -140,6 +140,7 @@ internal abstract class GenerateDeeplinkReportTask : DefaultTask() {
         module: String,
         source: String
     ): DeeplinkReportSpec {
+        val exampleUri = generateExampleUri()
         return DeeplinkReportSpec(
             name = name,
             description = description.orEmpty(),
@@ -168,7 +169,8 @@ internal abstract class GenerateDeeplinkReportTask : DefaultTask() {
             autoVerify = autoVerify,
             generatedSpec = toSpecClassName(),
             generatedParams = toParamsClassName(),
-            exampleUri = generateExampleUri()
+            exampleUri = exampleUri,
+            adbCommand = generateAdbCommand(exampleUri)
         )
     }
 
@@ -239,6 +241,10 @@ internal abstract class GenerateDeeplinkReportTask : DefaultTask() {
         }
     }
 
+    private fun generateAdbCommand(exampleUri: String): String {
+        return "adb shell am start -a android.intent.action.VIEW -d \"$exampleUri\""
+    }
+
     private companion object {
         private const val REPORT_TEMPLATE_RESOURCE = "deeplink-report-template.html"
         private const val REPORT_JSON_PLACEHOLDER = "/* __SPECS_JSON__ */"
@@ -282,7 +288,8 @@ internal data class DeeplinkReportSpec(
     val autoVerify: Boolean,
     val generatedSpec: String,
     val generatedParams: String,
-    val exampleUri: String
+    val exampleUri: String,
+    val adbCommand: String
 )
 
 @Serializable

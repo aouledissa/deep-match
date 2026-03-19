@@ -121,6 +121,51 @@ class GenerateDeeplinkReportTaskTest {
         assertThat(nearMiss.matched).isFalse()
         assertThat(nearMiss.nearMissSpec).isEqualTo("open profile")
         assertThat(nearMiss.reason).contains("Missing required query param: campaign")
+
+        // Verify ADB commands are generated
+        assertThat(openProfile.adbCommand).contains("adb shell am start")
+        assertThat(openProfile.adbCommand).contains("-a android.intent.action.VIEW")
+        assertThat(openProfile.adbCommand).contains("-d")
+        assertThat(openProfile.adbCommand).contains(openProfile.exampleUri)
+    }
+
+    @Test
+    fun `ADB command format is correct`() {
+        val project = ProjectBuilder.builder().build()
+        val specsFile = temporaryFolder.newFile("adb-test.deeplinks.yml").apply {
+            writeText(
+                """
+                deeplinkSpecs:
+                  - name: "open product"
+                    activity: com.example.app.ProductActivity
+                    scheme: [app]
+                    host: ["example.com"]
+                    pathParams:
+                      - name: productId
+                        type: numeric
+                """.trimIndent()
+            )
+        }
+        val outputFile = File(temporaryFolder.root, "reports/adb-test.html")
+        val task = project.tasks.register("generateAdbReport", GenerateDeeplinkReportTask::class.java).get()
+        task.specsFileProperty.set(project.layout.file(project.provider { specsFile }))
+        task.moduleNameProperty.set("app")
+        task.additionalModuleSourcesProperty.set(emptyList())
+        task.outputFile.set(project.layout.file(project.provider { outputFile }))
+
+        task.generate()
+
+        val payload = extractPayload(outputFile.readText())
+        val productSpec = payload.specs.first { it.name == "open product" }
+
+        // Verify the ADB command structure matches the GitHub issue format
+        assertThat(productSpec.adbCommand).isEqualTo(
+            "adb shell am start -a android.intent.action.VIEW -d \"${productSpec.exampleUri}\""
+        )
+        // Verify specific parts exist
+        assertThat(productSpec.adbCommand).startsWith("adb shell am start")
+        assertThat(productSpec.adbCommand).contains("-a android.intent.action.VIEW")
+        assertThat(productSpec.adbCommand).contains("-d \"app://example.com/123\"")
     }
 
     @Test
