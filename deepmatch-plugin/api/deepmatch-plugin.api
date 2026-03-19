@@ -8,6 +8,7 @@ public abstract class com/aouledissa/deepmatch/gradle/DeepMatchPluginConfig {
 	public static final field Companion Lcom/aouledissa/deepmatch/gradle/DeepMatchPluginConfig$Companion;
 	public fun <init> (Lorg/gradle/api/model/ObjectFactory;)V
 	public final fun getGenerateManifestFiles ()Lorg/gradle/api/provider/Property;
+	public final fun getManifestSyncViolation ()Lorg/gradle/api/provider/Property;
 	public final fun getReport ()Lcom/aouledissa/deepmatch/gradle/DeepMatchReportConfig;
 	public final fun report (Lorg/gradle/api/Action;)V
 }
@@ -19,5 +20,13 @@ public abstract class com/aouledissa/deepmatch/gradle/DeepMatchReportConfig {
 	public fun <init> (Lorg/gradle/api/model/ObjectFactory;)V
 	public final fun getEnabled ()Lorg/gradle/api/provider/Property;
 	public final fun getOutput ()Lorg/gradle/api/file/RegularFileProperty;
+}
+
+public final class com/aouledissa/deepmatch/gradle/ManifestSyncViolation : java/lang/Enum {
+	public static final field FAIL Lcom/aouledissa/deepmatch/gradle/ManifestSyncViolation;
+	public static final field WARN Lcom/aouledissa/deepmatch/gradle/ManifestSyncViolation;
+	public static fun getEntries ()Lkotlin/enums/EnumEntries;
+	public static fun valueOf (Ljava/lang/String;)Lcom/aouledissa/deepmatch/gradle/ManifestSyncViolation;
+	public static fun values ()[Lcom/aouledissa/deepmatch/gradle/ManifestSyncViolation;
 }
 

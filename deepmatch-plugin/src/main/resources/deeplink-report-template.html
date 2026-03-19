@@ -352,6 +352,66 @@
       word-break: break-all;
     }
 
+    .code-block {
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 13px;
+      background: #1e1e1e;
+      color: #d4d4d4;
+      border-radius: 6px;
+      padding: 12px 45px 12px 12px;
+      word-break: break-all;
+      overflow-x: auto;
+      border: 1px solid #3e3e3e;
+    }
+
+    .code-keyword {
+      color: #569cd6;
+      font-weight: 600;
+    }
+
+    .code-flag {
+      color: #ce9178;
+    }
+
+    .code-uri {
+      color: #4ec9b0;
+    }
+
+    .code-block-container {
+      position: relative;
+      margin-top: 6px;
+    }
+
+    .copy-btn {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: rgba(30, 30, 30, 0.9);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #d4d4d4;
+      border-radius: 4px;
+      padding: 5px 6px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 28px;
+      height: 28px;
+      z-index: 10;
+    }
+
+    .copy-btn:hover {
+      background: rgba(30, 30, 30, 0.95);
+      border-color: rgba(255, 255, 255, 0.3);
+    }
+
+    .copy-btn.copied {
+      background: rgba(76, 175, 80, 0.3);
+      border-color: rgba(76, 175, 80, 0.4);
+      color: #4ec9b0;
+    }
+
     .empty {
       padding: 18px;
       border: 1px dashed var(--line);
@@ -1182,6 +1242,9 @@ function renderCatalog(searchValue = "") {
     const portText = spec.port !== null ? String(spec.port) : "-";
     const descriptionText = spec.description || "-";
 
+    // Format ADB command with syntax highlighting
+    const adbCommandHighlighted = formatAdbCommand(spec.adbCommand);
+
     return (
       "<article class='spec-card'>" +
         "<div class='spec-name'>" + escapeHtml(spec.name) + "</div>" +
@@ -1200,10 +1263,19 @@ function renderCatalog(searchValue = "") {
           "<div><strong>Generated spec:</strong> <span class='code'>" + escapeHtml(spec.generatedSpec) + "</span></div>" +
           "<div><strong>Generated params:</strong> <span class='code'>" + escapeHtml(spec.generatedParams) + "</span></div>" +
           "<div><strong>Example URI:</strong> <span class='code'>" + escapeHtml(spec.exampleUri) + "</span></div>" +
+          "<div><strong>ADB Command:</strong>" + adbCommandHighlighted + "</div>" +
         "</div>" +
       "</article>"
     );
   }).join("");
+
+  // Attach copy button listeners
+  catalogEl.querySelectorAll(".copy-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const command = btn.parentElement.querySelector(".code-block").textContent.trim();
+      copyCommand(btn, command);
+    });
+  });
 }
 
 function formatParams(params) {
@@ -1220,6 +1292,48 @@ function formatParams(params) {
       }).join("") +
     "</div>"
   );
+}
+
+function formatAdbCommand(command) {
+  // Extract the URI from the command
+  const uriMatch = command.match(/-d "([^"]*)"/);
+  const uri = uriMatch ? uriMatch[1] : "";
+
+  return (
+    "<div class='code-block-container'>" +
+      "<button class='copy-btn' type='button' aria-label='Copy command'>" +
+        "<svg width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'>" +
+          "<path d='M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2'></path>" +
+          "<rect x='8' y='2' width='8' height='4' rx='1' ry='1'></rect>" +
+        "</svg>" +
+      "</button>" +
+      "<div class='code-block'>" +
+        "<span class='code-keyword'>adb</span> " +
+        "<span class='code-keyword'>shell</span> " +
+        "<span class='code-keyword'>am</span> " +
+        "<span class='code-keyword'>start</span> " +
+        "<span class='code-flag'>-a</span> " +
+        "<span class='code-keyword'>android.intent.action.VIEW</span> " +
+        "<span class='code-flag'>-d</span> " +
+        "<span class='code-flag'>\"</span>" +
+        "<span class='code-uri'>" + escapeHtml(uri) + "</span>" +
+        "<span class='code-flag'>\"</span>" +
+      "</div>" +
+    "</div>"
+  );
+}
+
+function copyCommand(btn, command) {
+  navigator.clipboard.writeText(command).then(() => {
+    btn.classList.add("copied");
+    btn.innerHTML = "<svg width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'><path d='M5 13l4 4L19 7'></path></svg>";
+    setTimeout(() => {
+      btn.classList.remove("copied");
+      btn.innerHTML = "<svg width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'><path d='M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2'></path><rect x='8' y='2' width='8' height='4' rx='1' ry='1'></rect></svg>";
+    }, 2000);
+  }).catch(err => {
+    console.error("Failed to copy:", err);
+  });
 }
 
 function escapeHtml(value) {
