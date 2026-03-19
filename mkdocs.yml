@@ -23,7 +23,6 @@ theme:
         name: Switch to light mode
   features:
     - navigation.instant
-    - navigation.sections
     - content.code.copy
     - toc.integrate
 nav:
@@ -39,11 +38,14 @@ nav:
       - v0.3.0-beta: migration-guide-0.3.0-beta.md
       - v0.2.0-alpha: migration-guide-0.2.0-alpha.md
   - Release Notes:
+      - v1.0.0: release-notes/1.0.0.md
       - v0.3.2-beta: release-notes/0.3.2-beta.md
       - v0.3.1-beta: release-notes/0.3.1-beta.md
       - v0.3.0-beta: release-notes/0.3.0-beta.md
       - v0.2.0-alpha: release-notes/0.2.0-alpha.md
       - v0.1.0-alpha: release-notes/0.1.0-alpha.md
+extra_css:
+  - stylesheets/extra.css
 markdown_extensions:
   - admonition
   - pymdownx.highlight:

@@ -1,5 +1,30 @@
 # Changelog
 
+## [1.0.0] - 2026-03-20
+
+### Added
+
+- ADB command examples for each deeplink in the HTML report with syntax highlighting and copy-to-clipboard functionality for quick terminal testing
+- Deeplinks YAML schema (`schemas/deeplinks.schema.json`) providing IDE autocompletion and validation support for `.deeplinks.yml` spec files
+- Support for `.deeplinks.yml` file extension in addition to existing `*.deeplinks.yml` pattern for single-file spec definitions
+- Deeplink descriptions now included in the generated HTML deeplink catalogue report
+- Separate intent filters generated for each host and scheme combination for granular routing control
+- Warning about out of sync AndroidManifest.xml when generateManifestFiles is disabled
+
+### Changed
+
+- Plugin task registration now targets Kotlin source-set instead of Java source-set, aligning with modern Android Gradle Plugin conventions
+- Generated manifest file is now properly added to the Kotlin source-set instead of Java source-set
+- Deeplink catalogue report is now generated under `/reports/deepmatch/deeplinks-catalogue/html/` for consistent report organization
+- Unified version catalogue (`gradle/libs.versions.toml`) now used throughout the project and in the sample app for centralized dependency management
+- HTML report now includes enhanced UI with syntax-highlighted ADB commands and improved spec card layout
+
+### Fixed
+
+- Fixed Gradle configuration cache compatibility by deferring serializer initialization to prevent `CompatLock` serialization errors
+- Fixed missing XML declaration header in generated Android manifest files
+- Fixed documentation URL references
+
 ## [0.3.2-beta] 2026-03-18
 
 ### Fixed
