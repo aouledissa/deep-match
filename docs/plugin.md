@@ -42,10 +42,33 @@ The primary responsibilities and capabilities of the DeepMatch Gradle plugin are
     *   For composed multi-module setups, the plugin also validates URI-shape collisions and fails fast when two modules define the same normalized deeplink shape.
 
 5.  **Configuration Options:**
-    *   The plugin provides a DSL (Domain Specific Language) extension in your `build.gradle` (`deepMatch { ... }` block) to customize its behavior:
-        *   **generateManifestFiles:** Specifying whether or not the plugin should generate `AndroidManifest.xml` file based on the deeplink config `yaml` file.
-        *   **report.enabled:** Enables generation of a standalone deeplink HTML report.
-        *   **report.output:** Optional output file override for the generated report.
+    *   The plugin provides a `deepMatch { ... }` DSL block to customize its behavior:
+
+    ```kotlin
+    deepMatch {
+        // Whether the plugin should generate <intent-filter> entries in a manifest file
+        // that AGP merges into the final app manifest.
+        // When false, intent filters must be maintained manually in AndroidManifest.xml.
+        // Default: false
+        generateManifestFiles = true
+
+        // Controls what happens when generateManifestFiles is false and the plugin
+        // detects deeplink intent filters missing from the merged AndroidManifest.xml.
+        // WARN  — log a warning and continue (default)
+        // FAIL  — fail the build with a list of missing intent filters
+        manifestSyncViolation = ManifestSyncViolation.WARN
+
+        report {
+            // Enables generation of a self-contained HTML deeplink catalogue report.
+            // Default: false
+            enabled = true
+
+            // Output path for the generated report file.
+            // Default: build/reports/deepmatch/deeplinks-catalogue.html
+            output = layout.buildDirectory.file("reports/deeplinks.html")
+        }
+    }
+    ```
 
 ### Benefits of Using the Plugin
 
@@ -105,6 +128,8 @@ Task details are documented in [Tasks](tasks.md), including:
 
 - `generate<Variant>DeeplinkSpecs`
 - `generate<Variant>DeeplinksManifest`
+- `warn<Variant>ManifestOutOfSync`
+- `validate<Variant>CompositeSpecsCollisions`
 - `validateDeeplinks`
 - `generateDeeplinkReport`
 

@@ -66,6 +66,24 @@ Example:
 ./gradlew :app:validateDebugCompositeSpecsCollisions
 ```
 
+## `warn<Variant>ManifestOutOfSync`
+
+Checks the variant's merged manifest for deeplink intent filters that are declared in the YAML specs but missing from the manifest.
+
+- Active when `deepMatch { generateManifestFiles = false }`.
+- Compares every `(activity, scheme, host)` combination from the specs against the merged manifest.
+- Reports missing combinations according to `manifestSyncViolation`:
+    - `WARN` (default) — logs a warning per missing intent filter, build continues.
+    - `FAIL` — throws a `GradleException` listing all missing intent filters, build fails.
+- Reads the **merged** manifest, so intent filters contributed by library manifests, build-type overlays, and flavor overlays are all accounted for.
+- Runs automatically as part of `check`.
+
+Example:
+
+```bash
+./gradlew :app:warnDebugManifestOutOfSync
+```
+
 ## `generateDeeplinkReport`
 
 Generates a single self-contained HTML report from local specs plus composed dependency-module specs.

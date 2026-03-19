@@ -16,11 +16,13 @@
 
 package com.aouledissa.deepmatch.gradle.internal.config
 
+import com.android.build.api.artifact.SingleArtifact
 import com.android.build.api.dsl.CommonExtension
 import com.android.build.api.variant.AndroidComponentsExtension
 import com.android.build.api.variant.Variant
 import com.aouledissa.deepmatch.gradle.DeepMatchPluginConfig
 import com.aouledissa.deepmatch.gradle.LOG_TAG
+import com.aouledissa.deepmatch.gradle.ManifestSyncViolation
 import com.aouledissa.deepmatch.gradle.internal.capitalize
 import com.aouledissa.deepmatch.gradle.internal.generatedModuleProcessorName
 import com.aouledissa.deepmatch.gradle.internal.task.GenerateDeeplinkManifestFile
@@ -28,6 +30,7 @@ import com.aouledissa.deepmatch.gradle.internal.task.GenerateDeeplinkReportTask
 import com.aouledissa.deepmatch.gradle.internal.task.GenerateDeeplinkSpecsTask
 import com.aouledissa.deepmatch.gradle.internal.task.ValidateCompositeSpecsCollisionsTask
 import com.aouledissa.deepmatch.gradle.internal.task.ValidateDeeplinksTask
+import com.aouledissa.deepmatch.gradle.internal.task.WarnManifestOutOfSyncTask
 import org.gradle.api.Project
 import org.gradle.api.artifacts.ProjectDependency
 import org.gradle.api.file.RegularFile
@@ -86,7 +89,8 @@ internal fun configureAndroidVariants(project: Project, config: DeepMatchPluginC
             specsFile = primarySpecsFile,
             additionalSpecsFiles = additionalSpecsFiles,
             compileSdk = compileSdk,
-            generateManifestFiles = config.generateManifestFiles.getOrElse(false)
+            generateManifestFiles = config.generateManifestFiles.getOrElse(false),
+            manifestSyncViolation = config.manifestSyncViolation.getOrElse(ManifestSyncViolation.WARN)
         )
     }
 }
@@ -320,7 +324,8 @@ private fun registerDeeplinkManifestTask(
     variant: Variant,
     specsFile: RegularFile,
     additionalSpecsFiles: List<RegularFile>,
-    compileSdk: Int
+    compileSdk: Int,
+    manifestSyncViolation: ManifestSyncViolation
 ) {
     val variantName = variant.name.capitalize()
     val taskName = "generate${variantName}DeeplinksManifest"
@@ -357,6 +362,23 @@ private fun registerDeeplinkManifestTask(
         if (fileToDelete.exists()) {
             project.logger.quiet("$LOG_TAG cleaning up ${fileToDelete.path}")
             fileToDelete.deleteRecursively()
+        }
+
+        val warnTask = project.tasks.register(
+            "warn${variantName}ManifestOutOfSync",
+            WarnManifestOutOfSyncTask::class.java
+        ) {
+            it.specFileProperty.set(specsFile)
+            it.additionalSpecsFilesProperty.setFrom(additionalSpecsFiles)
+            it.mergedManifestProperty.set(variant.artifacts.get(SingleArtifact.MERGED_MANIFEST))
+            it.violationProperty.set(manifestSyncViolation)
+            it.group = "deepmatch"
+            it.description =
+                "Warns about deeplink intent filters missing from the merged AndroidManifest.xml for the ${variant.name} variant."
+        }
+
+        project.tasks.matching { it.name == "check" }.configureEach { checkTask ->
+            checkTask.dependsOn(warnTask)
         }
     }
 }

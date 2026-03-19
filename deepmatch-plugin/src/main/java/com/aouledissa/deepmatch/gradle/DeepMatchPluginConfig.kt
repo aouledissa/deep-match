@@ -30,7 +30,12 @@ import javax.inject.Inject
 abstract class DeepMatchPluginConfig @Inject constructor(objects: ObjectFactory) {
 
     val generateManifestFiles: Property<Boolean> = objects.property(Boolean::class.java)
+    val manifestSyncViolation: Property<ManifestSyncViolation> = objects.property(ManifestSyncViolation::class.java)
     val report: DeepMatchReportConfig = objects.newInstance(DeepMatchReportConfig::class.java)
+
+    init {
+        manifestSyncViolation.convention(ManifestSyncViolation.WARN)
+    }
 
     fun report(action: Action<in DeepMatchReportConfig>) {
         action.execute(report)
@@ -48,4 +53,12 @@ abstract class DeepMatchReportConfig @Inject constructor(objects: ObjectFactory)
     init {
         enabled.convention(false)
     }
+}
+
+enum class ManifestSyncViolation {
+    /** Log a warning when deeplink intent filters are missing from the manifest. */
+    WARN,
+
+    /** Fail the build when deeplink intent filters are missing from the manifest. */
+    FAIL
 }

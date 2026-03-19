@@ -1,20 +1,4 @@
-## IDE Autocomplete Support
-
-DeepMatch provides a JSON Schema for `.deeplinks.yml` and `.deeplinks.yaml` files that enables syntax autocomplete and validation in your IDE:
-
-**VS Code**
-- Install the [YAML extension](https://marketplace.visualstudio.com/items?itemName=redhat.vscode-yaml) by Red Hat
-- Autocomplete and validation are automatically enabled for `*.deeplinks.yml`, `.deeplinks.yml`, `*.deeplinks.yaml`, and `.deeplinks.yaml` files
-
-**Android Studio / IntelliJ IDEA**
-- Schema support is automatically configured when you open the project
-- Autocomplete and validation are enabled for `*.deeplinks.yml`, `.deeplinks.yml`, `*.deeplinks.yaml`, and `.deeplinks.yaml` files
-
-The schema is also registered with [SchemaStore](https://www.schemastore.org/), so any tool that supports SchemaStore will automatically provide autocomplete for deeplink files.
-
----
-
-### Deeplink Configuration Object (`DeeplinkConfig`)
+## Deeplink Configuration Object (`DeeplinkConfig`)
 
 Each item in the deeplinkSpecs list is a deep link configuration object with the following properties:
 
@@ -210,7 +194,7 @@ deeplinkSpecs:
 
 - `name` values must be unique within each YAML source file. Across multiple sources, later files override earlier specs with the same `name`.
 - Regenerate sources (`./gradlew generate<Variant>DeeplinkSpecs`) whenever you modify the YAML schema.
-- If `generateManifestFiles` is disabled, remember to replicate the `<intent-filter>` changes manually in your main manifest.
+- See [AndroidManifest](android-manifest.md) for details on automatic generation, manual maintenance, and sync validation.
 - The plugin creates a `<Name>DeeplinkParams` class for every deeplink spec. This avoids ambiguity between "no match" and "matched static deeplink".
 - Typed query params are validated by key and type after structural URI matching, so query order does not affect matching.
 - Query params are optional by default; set `required: true` only for values that must be present.
