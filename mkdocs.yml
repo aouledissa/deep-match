@@ -53,6 +53,20 @@ markdown_extensions:
       permalink: true
   - tables
 extra:
+  analytics:
+    provider: google
+    property: G-0B26NFZ0QQ
+    feedback:
+      title: Was this page helpful?
+      ratings:
+        - icon: material/thumb-up-outline
+          name: This page was helpful
+          data: helpful
+          note: Thanks for your feedback!
+        - icon: material/thumb-down-outline
+          name: This page needs improvement
+          data: unhelpful
+          note: Thanks for your feedback!
   social:
     - icon: fontawesome/brands/github
       link: https://github.com/aouledissa/deep-match
