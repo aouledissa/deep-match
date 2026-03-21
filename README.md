@@ -6,9 +6,9 @@
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://www.apache.org/licenses/LICENSE-2.0)
 [![AndroidWeekly](https://androidweekly.net/issues/issue-717/badge)](https://androidweekly.net/issues/issue-717)
 
-# DeepMatch
+# DeepMatch — Android Deeplink Toolkit
 
-DeepMatch is a Gradle plugin and Android library that automates deep link handling: describe your links once in YAML, and it generates the manifest intent filters, type-safe parameter classes, and runtime routing logic for you.
+DeepMatch is a complete toolkit for Android deeplink handling: a Gradle plugin and runtime library that automates everything. Describe your links once in YAML, and it generates the manifest intent filters, type-safe parameter classes, and runtime routing logic for you.
 
 ## Why DeepMatch?
 

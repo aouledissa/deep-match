@@ -1,5 +1,5 @@
 site_name: DeepMatch
-site_description: "Android deeplink toolkit"
+site_description: "Complete Android deeplink toolkit: Gradle plugin, runtime library, schema validation, and interactive HTML reports. Declare once in YAML, generate everything."
 site_url: "https://aouledissa.com/deep-match/"
 repo_url: "https://github.com/aouledissa/deep-match"
 repo_name: "aouledissa/DeepMatch"
