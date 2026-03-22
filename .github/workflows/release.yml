@@ -7,26 +7,31 @@ on:
       - '*.*.*'
 
 jobs:
-  unit-tests:
-    uses: ./.github/workflows/unit-tests.yml
+  test:
+    uses: ./.github/workflows/test.yml
 
   publish-artifacts:
     runs-on: ubuntu-latest
-    needs: unit-tests
+    needs: test
     permissions:
       contents: read
+    env:
+      MAVEN_USERNAME: ${{ secrets.MAVEN_USERNAME }}
+      MAVEN_TOKEN: ${{ secrets.MAVEN_TOKEN }}
+      ORG_GRADLE_PROJECT_signingKey: ${{ secrets.ORG_GRADLE_PROJECT_SIGNINGKEY }}
+      ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.ORG_GRADLE_PROJECT_SIGNINGPASSWORD }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Java
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: '17'
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3
+        uses: gradle/actions/setup-gradle@v4
 
       - name: Derive version from tag
         id: version
@@ -37,17 +42,11 @@ jobs:
           echo "Publishing version $VERSION"
 
       - name: Publish to Central Portal
-        env:
-          MAVEN_USERNAME: ${{ secrets.MAVEN_USERNAME }}
-          MAVEN_TOKEN: ${{ secrets.MAVEN_TOKEN }}
-          ORG_GRADLE_PROJECT_signingKey: ${{ secrets.ORG_GRADLE_PROJECT_SIGNINGKEY }}
-          ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.ORG_GRADLE_PROJECT_SIGNINGPASSWORD }}
-          DEEP_MATCH_VERSION: ${{ steps.version.outputs.version }}
         run: |
           ./gradlew \
             apiCheck \
             publishAggregationToCentralPortal \
-            -Pdeep.match.version=${DEEP_MATCH_VERSION} \
+            -Pdeep.match.version=${{ steps.version.outputs.version }} \
             --no-daemon
 
   publish-gradle-plugin:
@@ -55,18 +54,21 @@ jobs:
     needs: publish-artifacts
     permissions:
       contents: read
+    env:
+      GRADLE_PUBLISH_KEY: ${{ secrets.GRADLE_PUBLISH_KEY }}
+      GRADLE_PUBLISH_SECRET: ${{ secrets.GRADLE_PUBLISH_SECRET }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup Java
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: '17'
 
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3
+        uses: gradle/actions/setup-gradle@v4
 
       - name: Derive version from tag
         id: version
@@ -77,12 +79,33 @@ jobs:
           echo "Publishing Gradle plugin version $VERSION"
 
       - name: Publish Gradle plugin
-        env:
-          GRADLE_PUBLISH_KEY: ${{ secrets.GRADLE_PUBLISH_KEY }}
-          GRADLE_PUBLISH_SECRET: ${{ secrets.GRADLE_PUBLISH_SECRET }}
-          DEEP_MATCH_VERSION: ${{ steps.version.outputs.version }}
         run: |
           ./gradlew \
             :deepmatch-plugin:publishPlugins \
-            -Pdeep.match.version=${DEEP_MATCH_VERSION} \
+            -Pdeep.match.version=${{ steps.version.outputs.version }} \
             --no-daemon
+
+  create-release:
+    runs-on: ubuntu-latest
+    needs: [publish-artifacts, publish-gradle-plugin]
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Derive version from tag
+        id: version
+        run: |
+          RAW_TAG="${GITHUB_REF_NAME}"
+          VERSION="${RAW_TAG#v}"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Create draft release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          gh release create "${{ github.ref_name }}" \
+            --title "${{ steps.version.outputs.version }}" \
+            --notes "TBD" \
+            --draft
