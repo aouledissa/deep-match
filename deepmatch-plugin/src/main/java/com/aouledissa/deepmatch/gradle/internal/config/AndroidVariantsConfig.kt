@@ -19,6 +19,7 @@ package com.aouledissa.deepmatch.gradle.internal.config
 import com.android.build.api.artifact.SingleArtifact
 import com.android.build.api.dsl.CommonExtension
 import com.android.build.api.variant.AndroidComponentsExtension
+import com.android.build.api.variant.Sources
 import com.android.build.api.variant.Variant
 import com.aouledissa.deepmatch.gradle.DeepMatchPluginConfig
 import com.aouledissa.deepmatch.gradle.LOG_TAG
@@ -32,7 +33,9 @@ import com.aouledissa.deepmatch.gradle.internal.task.ValidateCompositeSpecsColli
 import com.aouledissa.deepmatch.gradle.internal.task.ValidateDeeplinksTask
 import com.aouledissa.deepmatch.gradle.internal.task.WarnManifestOutOfSyncTask
 import org.gradle.api.Project
+import org.gradle.api.Task
 import org.gradle.api.artifacts.ProjectDependency
+import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFile
 import org.gradle.api.provider.Provider
 import org.gradle.api.tasks.TaskProvider
@@ -196,7 +199,7 @@ private fun registerDeeplinkSpecsSourcesTask(
      * This api will automatically add the sources to the variant's main sourceSet,
      * and also make the variant build pipeline depend on this task.
      */
-    variant.sources.kotlin?.addGeneratedSourceDirectory(
+    variant.sources.addGeneratedSourceDirectory(
         generateVariantDeeplinkSpecsTask,
         GenerateDeeplinkSpecsTask::outputDir
     )
@@ -352,7 +355,7 @@ private fun registerDeeplinkManifestTask(
             generateVariantManifestFile,
             GenerateDeeplinkManifestFile::outputFile
         )
-        variant.sources.kotlin?.addGeneratedSourceDirectory(
+        variant.sources.addGeneratedSourceDirectory(
             generateVariantManifestFile,
             GenerateDeeplinkManifestFile::outputDir
         )
@@ -419,4 +422,16 @@ private fun listSpecFiles(directory: java.io.File): List<java.io.File> {
                     )
         }
         .sortedBy { it.name }
+}
+
+private fun <TASK : Task> Sources.addGeneratedSourceDirectory(
+    taskProvider: TaskProvider<TASK>,
+    wiredWith: (TASK) -> DirectoryProperty
+) {
+    val kotlinSources = kotlin
+    if (kotlinSources != null) {
+        kotlinSources.addGeneratedSourceDirectory(taskProvider, wiredWith)
+    } else {
+        java?.addGeneratedSourceDirectory(taskProvider, wiredWith)
+    }
 }

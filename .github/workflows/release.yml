@@ -7,12 +7,12 @@ on:
       - '*.*.*'
 
 jobs:
-  unit-tests:
-    uses: ./.github/workflows/unit-tests.yml
+  test:
+    uses: ./.github/workflows/test.yml
 
   publish-artifacts:
     runs-on: ubuntu-latest
-    needs: unit-tests
+    needs: test
     permissions:
       contents: read
     steps:
@@ -86,3 +86,29 @@ jobs:
             :deepmatch-plugin:publishPlugins \
             -Pdeep.match.version=${DEEP_MATCH_VERSION} \
             --no-daemon
+
+  create-release:
+    runs-on: ubuntu-latest
+    needs: [publish-artifacts, publish-gradle-plugin]
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Derive version from tag
+        id: version
+        run: |
+          RAW_TAG="${GITHUB_REF_NAME}"
+          VERSION="${RAW_TAG#v}"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Create draft release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref_name }}
+          release_name: ${{ steps.version.outputs.version }}
+          body: TBD
+          draft: true
