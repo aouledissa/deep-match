@@ -1,3 +1,7 @@
+---
+description: Additional DeepMatch features including IDE autocomplete support for YAML spec files and other developer experience improvements.
+---
+
 # Miscellaneous
 
 ## IDE Autocomplete Support

@@ -1,3 +1,7 @@
+---
+description: Full schema reference for DeepMatch YAML spec files — deeplink configuration, path params, query params, schemes, hosts, and port matching.
+---
+
 ## Deeplink Configuration Object (`DeeplinkConfig`)
 
 Each item in the deeplinkSpecs list is a deep link configuration object with the following properties:

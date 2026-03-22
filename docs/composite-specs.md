@@ -1,3 +1,7 @@
+---
+description: Learn how DeepMatch composite specs let multiple Android modules share and merge deeplink definitions across a multi-module project.
+---
+
 # Composite Specs
 
 DeepMatch supports both:

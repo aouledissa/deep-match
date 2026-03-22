@@ -1,3 +1,7 @@
+---
+description: Reference for all Gradle tasks added by DeepMatch — code generation, URI validation, manifest sync checks, and report generation.
+---
+
 # Generated Tasks
 
 DeepMatch adds Gradle tasks under the `deepmatch` group.

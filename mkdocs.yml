@@ -1,8 +1,10 @@
 site_name: DeepMatch
 site_description: "Complete Android deeplink toolkit: Gradle plugin, runtime library, schema validation, and interactive HTML reports. Declare once in YAML, generate everything."
+site_author: "aouledissa"
 site_url: "https://aouledissa.com/deep-match/"
 repo_url: "https://github.com/aouledissa/deep-match"
 repo_name: "aouledissa/DeepMatch"
+copyright: "Copyright &copy; 2026 aouledissa"
 docs_dir: docs
 theme:
   variant: modern
@@ -47,6 +49,8 @@ nav:
       - v0.1.0-alpha: release-notes/0.1.0-alpha.md
 extra_css:
   - stylesheets/extra.css
+extra_files:
+  - robots.txt
 markdown_extensions:
   - admonition
   - pymdownx.highlight:
@@ -58,6 +62,8 @@ markdown_extensions:
       permalink: true
   - tables
 extra:
+  verification:
+    google: 8pGoNV6KMuRkoH0JPGJXaWI75ep3cMHLa5R-tVVHm04
   analytics:
     provider: google
     property: G-0B26NFZ0QQ

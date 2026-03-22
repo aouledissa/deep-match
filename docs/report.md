@@ -1,3 +1,7 @@
+---
+description: DeepMatch generates a standalone HTML report with a full deeplink catalog, URI validator, and per-module views — no app run required.
+---
+
 # Deeplink Report
 
 DeepMatch can generate a standalone HTML report that combines:

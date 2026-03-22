@@ -1,3 +1,7 @@
+---
+description: How DeepMatch automatically generates and validates AndroidManifest.xml intent filters from your YAML deeplink specs, keeping them always in sync.
+---
+
 # AndroidManifest Integration
 
 DeepMatch keeps your app's `AndroidManifest.xml` intent filters in sync with your deeplink specs. This guide explains how the plugin manages manifest generation and validation.

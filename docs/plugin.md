@@ -1,3 +1,9 @@
+---
+description: Reference for the DeepMatch Gradle plugin — configuration options, extension properties, and how it integrates with Android build variants.
+---
+
+# Plugin
+
 ### Core Capabilities
 
 The primary responsibilities and capabilities of the DeepMatch Gradle plugin are:

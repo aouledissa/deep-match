@@ -1,3 +1,7 @@
+---
+description: DeepMatch is an Android deeplink toolkit that generates manifest intent filters, type-safe Kotlin classes, and runtime routing from a single YAML spec file.
+---
+
 # DeepMatch
 
 DeepMatch keeps your Android deeplinks consistent from configuration to runtime. The Gradle plugin
