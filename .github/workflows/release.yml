@@ -88,6 +88,10 @@ jobs:
             -Pdeep.match.version=${{ steps.version.outputs.version }} \
             --no-daemon
 
+  docs:
+    uses: ./.github/workflows/docs.yml
+    needs: [publish-artifacts, publish-gradle-plugin]
+
   create-release:
     runs-on: ubuntu-latest
     needs: [publish-artifacts, publish-gradle-plugin]
