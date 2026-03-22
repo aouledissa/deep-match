@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.0.1] - 2026-03-22
+
+### Added
+
+- Sample App smoke and integration tests
+
+### Fixed
+
+- Revert using kotlin sources only in agp. Now Java source set is used when kotlin-android plugin is not applied.
+
 ## [1.0.0] - 2026-03-20
 
 ### Added
