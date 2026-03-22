@@ -6,6 +6,14 @@ on:
       - 'v*'
       - '*.*.*'
 
+env:
+  MAVEN_USERNAME: ${{ secrets.MAVEN_USERNAME }}
+  MAVEN_TOKEN: ${{ secrets.MAVEN_TOKEN }}
+  ORG_GRADLE_PROJECT_signingKey: ${{ secrets.ORG_GRADLE_PROJECT_SIGNINGKEY }}
+  ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.ORG_GRADLE_PROJECT_SIGNINGPASSWORD }}
+  GRADLE_PUBLISH_KEY: ${{ secrets.GRADLE_PUBLISH_KEY }}
+  GRADLE_PUBLISH_SECRET: ${{ secrets.GRADLE_PUBLISH_SECRET }}
+
 jobs:
   test:
     uses: ./.github/workflows/test.yml
@@ -37,17 +45,11 @@ jobs:
           echo "Publishing version $VERSION"
 
       - name: Publish to Central Portal
-        env:
-          MAVEN_USERNAME: ${{ secrets.MAVEN_USERNAME }}
-          MAVEN_TOKEN: ${{ secrets.MAVEN_TOKEN }}
-          ORG_GRADLE_PROJECT_signingKey: ${{ secrets.ORG_GRADLE_PROJECT_SIGNINGKEY }}
-          ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.ORG_GRADLE_PROJECT_SIGNINGPASSWORD }}
-          DEEP_MATCH_VERSION: ${{ steps.version.outputs.version }}
         run: |
           ./gradlew \
             apiCheck \
             publishAggregationToCentralPortal \
-            -Pdeep.match.version=${DEEP_MATCH_VERSION} \
+            -Pdeep.match.version=${{ steps.version.outputs.version }} \
             --no-daemon
 
   publish-gradle-plugin:
@@ -77,14 +79,10 @@ jobs:
           echo "Publishing Gradle plugin version $VERSION"
 
       - name: Publish Gradle plugin
-        env:
-          GRADLE_PUBLISH_KEY: ${{ secrets.GRADLE_PUBLISH_KEY }}
-          GRADLE_PUBLISH_SECRET: ${{ secrets.GRADLE_PUBLISH_SECRET }}
-          DEEP_MATCH_VERSION: ${{ steps.version.outputs.version }}
         run: |
           ./gradlew \
             :deepmatch-plugin:publishPlugins \
-            -Pdeep.match.version=${DEEP_MATCH_VERSION} \
+            -Pdeep.match.version=${{ steps.version.outputs.version }} \
             --no-daemon
 
   create-release:
