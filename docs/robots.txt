@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://aouledissa.com/deep-match/sitemap.xml

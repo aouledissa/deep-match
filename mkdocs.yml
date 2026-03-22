@@ -62,8 +62,6 @@ markdown_extensions:
       permalink: true
   - tables
 extra:
-  verification:
-    google: 8pGoNV6KMuRkoH0JPGJXaWI75ep3cMHLa5R-tVVHm04
   analytics:
     provider: google
     property: G-0B26NFZ0QQ
