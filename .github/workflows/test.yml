@@ -10,7 +10,7 @@ on:
 env:
   MAVEN_USERNAME: ${{ secrets.MAVEN_USERNAME }}
   MAVEN_TOKEN: ${{ secrets.MAVEN_TOKEN }}
-  DEEP_MATCH_VERSION: ${{ github.ref_name }}
+  DEEP_MATCH_VERSION: 0.0.0-SNAPSHOT
 
 jobs:
   build-artifacts:
