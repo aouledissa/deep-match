@@ -18,6 +18,25 @@ kotlin {
     }
 }
 
+val integrationTest: SourceSet by sourceSets.creating {
+    compileClasspath += sourceSets.main.get().output
+    runtimeClasspath += sourceSets.main.get().output
+}
+
+val integrationTestImplementation: Configuration by configurations.getting {
+    extendsFrom(configurations.testImplementation.get())
+}
+
+val integrationTestRuntimeOnly: Configuration by configurations.getting
+
+// Dedicated resolvable configuration for AGP so pluginUnderTestMetadata can pick it up
+// without a circular dependency on integrationTestRuntimeClasspath (which itself depends
+// on pluginUnderTestMetadata output once testSourceSets.add(integrationTest) is applied).
+val agpPluginMetadata: Configuration by configurations.creating {
+    isCanBeConsumed = false
+    isCanBeResolved = true
+}
+
 dependencies {
     implementation(project(":deepmatch-api"))
     compileOnly(libs.android.gradle.api)
@@ -29,6 +48,21 @@ dependencies {
     testImplementation(gradleTestKit())
     testImplementation(libs.junit)
     testImplementation(libs.google.truth)
+    // AGP on the integrationTest runtime classpath so GradleRunner can load the plugin
+    integrationTestRuntimeOnly(libs.android.gradle.api)
+    // Same AGP jar fed into pluginUnderTestMetadata via a cycle-free resolvable config
+    agpPluginMetadata(libs.android.gradle.api)
+}
+
+tasks.named<org.gradle.plugin.devel.tasks.PluginUnderTestMetadata>("pluginUnderTestMetadata") {
+    pluginClasspath.from(agpPluginMetadata)
+}
+
+tasks.register<Test>("integrationTest") {
+    description = "Runs GradleRunner integration tests."
+    group = LifecycleBasePlugin.VERIFICATION_GROUP
+    testClassesDirs = integrationTest.output.classesDirs
+    classpath = integrationTest.runtimeClasspath
 }
 
 gradlePlugin {
@@ -43,4 +77,8 @@ gradlePlugin {
             tags = listOf("android", "deeplink", "codegen", "deepmatch")
         }
     }
+    // Registers integrationTest as a test source set for GradleTestKit:
+    // - automatically wires plugin-under-test metadata onto its runtime classpath
+    // - makes GradleRunner.withPluginClasspath() work in integration tests
+    testSourceSets.add(integrationTest)
 }
