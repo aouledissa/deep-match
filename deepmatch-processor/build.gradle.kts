@@ -75,6 +75,6 @@ signing {
     val signingPassword: String? by project
     if (signingKey != null) {
         useInMemoryPgpKeys(signingKey, signingPassword)
+        sign(publishing.publications["deepMatchProcessor"])
     }
-    sign(publishing.publications["deepMatchProcessor"])
 }
