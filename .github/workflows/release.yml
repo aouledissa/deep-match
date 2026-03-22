@@ -6,14 +6,6 @@ on:
       - 'v*'
       - '*.*.*'
 
-env:
-  MAVEN_USERNAME: ${{ secrets.MAVEN_USERNAME }}
-  MAVEN_TOKEN: ${{ secrets.MAVEN_TOKEN }}
-  ORG_GRADLE_PROJECT_signingKey: ${{ secrets.ORG_GRADLE_PROJECT_SIGNINGKEY }}
-  ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.ORG_GRADLE_PROJECT_SIGNINGPASSWORD }}
-  GRADLE_PUBLISH_KEY: ${{ secrets.GRADLE_PUBLISH_KEY }}
-  GRADLE_PUBLISH_SECRET: ${{ secrets.GRADLE_PUBLISH_SECRET }}
-
 jobs:
   test:
     uses: ./.github/workflows/test.yml
@@ -23,6 +15,11 @@ jobs:
     needs: test
     permissions:
       contents: read
+    env:
+      MAVEN_USERNAME: ${{ secrets.MAVEN_USERNAME }}
+      MAVEN_TOKEN: ${{ secrets.MAVEN_TOKEN }}
+      ORG_GRADLE_PROJECT_signingKey: ${{ secrets.ORG_GRADLE_PROJECT_SIGNINGKEY }}
+      ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.ORG_GRADLE_PROJECT_SIGNINGPASSWORD }}
     steps:
       - name: Checkout
         uses: actions/checkout@v5
@@ -57,6 +54,9 @@ jobs:
     needs: publish-artifacts
     permissions:
       contents: read
+    env:
+      GRADLE_PUBLISH_KEY: ${{ secrets.GRADLE_PUBLISH_KEY }}
+      GRADLE_PUBLISH_SECRET: ${{ secrets.GRADLE_PUBLISH_SECRET }}
     steps:
       - name: Checkout
         uses: actions/checkout@v5
