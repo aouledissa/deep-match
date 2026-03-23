@@ -91,6 +91,10 @@ jobs:
   docs:
     uses: ./.github/workflows/docs.yml
     needs: [publish-artifacts, publish-gradle-plugin]
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
 
   create-release:
     runs-on: ubuntu-latest
