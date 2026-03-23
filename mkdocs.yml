@@ -40,6 +40,7 @@ nav:
       - v0.3.0-beta: migration-guide-0.3.0-beta.md
       - v0.2.0-alpha: migration-guide-0.2.0-alpha.md
   - Release Notes:
+      - v1.0.2: release-notes/1.0.2.md
       - v1.0.1: release-notes/1.0.1.md
       - v1.0.0: release-notes/1.0.0.md
       - v0.3.2-beta: release-notes/0.3.2-beta.md
