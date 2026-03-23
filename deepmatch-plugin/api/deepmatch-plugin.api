@@ -1,4 +1,6 @@
 public final class com/aouledissa/deepmatch/gradle/DeepMatchPlugin : org/gradle/api/Plugin {
+	public static final field ANDROID_APPLICATION_PLUGIN_ID Ljava/lang/String;
+	public static final field ANDROID_LIBRARY_PLUGIN_ID Ljava/lang/String;
 	public fun <init> ()V
 	public synthetic fun apply (Ljava/lang/Object;)V
 	public fun apply (Lorg/gradle/api/Project;)V
