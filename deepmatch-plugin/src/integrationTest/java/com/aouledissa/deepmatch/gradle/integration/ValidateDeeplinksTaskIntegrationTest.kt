@@ -40,7 +40,7 @@ class ValidateDeeplinksTaskIntegrationTest {
 
     @Test
     fun validateDeeplinksFailsWhenUriArgumentIsMissing() {
-        fixture.withAndroidProject()
+        fixture.withWorkingAndroidProject()
         fixture.writeFile(".deeplinks.yml", validSpecYaml)
 
         val result = fixture.run("validateDeeplinks", expectFailure = true)
@@ -52,7 +52,7 @@ class ValidateDeeplinksTaskIntegrationTest {
 
     @Test
     fun validateDeeplinksSucceedsWithMatchingUri() {
-        fixture.withAndroidProject()
+        fixture.withWorkingAndroidProject()
         fixture.writeFile(".deeplinks.yml", validSpecYaml)
 
         val result = fixture.run("validateDeeplinks", "--uri=app://example.com/profile/123")

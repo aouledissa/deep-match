@@ -16,8 +16,6 @@
 
 package com.aouledissa.deepmatch.gradle
 
-import com.android.build.gradle.AppPlugin
-import com.android.build.gradle.LibraryPlugin
 import com.aouledissa.deepmatch.gradle.internal.config.configureAndroidVariants
 import org.gradle.api.Plugin
 import org.gradle.api.Project
@@ -36,10 +34,15 @@ class DeepMatchPlugin : Plugin<Project> {
             target.extensions.create(DeepMatchPluginConfig.NAME, DeepMatchPluginConfig::class.java)
 
         when {
-            target.plugins.hasPlugin(AppPlugin::class.java)
-                    || target.plugins.hasPlugin(LibraryPlugin::class.java) -> {
+            target.plugins.hasPlugin(ANDROID_APPLICATION_PLUGIN_ID)
+                    || target.plugins.hasPlugin(ANDROID_LIBRARY_PLUGIN_ID) -> {
                 configureAndroidVariants(target, config)
             }
         }
+    }
+
+    private companion object {
+        const val ANDROID_APPLICATION_PLUGIN_ID = "com.android.application"
+        const val ANDROID_LIBRARY_PLUGIN_ID = "com.android.library"
     }
 }

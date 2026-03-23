@@ -21,6 +21,7 @@ import com.android.build.api.dsl.CommonExtension
 import com.android.build.api.variant.AndroidComponentsExtension
 import com.android.build.api.variant.Sources
 import com.android.build.api.variant.Variant
+import com.android.build.gradle.internal.utils.KOTLIN_ANDROID_PLUGIN_ID
 import com.aouledissa.deepmatch.gradle.DeepMatchPluginConfig
 import com.aouledissa.deepmatch.gradle.LOG_TAG
 import com.aouledissa.deepmatch.gradle.ManifestSyncViolation
@@ -32,6 +33,7 @@ import com.aouledissa.deepmatch.gradle.internal.task.GenerateDeeplinkSpecsTask
 import com.aouledissa.deepmatch.gradle.internal.task.ValidateCompositeSpecsCollisionsTask
 import com.aouledissa.deepmatch.gradle.internal.task.ValidateDeeplinksTask
 import com.aouledissa.deepmatch.gradle.internal.task.WarnManifestOutOfSyncTask
+import org.gradle.api.GradleException
 import org.gradle.api.Project
 import org.gradle.api.Task
 import org.gradle.api.artifacts.ProjectDependency
@@ -200,8 +202,9 @@ private fun registerDeeplinkSpecsSourcesTask(
      * and also make the variant build pipeline depend on this task.
      */
     variant.sources.addGeneratedSourceDirectory(
-        generateVariantDeeplinkSpecsTask,
-        GenerateDeeplinkSpecsTask::outputDir
+        project = project,
+        taskProvider = generateVariantDeeplinkSpecsTask,
+        wiredWith = GenerateDeeplinkSpecsTask::outputDir
     )
 
     return generateVariantDeeplinkSpecsTask
@@ -356,8 +359,9 @@ private fun registerDeeplinkManifestTask(
             GenerateDeeplinkManifestFile::outputFile
         )
         variant.sources.addGeneratedSourceDirectory(
-            generateVariantManifestFile,
-            GenerateDeeplinkManifestFile::outputDir
+            project = project,
+            taskProvider = generateVariantManifestFile,
+            wiredWith = GenerateDeeplinkManifestFile::outputDir
         )
     } else {
         val fileToDelete = project.layout.buildDirectory.dir("generated/manifests/$taskName")
@@ -424,14 +428,53 @@ private fun listSpecFiles(directory: java.io.File): List<java.io.File> {
         .sortedBy { it.name }
 }
 
+/**
+ * Adds a generated source directory to the appropriate source set based on the Kotlin setup.
+ *
+ * AGP >= 9 ships with built-in Kotlin support and its [Sources.kotlin] is always non-null, so
+ * generated sources are wired directly to the **kotlin** source set.
+ *
+ * AGP < 9 does **not** add the Kotlin source set to the compilation classpath automatically —
+ * even when `org.jetbrains.kotlin.android` is applied, AGP only exposes a [Sources.kotlin]
+ * container but does not promote it to the final classpath. Sources must therefore be wired via
+ * [Sources.java], which KGP then picks up and promotes to the Kotlin compilation classpath.
+ *
+ * Note: on AGP < 9, [Sources.kotlin] may be non-null even without `org.jetbrains.kotlin.android`
+ * (AGP still creates the container). The AGP major version is therefore used to distinguish
+ * true built-in Kotlin support (AGP >= 9) from an empty container (AGP < 9 without KGP).
+ *
+ * If neither condition is met (AGP < 9 without `org.jetbrains.kotlin.android` applied), an
+ * exception is thrown with an actionable message. To fix this, either apply
+ * `org.jetbrains.kotlin.android` if on AGP < 9, or upgrade to AGP >= 9.
+ *
+ * @param TASK the type of the task that produces the generated source directory.
+ * @param project the Gradle project used to check the AGP version and applied plugins.
+ * @param taskProvider the provider for the task that generates the sources.
+ * @param wiredWith a function that extracts the [DirectoryProperty] output from [TASK]; this
+ *   directory is registered as the generated source root.
+ */
 private fun <TASK : Task> Sources.addGeneratedSourceDirectory(
+    project: Project,
     taskProvider: TaskProvider<TASK>,
     wiredWith: (TASK) -> DirectoryProperty
 ) {
-    val kotlinSources = kotlin
-    if (kotlinSources != null) {
-        kotlinSources.addGeneratedSourceDirectory(taskProvider, wiredWith)
-    } else {
-        java?.addGeneratedSourceDirectory(taskProvider, wiredWith)
+    val isAgp9Plus = project.extensions.getByType(AndroidComponentsExtension::class.java)
+        .pluginVersion.major >= 9
+    when {
+        project.plugins.hasPlugin(KOTLIN_ANDROID_PLUGIN_ID) && java != null -> java?.addGeneratedSourceDirectory(
+            taskProvider,
+            wiredWith
+        )
+
+        isAgp9Plus && kotlin != null -> kotlin?.addGeneratedSourceDirectory(
+            taskProvider,
+            wiredWith
+        )
+
+        else -> throw GradleException(
+            "DeepMatch requires Kotlin support to generate sources. " +
+                    "Apply the 'org.jetbrains.kotlin.android' plugin if you are on AGP < 9, " +
+                    "or upgrade to AGP >= 9."
+        )
     }
 }

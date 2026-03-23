@@ -66,13 +66,13 @@ jobs:
         run: chmod +x gradlew
 
       - name: Prepare Maven local directory
-        run: mkdir -p ~/.m2/repository/com/aouledissa
+        run: mkdir -p ~/.m2/repository/com/aouledissa/deepmatch
 
       - name: Download DeepMatch Maven artifacts
         uses: actions/download-artifact@v5
         with:
           name: deepmatch-artifacts-${{ github.run_id }}
-          path: ~/.m2/repository/com/aouledissa
+          path: ~/.m2/repository/com/aouledissa/deepmatch
 
       - name: Run unit tests
         run: ./gradlew test --no-daemon
@@ -81,9 +81,17 @@ jobs:
         run: ./gradlew -p samples/android-app generateDebugDeeplinkSpecs --no-daemon
 
   integration-tests:
-    name: Integration tests
+    name: Integration tests (AGP ${{ matrix.agp-label }})
     runs-on: ubuntu-latest
     needs: build-artifacts
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - agp-label: "9"
+            task: integrationTestAgp9
+          - agp-label: "8"
+            task: integrationTestAgp8
     steps:
       - name: Checkout sources
         uses: actions/checkout@v5
@@ -103,8 +111,17 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
+      - name: Prepare Maven local directory
+        run: mkdir -p ~/.m2/repository/com/aouledissa/deepmatch
+
+      - name: Download DeepMatch Maven artifacts
+        uses: actions/download-artifact@v5
+        with:
+          name: deepmatch-artifacts-${{ github.run_id }}
+          path: ~/.m2/repository/com/aouledissa/deepmatch
+
       - name: Run integration tests
-        run: ./gradlew :deepmatch-plugin:integrationTest --no-daemon
+        run: ./gradlew :deepmatch-plugin:${{ matrix.task }} --no-daemon
 
   smoke-tests:
     name: Smoke tests
@@ -127,13 +144,13 @@ jobs:
         run: chmod +x gradlew
 
       - name: Prepare Maven local directory
-        run: mkdir -p ~/.m2/repository/com/aouledissa
+        run: mkdir -p ~/.m2/repository/com/aouledissa/deepmatch
 
       - name: Download DeepMatch Maven artifacts
         uses: actions/download-artifact@v5
         with:
           name: deepmatch-artifacts-${{ github.run_id }}
-          path: ~/.m2/repository/com/aouledissa
+          path: ~/.m2/repository/com/aouledissa/deepmatch
 
       - name: Enable KVM
         run: |

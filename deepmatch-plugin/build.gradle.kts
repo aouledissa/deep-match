@@ -29,14 +29,6 @@ val integrationTestImplementation: Configuration by configurations.getting {
 
 val integrationTestRuntimeOnly: Configuration by configurations.getting
 
-// Dedicated resolvable configuration for AGP so pluginUnderTestMetadata can pick it up
-// without a circular dependency on integrationTestRuntimeClasspath (which itself depends
-// on pluginUnderTestMetadata output once testSourceSets.add(integrationTest) is applied).
-val agpPluginMetadata: Configuration by configurations.creating {
-    isCanBeConsumed = false
-    isCanBeResolved = true
-}
-
 dependencies {
     implementation(project(":deepmatch-api"))
     compileOnly(libs.android.gradle.api)
@@ -48,21 +40,46 @@ dependencies {
     testImplementation(gradleTestKit())
     testImplementation(libs.junit)
     testImplementation(libs.google.truth)
-    // AGP on the integrationTest runtime classpath so GradleRunner can load the plugin
-    integrationTestRuntimeOnly(libs.android.gradle.api)
-    // Same AGP jar fed into pluginUnderTestMetadata via a cycle-free resolvable config
-    agpPluginMetadata(libs.android.gradle.api)
+    // AGP is intentionally NOT on the integration test runtime classpath.
+    // Integration test projects resolve AGP directly from remote repositories at the version
+    // specified by the agp.version system property, allowing multi-version testing.
 }
 
-tasks.named<org.gradle.plugin.devel.tasks.PluginUnderTestMetadata>("pluginUnderTestMetadata") {
-    pluginClasspath.from(agpPluginMetadata)
-}
+val deepMatchVersion = providers.environmentVariable("DEEP_MATCH_VERSION")
+    .orElse(providers.gradleProperty("deep.match.version"))
+    .getOrElse("0.0.0-SNAPSHOT")
 
-tasks.register<Test>("integrationTest") {
-    description = "Runs GradleRunner integration tests."
+val localMavenRepo = "${System.getProperty("user.home")}/.m2/repository"
+
+fun registerIntegrationTestTask(taskName: String, agpVersion: String, gradleVersion: String? = null) =
+    tasks.register<Test>(taskName) {
+        description = "Runs GradleRunner integration tests against AGP $agpVersion."
+        group = LifecycleBasePlugin.VERIFICATION_GROUP
+        testClassesDirs = integrationTest.output.classesDirs
+        classpath = integrationTest.runtimeClasspath
+        systemProperty("agp.version", agpVersion)
+        systemProperty("deepmatch.plugin.version", deepMatchVersion)
+        systemProperty("integration.test.local.repo", localMavenRepo)
+        // AGP 8.x is not compatible with Gradle 9.x. Pin the GradleRunner to a Gradle version
+        // that is compatible with the AGP series under test.
+        if (gradleVersion != null) {
+            systemProperty("gradle.version.for.test", gradleVersion)
+        }
+        // Locally: auto-publish so `./gradlew integrationTestAgp9` works without a separate step.
+        // In CI: artifacts are pre-built by the build-artifacts job and downloaded to ~/.m2,
+        // so re-publishing would wastefully recompile the entire project.
+        if (System.getenv("CI") == null) {
+            dependsOn(rootProject.getTasksByName("publishToMavenLocal", true))
+        }
+    }
+
+registerIntegrationTestTask("integrationTestAgp9", libs.versions.agp.get())
+registerIntegrationTestTask("integrationTestAgp8", libs.versions.agp8.get(), libs.versions.gradle8.get())
+
+tasks.register("integrationTest") {
+    description = "Runs GradleRunner integration tests against all supported AGP versions."
     group = LifecycleBasePlugin.VERIFICATION_GROUP
-    testClassesDirs = integrationTest.output.classesDirs
-    classpath = integrationTest.runtimeClasspath
+    dependsOn("integrationTestAgp9", "integrationTestAgp8")
 }
 
 gradlePlugin {
@@ -77,8 +94,4 @@ gradlePlugin {
             tags = listOf("android", "deeplink", "codegen", "deepmatch")
         }
     }
-    // Registers integrationTest as a test source set for GradleTestKit:
-    // - automatically wires plugin-under-test metadata onto its runtime classpath
-    // - makes GradleRunner.withPluginClasspath() work in integration tests
-    testSourceSets.add(integrationTest)
 }

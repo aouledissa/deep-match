@@ -40,7 +40,7 @@ class ValidateCompositeSpecsCollisionsTaskIntegrationTest {
 
     @Test
     fun validateDebugCompositeSpecsCollisionsSucceedsForSingleModule() {
-        fixture.withAndroidProject()
+        fixture.withWorkingAndroidProject()
         fixture.writeFile(".deeplinks.yml", validSpecYaml)
 
         val result = fixture.run("validateDebugCompositeSpecsCollisions")
@@ -51,7 +51,7 @@ class ValidateCompositeSpecsCollisionsTaskIntegrationTest {
 
     @Test
     fun validateDebugCompositeSpecsCollisionsDependsOnSpecsGeneration() {
-        fixture.withAndroidProject()
+        fixture.withWorkingAndroidProject()
         fixture.writeFile(".deeplinks.yml", validSpecYaml)
 
         val result = fixture.run("validateDebugCompositeSpecsCollisions")

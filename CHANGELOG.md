@@ -1,10 +1,16 @@
 # Changelog
 
-## [1.0.1] - 2026-03-22
+## [1.0.2] - 2026-03-23
 
 ### Added
 
-- Sample App smoke and integration tests
+- Support for AGP 8.x projects using the standalone Kotlin Gradle Plugin (`org.jetbrains.kotlin.android`)
+
+### Fixed
+
+- Fixed generated sources not being added to the compilation classpath on AGP 8.x projects
+
+## [1.0.1] - 2026-03-22
 
 ### Fixed
 

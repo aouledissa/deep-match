@@ -41,7 +41,7 @@ class GenerateDeeplinkReportTaskIntegrationTest {
 
     @Test
     fun generateDeeplinkReportSucceedsAndProducesHtmlReport() {
-        fixture.withAndroidProject(
+        fixture.withWorkingAndroidProject(
             buildScriptExtra = """
                 deepMatch {
                     report {
