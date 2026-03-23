@@ -66,13 +66,13 @@ jobs:
         run: chmod +x gradlew
 
       - name: Prepare Maven local directory
-        run: mkdir -p ~/.m2/repository/com/aouledissa
+        run: mkdir -p ~/.m2/repository/com/aouledissa/deepmatch
 
       - name: Download DeepMatch Maven artifacts
         uses: actions/download-artifact@v5
         with:
           name: deepmatch-artifacts-${{ github.run_id }}
-          path: ~/.m2/repository/com/aouledissa
+          path: ~/.m2/repository/com/aouledissa/deepmatch
 
       - name: Run unit tests
         run: ./gradlew test --no-daemon
@@ -112,13 +112,13 @@ jobs:
         run: chmod +x gradlew
 
       - name: Prepare Maven local directory
-        run: mkdir -p ~/.m2/repository/com/aouledissa
+        run: mkdir -p ~/.m2/repository/com/aouledissa/deepmatch
 
       - name: Download DeepMatch Maven artifacts
         uses: actions/download-artifact@v5
         with:
           name: deepmatch-artifacts-${{ github.run_id }}
-          path: ~/.m2/repository/com/aouledissa
+          path: ~/.m2/repository/com/aouledissa/deepmatch
 
       - name: Run integration tests
         run: ./gradlew :deepmatch-plugin:${{ matrix.task }} --no-daemon
@@ -144,13 +144,13 @@ jobs:
         run: chmod +x gradlew
 
       - name: Prepare Maven local directory
-        run: mkdir -p ~/.m2/repository/com/aouledissa
+        run: mkdir -p ~/.m2/repository/com/aouledissa/deepmatch
 
       - name: Download DeepMatch Maven artifacts
         uses: actions/download-artifact@v5
         with:
           name: deepmatch-artifacts-${{ github.run_id }}
-          path: ~/.m2/repository/com/aouledissa
+          path: ~/.m2/repository/com/aouledissa/deepmatch
 
       - name: Enable KVM
         run: |
