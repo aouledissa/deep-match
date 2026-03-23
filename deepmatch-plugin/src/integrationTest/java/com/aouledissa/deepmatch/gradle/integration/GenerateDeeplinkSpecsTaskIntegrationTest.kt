@@ -41,7 +41,7 @@ class GenerateDeeplinkSpecsTaskIntegrationTest {
 
     @Test
     fun generateDebugDeeplinkSpecsSucceedsAndProducesFiles() {
-        fixture.withAndroidProject()
+        fixture.withWorkingAndroidProject()
         fixture.writeFile(".deeplinks.yml", validSpecYaml)
 
         val result = fixture.run("generateDebugDeeplinkSpecs")
@@ -61,7 +61,7 @@ class GenerateDeeplinkSpecsTaskIntegrationTest {
 
     @Test
     fun generateDebugDeeplinkSpecsIsUpToDateOnSecondRun() {
-        fixture.withAndroidProject()
+        fixture.withWorkingAndroidProject()
         fixture.writeFile(".deeplinks.yml", validSpecYaml)
 
         val result1 = fixture.run("generateDebugDeeplinkSpecs")
@@ -75,7 +75,7 @@ class GenerateDeeplinkSpecsTaskIntegrationTest {
 
     @Test
     fun generateDebugDeeplinkSpecsFailsWithInvalidSpec() {
-        fixture.withAndroidProject()
+        fixture.withWorkingAndroidProject()
         fixture.writeFile(
             ".deeplinks.yml",
             """

@@ -13,6 +13,7 @@ plugins {
 group = "com.aouledissa.deepmatch"
 version = (project.findProperty("deep.match.version") as? String)
     ?: System.getenv("DEEP_MATCH_VERSION")
+    ?: "0.0.0-SNAPSHOT"
 
 allprojects {
     group = rootProject.group

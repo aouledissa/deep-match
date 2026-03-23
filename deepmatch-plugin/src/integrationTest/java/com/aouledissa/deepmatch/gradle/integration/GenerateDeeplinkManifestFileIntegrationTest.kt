@@ -37,7 +37,7 @@ class GenerateDeeplinkManifestFileIntegrationTest {
 
     @Test
     fun generateDebugDeeplinksManifestSucceedsAndProducesXml() {
-        fixture.withAndroidProject(
+        fixture.withWorkingAndroidProject(
             buildScriptExtra = """
                 deepMatch {
                     generateManifestFiles = true
@@ -65,7 +65,7 @@ class GenerateDeeplinkManifestFileIntegrationTest {
 
     @Test
     fun generateDebugDeeplinksManifestIsUpToDateOnSecondRun() {
-        fixture.withAndroidProject(
+        fixture.withWorkingAndroidProject(
             buildScriptExtra = """
                 deepMatch {
                     generateManifestFiles = true
