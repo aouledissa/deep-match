@@ -1,0 +1,7 @@
+<?xml version="1.0" ?>
+<SmellBaseline>
+  <ManuallySuppressedIssues/>
+  <CurrentIssues>
+    <ID>LongParameterList:DeeplinkSpecFixtures.kt$DeeplinkSpecFixtures$( name: String = "", scheme: Set&lt;String&gt; = setOf(), host: Set&lt;String&gt; = setOf(), port: Int? = null, pathParams: List&lt;Param&gt; = emptyList(), queryParams: Set&lt;Param&gt; = setOf(), fragment: String? = null, paramsFactory: ((Map&lt;String, String?&gt;) -&gt; DeeplinkParams?)? = null )</ID>
+  </CurrentIssues>
+</SmellBaseline>

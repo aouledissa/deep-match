@@ -1,0 +1,13 @@
+<?xml version="1.0" ?>
+<SmellBaseline>
+  <ManuallySuppressedIssues/>
+  <CurrentIssues>
+    <ID>LoopWithTooManyJumpStatements:DeeplinkProcessor.kt$DeeplinkProcessor$for</ID>
+    <ID>ReturnCount:DeeplinkProcessor.kt$DeeplinkProcessor$open fun match(deeplink: Uri): DeeplinkParams?</ID>
+    <ID>SwallowedException:DeeplinkProcessor.kt$DeeplinkProcessor$error: Exception</ID>
+    <ID>SwallowedException:DeeplinkProcessorRobolectricTest.kt$DeeplinkProcessorRobolectricTest$e: Exception</ID>
+    <ID>SwallowedException:DeeplinkProcessorTest.kt$DeeplinkProcessorTest$e: Exception</ID>
+    <ID>TooGenericExceptionCaught:DeeplinkProcessor.kt$DeeplinkProcessor$error: Exception</ID>
+    <ID>UnusedPrivateMember:DeeplinkProcessorTest.kt$DeeplinkProcessorTest$private fun profileFactory(params: Map&lt;String, String?&gt;): DeeplinkParams?</ID>
+  </CurrentIssues>
+</SmellBaseline>

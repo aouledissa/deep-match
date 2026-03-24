@@ -1,7 +1,9 @@
-name: test
+name: CI
 
 on:
   pull_request:
+  push:
+    branches: [main]
   workflow_call:
 
 env:
@@ -9,36 +11,44 @@ env:
   DEEP_MATCH_VERSION: 0.0.0-SNAPSHOT
 
 jobs:
-  build-artifacts:
-    name: Build and publish artifacts
+  validate:
+    name: Validate Gradle wrapper
     runs-on: ubuntu-latest
     steps:
       - name: Checkout sources
-        uses: actions/checkout@v5
+        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
+
+      - name: Validate Gradle wrapper
+        uses: gradle/actions/wrapper-validation@48b5f213c81028ace310571dc5ec0fbbca0b2947 # v4
+
+  build-artifacts:
+    name: Build and publish artifacts
+    runs-on: ubuntu-latest
+    needs: validate
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
 
       - name: Set up JDK 17
-        uses: actions/setup-java@v5
+        uses: actions/setup-java@be666c2fcd27ec809703dec50e508c2fdc7f6654 # v5
         with:
           distribution: temurin
           java-version: 17
 
-      - name: Setup Gradle cache
-        uses: gradle/actions/setup-gradle@v4
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@48b5f213c81028ace310571dc5ec0fbbca0b2947 # v4
 
       - name: Cache configuration cache
-        uses: actions/cache@v5
+        uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5
         with:
           path: .gradle/configuration-cache
           key: configuration-cache-${{ hashFiles('**/*.gradle.kts', 'gradle.properties', 'gradle/libs.versions.toml') }}
 
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
-
-      - name: Publish to Maven Local
-        run: ./gradlew publishToMavenLocal --no-daemon
+      - name: Build and verify API compatibility
+        run: ./gradlew publishToMavenLocal apiCheck --no-daemon
 
       - name: Upload DeepMatch artifacts
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5
         with:
           name: deepmatch-artifacts-${{ github.run_id }}
           path: |
@@ -51,25 +61,22 @@ jobs:
     needs: build-artifacts
     steps:
       - name: Checkout sources
-        uses: actions/checkout@v5
+        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
 
       - name: Set up JDK 17
-        uses: actions/setup-java@v5
+        uses: actions/setup-java@be666c2fcd27ec809703dec50e508c2fdc7f6654 # v5
         with:
           distribution: temurin
           java-version: 17
 
-      - name: Setup Gradle cache
-        uses: gradle/actions/setup-gradle@v4
-
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@48b5f213c81028ace310571dc5ec0fbbca0b2947 # v4
 
       - name: Prepare Maven local directory
         run: mkdir -p ~/.m2/repository/com/aouledissa/deepmatch
 
       - name: Download DeepMatch Maven artifacts
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5
         with:
           name: deepmatch-artifacts-${{ github.run_id }}
           path: ~/.m2/repository/com/aouledissa/deepmatch
@@ -79,6 +86,14 @@ jobs:
 
       - name: Validate sample composite build
         run: ./gradlew -p samples/android-app generateDebugDeeplinkSpecs --no-daemon
+
+      - name: Upload test reports
+        if: failure()
+        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5
+        with:
+          name: unit-test-reports
+          path: '**/build/reports/tests/'
+          retention-days: 7
 
   integration-tests:
     name: Integration tests (AGP ${{ matrix.agp-label }})
@@ -94,28 +109,25 @@ jobs:
             task: integrationTestAgp8
     steps:
       - name: Checkout sources
-        uses: actions/checkout@v5
+        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
 
       - name: Set up JDK 17
-        uses: actions/setup-java@v5
+        uses: actions/setup-java@be666c2fcd27ec809703dec50e508c2fdc7f6654 # v5
         with:
           distribution: temurin
           java-version: 17
 
       - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
+        uses: android-actions/setup-android@9fc6c4e9069bf8d3d10b2204b1fb8f6ef7065407 # v3
 
-      - name: Setup Gradle cache
-        uses: gradle/actions/setup-gradle@v4
-
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@48b5f213c81028ace310571dc5ec0fbbca0b2947 # v4
 
       - name: Prepare Maven local directory
         run: mkdir -p ~/.m2/repository/com/aouledissa/deepmatch
 
       - name: Download DeepMatch Maven artifacts
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5
         with:
           name: deepmatch-artifacts-${{ github.run_id }}
           path: ~/.m2/repository/com/aouledissa/deepmatch
@@ -123,31 +135,36 @@ jobs:
       - name: Run integration tests
         run: ./gradlew :deepmatch-plugin:${{ matrix.task }} --no-daemon
 
+      - name: Upload test reports
+        if: failure()
+        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5
+        with:
+          name: integration-test-reports-agp${{ matrix.agp-label }}
+          path: '**/build/reports/tests/'
+          retention-days: 7
+
   smoke-tests:
     name: Smoke tests
     runs-on: ubuntu-latest
     needs: build-artifacts
     steps:
       - name: Checkout sources
-        uses: actions/checkout@v5
+        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
 
       - name: Set up JDK 17
-        uses: actions/setup-java@v5
+        uses: actions/setup-java@be666c2fcd27ec809703dec50e508c2fdc7f6654 # v5
         with:
           distribution: temurin
           java-version: 17
 
-      - name: Setup Gradle cache
-        uses: gradle/actions/setup-gradle@v4
-
-      - name: Grant execute permission for gradlew
-        run: chmod +x gradlew
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@48b5f213c81028ace310571dc5ec0fbbca0b2947 # v4
 
       - name: Prepare Maven local directory
         run: mkdir -p ~/.m2/repository/com/aouledissa/deepmatch
 
       - name: Download DeepMatch Maven artifacts
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5
         with:
           name: deepmatch-artifacts-${{ github.run_id }}
           path: ~/.m2/repository/com/aouledissa/deepmatch
@@ -162,10 +179,31 @@ jobs:
         run: ./gradlew -p samples/android-app assembleDebug --no-daemon
 
       - name: Run smoke tests
-        uses: reactivecircus/android-emulator-runner@v2
+        uses: reactivecircus/android-emulator-runner@e89f39f1abbbd05b1113a29cf4db69e7540cae5a # v2
         with:
           api-level: 30
           target: google_apis
           arch: x86_64
           emulator-boot-timeout: 300
           script: ./gradlew -p samples/android-app connectedDebugAndroidTest --no-daemon
+
+  detekt:
+    name: Static analysis
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+    needs: validate
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@93cb6efe18208431cddfb8368fd83d5badbf9bfd # v5
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@be666c2fcd27ec809703dec50e508c2fdc7f6654 # v5
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@48b5f213c81028ace310571dc5ec0fbbca0b2947 # v4
+
+      - name: Run detekt
+        run: ./gradlew detekt --no-daemon

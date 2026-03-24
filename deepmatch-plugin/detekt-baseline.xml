@@ -1,0 +1,32 @@
+<?xml version="1.0" ?>
+<SmellBaseline>
+  <ManuallySuppressedIssues/>
+  <CurrentIssues>
+    <ID>ForbiddenComment:GenerateDeeplinkSpecsTask.kt$GenerateDeeplinkSpecsTask$// TODO: generate all possible examples</ID>
+    <ID>LongMethod:GenerateDeeplinkManifestFile.kt$GenerateDeeplinkManifestFile$@TaskAction fun generateDeeplinkManifest()</ID>
+    <ID>LongMethod:GenerateDeeplinkManifestFile.kt$GenerateDeeplinkManifestFile$private fun buildPathData(pathParams: List&lt;Param&gt;): PathDataGroups</ID>
+    <ID>LongMethod:GenerateDeeplinkReportTaskTest.kt$GenerateDeeplinkReportTaskTest$@Test fun `report includes specs metadata and valid example uris`()</ID>
+    <ID>LongMethod:GenerateDeeplinkSpecsTask.kt$GenerateDeeplinkSpecsTask$@TaskAction fun generateDeeplinkSpecs()</ID>
+    <ID>LongMethod:GenerateDeeplinkSpecsTask.kt$GenerateDeeplinkSpecsTask$private fun generateDeeplinkParamType( name: String, config: DeeplinkConfig, packageName: String, moduleSealedInterfaceName: String ): TypeSpec</ID>
+    <ID>LongParameterList:AndroidVariantsConfig.kt$( generateManifestFiles: Boolean, project: Project, variant: Variant, specsFile: RegularFile, additionalSpecsFiles: List&lt;RegularFile&gt;, compileSdk: Int, manifestSyncViolation: ManifestSyncViolation )</ID>
+    <ID>LongParameterList:AndroidVariantsConfig.kt$( project: Project, variantName: String, moduleName: String, composedDependencyProjects: List&lt;Project&gt;, enabled: Boolean, outputFileProvider: Provider&lt;RegularFile&gt; )</ID>
+    <ID>MagicNumber:AndroidVariantsConfig.kt$9</ID>
+    <ID>MagicNumber:GenerateDeeplinkManifestFile.kt$GenerateDeeplinkManifestFile$31</ID>
+    <ID>MaxLineLength:AndroidVariantsConfig.kt$"Warns about deeplink intent filters missing from the merged AndroidManifest.xml for the ${variant.name} variant."</ID>
+    <ID>MaxLineLength:GenerateDeeplinkManifestFileTest.kt$GenerateDeeplinkManifestFileTest$"&lt;intent-filter(?![^&gt;]*android:autoVerify=\"true\")[\\s\\S]*?android:scheme=\"app\"[\\s\\S]*?&lt;/intent-filter&gt;"</ID>
+    <ID>MaxLineLength:GenerateDeeplinkSpecsTask.kt$GenerateDeeplinkSpecsTask$throw GradleException("DeepMatch: All queryParams should define a type: [numeric, alphanumeric, string]")</ID>
+    <ID>MaxLineLength:ValidateCompositeSpecsCollisionsTaskTest.kt$ValidateCompositeSpecsCollisionsTaskTest$val sharedSignature = "scheme=app|host=example.com|port=|path=static:profile/typed:alphanumeric|query=|fragment="</ID>
+    <ID>MaxLineLength:WarnManifestOutOfSyncTask.kt$WarnManifestOutOfSyncTask$return schemes.flatMap { scheme -&gt; hostsToUse.map { host -&gt; IntentFilterSignature(activityName, scheme, host) } }</ID>
+    <ID>MaxLineLength:WarnManifestOutOfSyncTask.kt$WarnManifestOutOfSyncTask$val activityName = activity.getAttribute("android:name").takeIf { it.isNotBlank() } ?: return@flatMap emptyList()</ID>
+    <ID>NestedBlockDepth:GenerateDeeplinkReportTaskTest.kt$GenerateDeeplinkReportTaskTest$private fun matchLikeReport( specs: List&lt;DeeplinkReportSpec&gt;, uriValue: String ): ReportMatchResult</ID>
+    <ID>NewLineAtEndOfFile:IntentFilterCategory.kt$com.aouledissa.deepmatch.gradle.internal.model.IntentFilterCategory.kt</ID>
+    <ID>ReturnCount:AndroidVariantsConfig.kt$private fun Project.resolveAndroidNamespaceOrNull(): String?</ID>
+    <ID>ReturnCount:GenerateDeeplinkManifestFile.kt$GenerateDeeplinkManifestFile$private fun buildPathData(pathParams: List&lt;Param&gt;): PathDataGroups</ID>
+    <ID>ReturnCount:GenerateDeeplinkManifestFile.kt$GenerateDeeplinkManifestFile$private fun buildSchemeFilters( schemes: List&lt;String&gt;, autoVerify: Boolean ): List&lt;SchemeFilter&gt;</ID>
+    <ID>ReturnCount:Utils.kt$internal fun String.toCamelCase(): String</ID>
+    <ID>ReturnCount:ValidateDeeplinksTask.kt$ValidateDeeplinksTask$private fun tryMatch(spec: DeeplinkSpec, uri: URI): MatchResult</ID>
+    <ID>TooGenericExceptionCaught:ValidateDeeplinksTask.kt$ValidateDeeplinksTask$e: Exception</ID>
+    <ID>TooManyFunctions:AndroidVariantsConfig.kt$com.aouledissa.deepmatch.gradle.internal.config.AndroidVariantsConfig.kt</ID>
+    <ID>TooManyFunctions:GenerateDeeplinkSpecsTask.kt$GenerateDeeplinkSpecsTask : DefaultTask</ID>
+  </CurrentIssues>
+</SmellBaseline>

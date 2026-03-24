@@ -1,4 +1,6 @@
-// Top-level build file where you can add configuration options common to all sub-projects/modules.
+import io.gitlab.arturbosch.detekt.extensions.DetektExtension
+
+// Top-level build file where you can add configuration options common to all subprojects/modules.
 plugins {
     alias(libs.plugins.android.application) apply false
     alias(libs.plugins.kotlin.android) apply false
@@ -8,6 +10,7 @@ plugins {
     alias(libs.plugins.gradleup.nmcp) apply false
     alias(libs.plugins.gradleup.nmcp.aggregation)
     alias(libs.plugins.binary.compatibility.validator)
+    alias(libs.plugins.detekt)
 }
 
 group = "com.aouledissa.deepmatch"
@@ -18,6 +21,12 @@ version = (project.findProperty("deep.match.version") as? String)
 allprojects {
     group = rootProject.group
     version = rootProject.version
+
+    apply(plugin = "io.gitlab.arturbosch.detekt")
+    configure<DetektExtension> {
+        buildUponDefaultConfig = true
+        parallel = true
+    }
 }
 
 nmcpAggregation {
