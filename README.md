@@ -225,6 +225,10 @@ Full documentation is available at **[aouledissa.com/deep-match](https://aouledi
 
 Shared test fixtures live in `deepmatch-testing` and can be used in downstream projects.
 
+## Official Distribution
+
+Official DeepMatch releases are published **exclusively** to [Sonatype Central Portal (Maven Central)](https://central.sonatype.com/) for library artifacts and the [Gradle Plugin Portal](https://plugins.gradle.org/plugin/com.aouledissa.deepmatch.gradle) for the plugin. **The authors bear no responsibility for artifacts obtained from any other source.** See [SECURITY.md](SECURITY.md) for the full policy.
+
 ## Contributing
 
 Issues and pull requests are welcome. Please ensure `./gradlew test` passes before opening a PR.

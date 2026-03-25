@@ -132,6 +132,10 @@ For an end-to-end sample app flow, see the repository sample at
 [Deeplink Specs](deeplink-specs.md), [Plugin](plugin.md), and
 [Composite Specs](composite-specs.md).
 
+## Official Distribution
+
+Official releases are published exclusively to [Maven Central](https://central.sonatype.com/) (library artifacts) and the [Gradle Plugin Portal](https://plugins.gradle.org/plugin/com.aouledissa.deepmatch.gradle) (plugin). The authors bear no responsibility for artifacts obtained from any other source. See [Miscellaneous](misc.md#official-distribution) for the full notice.
+
 ## Upgrading
 
 - Check **Release Notes** for version-specific changes.
