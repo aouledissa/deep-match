@@ -4,7 +4,7 @@
 
 Official DeepMatch releases are published **exclusively** to the following authorized channels:
 
-- **[Sonatype Central Portal (Maven Central)](https://central.sonatype.com/)** — for the runtime library and API artifacts (`com.aouledissa.deepmatch`)
+- **[Sonatype Central Portal (Maven Central)](https://central.sonatype.com/namespace/com.aouledissa.deepmatch)** — for the runtime library and API artifacts (`com.aouledissa.deepmatch`)
 - **[Gradle Plugin Portal](https://plugins.gradle.org/plugin/com.aouledissa.deepmatch.gradle)** — for the Gradle plugin (`com.aouledissa.deepmatch.gradle`)
 
 These are the only authorized sources for DeepMatch artifacts. **The authors bear no responsibility whatsoever for the integrity, safety, or correctness of artifacts obtained from any other source.** This includes but is not limited to tampered binaries, malicious code injection, or broken functionality. You use such artifacts entirely at your own risk.

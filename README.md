@@ -213,8 +213,8 @@ Full documentation is available at **[aouledissa.com/deep-match](https://aouledi
 | [Composite Specs](docs/composite-specs.md)                   | Multi-module processor composition and match precedence    |
 | [Tasks](docs/tasks.md)                                       | All generated Gradle tasks and the `validateDeeplinks` CLI |
 | [Report](docs/report.md)                                     | HTML catalog and live URI validator                        |
-| [Migration 0.3.0-beta](docs/migration-guide-0.3.0-beta.md)   | Migration guide for 0.3.0-beta                             |
-| [Migration 0.2.0-alpha](docs/migration-guide-0.2.0-alpha.md) | Migration guide for 0.2.0-alpha                            |
+| [Migration 0.3.0-beta](docs/migrations/migration-guide-0.3.0-beta.md)   | Migration guide for 0.3.0-beta                             |
+| [Migration 0.2.0-alpha](docs/migrations/migration-guide-0.2.0-alpha.md) | Migration guide for 0.2.0-alpha                            |
 
 ## Testing
 
@@ -227,7 +227,7 @@ Shared test fixtures live in `deepmatch-testing` and can be used in downstream p
 
 ## Official Distribution
 
-Official DeepMatch releases are published **exclusively** to [Sonatype Central Portal (Maven Central)](https://central.sonatype.com/) for library artifacts and the [Gradle Plugin Portal](https://plugins.gradle.org/plugin/com.aouledissa.deepmatch.gradle) for the plugin. **The authors bear no responsibility for artifacts obtained from any other source.** See [SECURITY.md](SECURITY.md) for the full policy.
+Official DeepMatch releases are published **exclusively** to [Sonatype Central Portal (Maven Central)](https://central.sonatype.com/namespace/com.aouledissa.deepmatch) for library artifacts and the [Gradle Plugin Portal](https://plugins.gradle.org/plugin/com.aouledissa.deepmatch.gradle) for the plugin. **The authors bear no responsibility for artifacts obtained from any other source.** See [SECURITY.md](SECURITY.md) for the full policy.
 
 ## Contributing
 
