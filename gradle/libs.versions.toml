@@ -17,6 +17,7 @@ binaryCompatibilityValidator = "0.18.1"
 gradleupNmcp = "1.4.4"
 gradlePublish = "2.0.0"
 detekt = "1.23.8"
+owaspDependencyCheck = "12.1.1"
 appcompatVersion = "1.7.1"
 activityComposeVersion = "1.12.4"
 composeUiVersion = "1.10.4"
@@ -63,3 +64,4 @@ gradleup-nmcp = { id = "com.gradleup.nmcp", version.ref = "gradleupNmcp" }
 gradleup-nmcp-aggregation = { id = "com.gradleup.nmcp.aggregation", version.ref = "gradleupNmcp" }
 gradle-publish = {id="com.gradle.plugin-publish", version.ref="gradlePublish"}
 detekt = { id = "io.gitlab.arturbosch.detekt", version.ref = "detekt" }
+owasp-dependency-check = { id = "org.owasp.dependencycheck", version.ref = "owaspDependencyCheck" }

@@ -11,6 +11,7 @@ plugins {
     alias(libs.plugins.gradleup.nmcp.aggregation)
     alias(libs.plugins.binary.compatibility.validator)
     alias(libs.plugins.detekt)
+    alias(libs.plugins.owasp.dependency.check)
 }
 
 group = "com.aouledissa.deepmatch"
