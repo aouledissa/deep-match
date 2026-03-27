@@ -90,7 +90,12 @@ internal abstract class WarnManifestOutOfSyncTask : DefaultTask() {
     }
 
     private fun parseManifestSignatures(manifestFile: java.io.File): Set<IntentFilterSignature> {
-        val document = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(manifestFile)
+        val factory = DocumentBuilderFactory.newInstance().apply {
+            setFeature("http://apache.org/xml/features/disallow-doctype-decl", true)
+            setFeature("http://xml.org/sax/features/external-general-entities", false)
+            setFeature("http://xml.org/sax/features/external-parameter-entities", false)
+        }
+        val document = factory.newDocumentBuilder().parse(manifestFile)
         return document.getElementsByTagName("activity")
             .elements()
             .flatMap { activity ->
