@@ -6,6 +6,7 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.gradle.plugin)
     alias(libs.plugins.gradle.publish)
+    signing
 }
 
 java {
@@ -45,7 +46,7 @@ dependencies {
     // specified by the agp.version system property, allowing multi-version testing.
 }
 
-val deepMatchVersion = providers.environmentVariable("DEEP_MATCH_VERSION")
+val deepMatchVersion: String? = providers.environmentVariable("DEEP_MATCH_VERSION")
     .orElse(providers.gradleProperty("deep.match.version"))
     .getOrElse("0.0.0-SNAPSHOT")
 
@@ -93,5 +94,15 @@ gradlePlugin {
             description = "Codegen and specs parser for Deeplink auto handling Library: DeepMatch"
             tags = listOf("android", "deeplink", "codegen", "deepmatch")
         }
+    }
+}
+
+signing {
+    val signingKeyId: String? by project
+    val signingKey: String? by project
+    val signingPassword: String? by project
+    if (signingKey != null) {
+        useInMemoryPgpKeys(signingKeyId, signingKey, signingPassword)
+        sign(publishing.publications)
     }
 }
