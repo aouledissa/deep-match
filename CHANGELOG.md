@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.1.0] - 2026-03-29
+
+### Security
+
+- **Important:** The primary artifact signing key has been compromised and revoked. It must no
+  longer be trusted.
+  Revoked key fingerprint: `5283 67B0 1C0B 54E0 55A6  96E0 4D0B DAAD C6F8 86DB`
+  All artifacts from this release onwards are signed with the new key. Update your keyring before
+  verifying signatures.
+  New key fingerprint: `80D0 DA79 427D A034 593F  2F35 0F14 8D47 0842 C013`
+- Hardened XML parser in manifest sync checker against malformed input
+
 ## [1.0.2] - 2026-03-23
 
 ### Added

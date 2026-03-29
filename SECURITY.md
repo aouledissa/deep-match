@@ -11,6 +11,58 @@ These are the only authorized sources for DeepMatch artifacts. **The authors bea
 
 If you encounter DeepMatch artifacts distributed outside of these official channels, please report it by [opening an issue](https://github.com/aouledissa/deep-match/issues).
 
+## Artifact Signing
+
+All official DeepMatch artifacts are signed with a PGP key. Verify the signature before using any artifact in a production or security-sensitive context.
+
+### Current Signing Key
+
+| Field       | Value                                                    |
+|-------------|----------------------------------------------------------|
+| Fingerprint | `80D0 DA79 427D A034 593F  2F35 0F14 8D47 0842 C013`    |
+| Valid from  | 1.1.0                                                    |
+
+### Verifying the Key Fingerprint
+
+Cross-check the fingerprint against at least two independent sources before trusting it:
+
+| Source | Details |
+|--------|---------|
+| **GitHub release asset** | Public key attached to the [1.1.0 GitHub release](https://github.com/aouledissa/deep-match/releases/tag/1.1.0) |
+| **DNS TXT record** | Query `aouledissa.com` for a TXT record containing the fingerprint |
+| **Keyservers** | `keys.openpgp.org`, `keyserver.ubuntu.com`, `pgp.mit.edu` |
+
+To verify via DNS:
+
+```bash
+dig TXT aouledissa.com +short
+```
+
+To fetch and import from a keyserver:
+
+```bash
+gpg --keyserver keys.openpgp.org --recv-keys 80D0DA79427DA034593F2F350F148D470842C013
+```
+
+### Revoked Key
+
+The previous signing key (`5283 67B0 1C0B 54E0 55A6  96E0 4D0B DAAD C6F8 86DB`) was compromised
+and revoked with reason **1 — Key has been compromised**. It must no longer be trusted. Do not
+verify artifacts against it. See the [1.1.0 release notes](CHANGELOG.md#110---2026-03-29) for
+details.
+
+### Verifying an Artifact
+
+Maven Central publishes `.asc` signature files alongside each artifact. To verify:
+
+```bash
+# Download the artifact and its signature, then:
+gpg --verify deepmatch-processor-<version>.jar.asc deepmatch-processor-<version>.jar
+```
+
+A valid signature from the current key fingerprint confirms the artifact is authentic and
+unmodified.
+
 ## YAML Schema
 
 The official JSON Schema for `.deeplinks.yml` files is served exclusively from:
