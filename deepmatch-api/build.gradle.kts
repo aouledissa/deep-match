@@ -45,10 +45,11 @@ publishing {
 }
 
 signing {
+    val singingKeyId: String? by project
     val signingKey: String? by project
     val signingPassword: String? by project
     if (signingKey != null) {
-        useInMemoryPgpKeys(signingKey, signingPassword)
+        useInMemoryPgpKeys(singingKeyId, signingKey, signingPassword)
         sign(publishing.publications["deepMatchApi"])
     }
 }
