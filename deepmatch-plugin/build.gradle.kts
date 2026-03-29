@@ -1,3 +1,4 @@
+import org.gradle.plugin.compatibility.compatibility
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
@@ -52,7 +53,11 @@ val deepMatchVersion: String? = providers.environmentVariable("DEEP_MATCH_VERSIO
 
 val localMavenRepo = "${System.getProperty("user.home")}/.m2/repository"
 
-fun registerIntegrationTestTask(taskName: String, agpVersion: String, gradleVersion: String? = null) =
+fun registerIntegrationTestTask(
+    taskName: String,
+    agpVersion: String,
+    gradleVersion: String? = null
+) =
     tasks.register<Test>(taskName) {
         description = "Runs GradleRunner integration tests against AGP $agpVersion."
         group = LifecycleBasePlugin.VERIFICATION_GROUP
@@ -75,7 +80,11 @@ fun registerIntegrationTestTask(taskName: String, agpVersion: String, gradleVers
     }
 
 registerIntegrationTestTask("integrationTestAgp9", libs.versions.agp.get())
-registerIntegrationTestTask("integrationTestAgp8", libs.versions.agp8.get(), libs.versions.gradle8.get())
+registerIntegrationTestTask(
+    "integrationTestAgp8",
+    libs.versions.agp8.get(),
+    libs.versions.gradle8.get()
+)
 
 tasks.register("integrationTest") {
     description = "Runs GradleRunner integration tests against all supported AGP versions."
@@ -93,6 +102,12 @@ gradlePlugin {
             displayName = "DeepMatch Gradle Plugin"
             description = "Codegen and specs parser for Deeplink auto handling Library: DeepMatch"
             tags = listOf("android", "deeplink", "codegen", "deepmatch")
+
+            compatibility {
+                features {
+                    configurationCache = true
+                }
+            }
         }
     }
 }

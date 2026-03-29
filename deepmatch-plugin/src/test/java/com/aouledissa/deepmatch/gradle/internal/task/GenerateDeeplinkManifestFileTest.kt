@@ -398,6 +398,7 @@ class GenerateDeeplinkManifestFileTest {
         task.outputFile.set(project.layout.file(project.provider { outputManifest }))
         task.outputDir.set(project.layout.dir(project.provider { outputDir }))
         task.compileSdkProperty.set(34)
+        task.verboseProperty.set(false)
 
         task.generateDeeplinkManifest()
         val xml = outputManifest.readText()
@@ -422,6 +423,7 @@ class GenerateDeeplinkManifestFileTest {
         task.outputFile.set(project.layout.file(project.provider { outputManifest }))
         task.outputDir.set(project.layout.dir(project.provider { outputDir }))
         task.compileSdkProperty.set(compileSdk)
+        task.verboseProperty.set(false)
 
         task.generateDeeplinkManifest()
         return outputManifest.readText()

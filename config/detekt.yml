@@ -1,0 +1,4 @@
+complexity:
+  LongParameterList:
+    functionThreshold: 9
+    constructorThreshold: 8

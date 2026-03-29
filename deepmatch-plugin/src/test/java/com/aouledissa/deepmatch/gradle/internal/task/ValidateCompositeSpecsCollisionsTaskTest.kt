@@ -58,6 +58,7 @@ class ValidateCompositeSpecsCollisionsTaskTest {
 
         task.metadataFiles.from(appMetadata, featureMetadata)
         task.variantNameProperty.set("debug")
+        task.verboseProperty.set(false)
 
         task.validate()
     }
@@ -86,6 +87,7 @@ class ValidateCompositeSpecsCollisionsTaskTest {
 
         task.metadataFiles.from(appMetadata, featureMetadata)
         task.variantNameProperty.set("debug")
+        task.verboseProperty.set(false)
 
         val error = assertThrows(GradleException::class.java) {
             task.validate()
