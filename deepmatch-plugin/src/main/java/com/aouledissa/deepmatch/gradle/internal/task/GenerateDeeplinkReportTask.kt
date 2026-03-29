@@ -39,6 +39,7 @@ import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.OutputFile
 import org.gradle.api.tasks.TaskAction
+import java.io.File
 
 internal abstract class GenerateDeeplinkReportTask : DefaultTask() {
 
@@ -97,7 +98,7 @@ internal abstract class GenerateDeeplinkReportTask : DefaultTask() {
                 sources = sourcePaths
                     .distinct()
                     .map { sourcePath ->
-                        val sourceFile = project.file(sourcePath)
+                        val sourceFile = File(sourcePath)
                         val sourceConfigs = if (sourceFile.exists()) {
                             yamlSerializer.deserializeDeeplinkConfigs(sourceFile)
                         } else {

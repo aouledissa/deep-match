@@ -101,6 +101,7 @@ signing {
     val signingKeyId: String? by project
     val signingKey: String? by project
     val signingPassword: String? by project
+    isRequired = signingKey != null // disable signing for local builds and test
     if (signingKey != null) {
         useInMemoryPgpKeys(signingKeyId, signingKey, signingPassword)
         sign(publishing.publications)

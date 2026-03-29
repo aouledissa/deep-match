@@ -45,7 +45,7 @@ class GradleProjectFixture : ExternalResource() {
         get() = temporaryFolder.root
 
     val agpVersion: String = System.getProperty("agp.version", "9.0.1")
-    private val deepMatchVersion: String = System.getProperty("deepmatch.plugin.version", "0.0.0-SNAPSHOT")
+    val deepMatchVersion: String = System.getProperty("deepmatch.plugin.version", "0.0.0-SNAPSHOT")
     private val localMavenRepo: String = System.getProperty(
         "integration.test.local.repo",
         "${System.getProperty("user.home")}/.m2/repository"
@@ -121,9 +121,13 @@ class GradleProjectFixture : ExternalResource() {
 
             android {
                 namespace 'com.example.app'
-                compileSdk 33
+                compileSdk 36
                 defaultConfig {
-                    minSdk 21
+                    minSdk 24
+                }
+                compileOptions {
+                    sourceCompatibility JavaVersion.VERSION_11
+                    targetCompatibility JavaVersion.VERSION_11
                 }
             }
             $buildScriptExtra
@@ -176,9 +180,16 @@ class GradleProjectFixture : ExternalResource() {
 
             android {
                 namespace 'com.example.app'
-                compileSdk 33
+                compileSdk 36
                 defaultConfig {
-                    minSdk 21
+                    minSdk 24
+                }
+                compileOptions {
+                    sourceCompatibility JavaVersion.VERSION_11
+                    targetCompatibility JavaVersion.VERSION_11
+                }
+                kotlinOptions {
+                    jvmTarget = '11'
                 }
             }
             $buildScriptExtra
