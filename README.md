@@ -135,7 +135,9 @@ No string extraction. No manual casting. No runtime surprises.
 
 ```kotlin
 deepMatch {
-    generateManifestFiles = true   // default: true
+    generateManifestFiles = true                          // default: false
+    manifestSyncViolation = ManifestSyncViolation.WARN    // default: WARN — use FAIL to break the build
+    verbose = true                                        // default: false — set to true to enable build logs
     report {
         enabled = true             // default: false
         // output = layout.buildDirectory.file("reports/deeplinks.html")

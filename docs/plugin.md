@@ -64,6 +64,11 @@ The primary responsibilities and capabilities of the DeepMatch Gradle plugin are
         // FAIL  — fail the build with a list of missing intent filters
         manifestSyncViolation = ManifestSyncViolation.WARN
 
+        // Whether the plugin logs progress messages during the build (e.g. generated file paths).
+        // When false, logs are still available via --info.
+        // Default: false
+        verbose = true
+
         report {
             // Enables generation of a self-contained HTML deeplink catalogue report.
             // Default: false
@@ -102,6 +107,7 @@ The primary responsibilities and capabilities of the DeepMatch Gradle plugin are
     ```kotlin
     deepMatch {
         generateManifestFiles = true
+        // verbose = true   // enable plugin build logs (default: false)
         report {
             enabled = true
             // output = layout.buildDirectory.file("reports/deeplinks.html")

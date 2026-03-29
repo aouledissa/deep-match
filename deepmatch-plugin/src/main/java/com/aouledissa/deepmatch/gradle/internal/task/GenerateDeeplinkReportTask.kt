@@ -24,6 +24,7 @@ import com.aouledissa.deepmatch.gradle.internal.capitalize
 import com.aouledissa.deepmatch.gradle.internal.deserializeDeeplinkConfigs
 import com.aouledissa.deepmatch.gradle.internal.model.DeeplinkConfig
 import com.aouledissa.deepmatch.gradle.internal.toCamelCase
+import com.aouledissa.deepmatch.gradle.internal.verboseLog
 import com.charleskorn.kaml.Yaml
 import com.charleskorn.kaml.YamlConfiguration
 import kotlinx.serialization.Serializable
@@ -55,11 +56,15 @@ internal abstract class GenerateDeeplinkReportTask : DefaultTask() {
     @get:Input
     abstract val additionalModuleSourcesProperty: ListProperty<String>
 
+    @get:Input
+    abstract val verboseProperty: Property<Boolean>
+
     @get:OutputFile
     abstract val outputFile: RegularFileProperty
 
     @TaskAction
     fun generate() {
+        val log = verboseLog(verboseProperty)
         val yamlSerializer = Yaml(configuration = YamlConfiguration(strictMode = false))
         val jsonSerializer = Json { prettyPrint = false }
         val specsJson = buildSpecsJson(yamlSerializer, jsonSerializer)
@@ -77,7 +82,7 @@ internal abstract class GenerateDeeplinkReportTask : DefaultTask() {
         destination.parentFile.mkdirs()
         destination.writeText(html)
 
-        logger.quiet("$LOG_TAG generated deeplink report at ${destination.path}")
+        log("$LOG_TAG generated deeplink report at ${destination.path}")
     }
 
     private fun buildSpecsJson(yamlSerializer: Yaml, jsonSerializer: Json): String {
