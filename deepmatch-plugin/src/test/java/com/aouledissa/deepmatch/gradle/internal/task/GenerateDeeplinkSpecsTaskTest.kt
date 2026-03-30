@@ -52,6 +52,7 @@ class GenerateDeeplinkSpecsTaskTest {
         task.packageNameProperty.set("com.example.app")
         task.moduleNameProperty.set("app")
         task.compositeProcessorsProperty.set(emptyList())
+        task.verboseProperty.set(false)
         task.outputDir.set(project.layout.dir(project.provider { outputDir }))
 
         task.generateDeeplinkSpecs()
@@ -96,6 +97,7 @@ class GenerateDeeplinkSpecsTaskTest {
         task.packageNameProperty.set("com.example.app")
         task.moduleNameProperty.set("app")
         task.compositeProcessorsProperty.set(emptyList())
+        task.verboseProperty.set(false)
         task.outputDir.set(project.layout.dir(project.provider { outputDir }))
 
         task.generateDeeplinkSpecs()
@@ -132,6 +134,7 @@ class GenerateDeeplinkSpecsTaskTest {
         task.packageNameProperty.set("com.example.app")
         task.moduleNameProperty.set("app")
         task.compositeProcessorsProperty.set(emptyList())
+        task.verboseProperty.set(false)
         task.outputDir.set(project.layout.dir(project.provider { outputDir }))
 
         task.generateDeeplinkSpecs()
@@ -170,6 +173,7 @@ class GenerateDeeplinkSpecsTaskTest {
         task.packageNameProperty.set("com.example.app")
         task.moduleNameProperty.set("app")
         task.compositeProcessorsProperty.set(emptyList())
+        task.verboseProperty.set(false)
         task.outputDir.set(project.layout.dir(project.provider { outputDir }))
 
         task.generateDeeplinkSpecs()
@@ -207,6 +211,7 @@ class GenerateDeeplinkSpecsTaskTest {
         task.packageNameProperty.set("com.example.app")
         task.moduleNameProperty.set("app")
         task.compositeProcessorsProperty.set(emptyList())
+        task.verboseProperty.set(false)
         task.outputDir.set(project.layout.dir(project.provider { outputDir }))
 
         task.generateDeeplinkSpecs()
@@ -243,6 +248,7 @@ class GenerateDeeplinkSpecsTaskTest {
         task.packageNameProperty.set("com.example.app")
         task.moduleNameProperty.set("app")
         task.compositeProcessorsProperty.set(emptyList())
+        task.verboseProperty.set(false)
         task.outputDir.set(project.layout.dir(project.provider { outputDir }))
 
         task.generateDeeplinkSpecs()
@@ -274,6 +280,7 @@ class GenerateDeeplinkSpecsTaskTest {
         task.packageNameProperty.set("com.example.app")
         task.moduleNameProperty.set("app")
         task.compositeProcessorsProperty.set(emptyList())
+        task.verboseProperty.set(false)
         task.outputDir.set(project.layout.dir(project.provider { outputDir }))
 
         val error = assertThrows(GradleException::class.java) {
@@ -308,6 +315,7 @@ class GenerateDeeplinkSpecsTaskTest {
         task.packageNameProperty.set("com.example.app")
         task.moduleNameProperty.set("app")
         task.compositeProcessorsProperty.set(emptyList())
+        task.verboseProperty.set(false)
         task.outputDir.set(project.layout.dir(project.provider { outputDir }))
 
         val error = assertThrows(GradleException::class.java) {
@@ -347,6 +355,7 @@ class GenerateDeeplinkSpecsTaskTest {
                 "com.example.feature.series.deeplinks.SeriesDeeplinkProcessor"
             )
         )
+        task.verboseProperty.set(false)
         task.outputDir.set(project.layout.dir(project.provider { outputDir }))
 
         task.generateDeeplinkSpecs()
@@ -394,6 +403,7 @@ class GenerateDeeplinkSpecsTaskTest {
         task.packageNameProperty.set("com.example.app")
         task.moduleNameProperty.set("app")
         task.compositeProcessorsProperty.set(emptyList())
+        task.verboseProperty.set(false)
         task.outputDir.set(project.layout.dir(project.provider { outputDir }))
 
         task.generateDeeplinkSpecs()
@@ -441,6 +451,7 @@ class GenerateDeeplinkSpecsTaskTest {
         task.packageNameProperty.set("com.example.app")
         task.moduleNameProperty.set("app")
         task.compositeProcessorsProperty.set(emptyList())
+        task.verboseProperty.set(false)
         task.outputDir.set(project.layout.dir(project.provider { outputDir }))
 
         task.generateDeeplinkSpecs()

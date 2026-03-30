@@ -31,6 +31,7 @@ import com.aouledissa.deepmatch.gradle.internal.model.CompositeSpecsMetadata
 import com.aouledissa.deepmatch.gradle.internal.model.DeeplinkConfig
 import com.aouledissa.deepmatch.gradle.internal.model.toCollisionSignature
 import com.aouledissa.deepmatch.gradle.internal.toCamelCase
+import com.aouledissa.deepmatch.gradle.internal.verboseLog
 import com.charleskorn.kaml.Yaml
 import com.charleskorn.kaml.YamlConfiguration
 import com.squareup.kotlinpoet.ClassName
@@ -53,19 +54,25 @@ import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
+import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.OutputFile
+import org.gradle.api.tasks.PathSensitive
+import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
 
+@CacheableTask
 internal abstract class GenerateDeeplinkSpecsTask : DefaultTask() {
 
     @get:InputFile
+    @get:PathSensitive(PathSensitivity.RELATIVE)
     abstract val specsFileProperty: RegularFileProperty
 
     @get:InputFiles
+    @get:PathSensitive(PathSensitivity.RELATIVE)
     abstract val additionalSpecsFilesProperty: ConfigurableFileCollection
 
     @get:Input
@@ -82,6 +89,9 @@ internal abstract class GenerateDeeplinkSpecsTask : DefaultTask() {
 
     @get:Input
     abstract val compositeProcessorsProperty: ListProperty<String>
+
+    @get:Input
+    abstract val verboseProperty: Property<Boolean>
 
     @get:OutputDirectory
     abstract val outputDir: DirectoryProperty
@@ -100,6 +110,7 @@ internal abstract class GenerateDeeplinkSpecsTask : DefaultTask() {
 
     @TaskAction
     fun generateDeeplinkSpecs() {
+        val log = verboseLog(verboseProperty)
         val yamlSerializer = Yaml(configuration = YamlConfiguration(strictMode = false))
         val jsonSerializer = Json { prettyPrint = false }
 
@@ -111,7 +122,7 @@ internal abstract class GenerateDeeplinkSpecsTask : DefaultTask() {
 
         outputFile.deleteRecursively()
 
-        logger.quiet("$LOG_TAG processing specs files: ${specsFiles.joinToString { it.path }}")
+        log("$LOG_TAG processing specs files: ${specsFiles.joinToString { it.path }}")
 
         val packageName = "${packageNameProperty.get()}.deeplinks"
         val moduleSealedInterfaceName = generatedModuleSealedInterfaceName(moduleNameProperty.get())
@@ -161,7 +172,7 @@ internal abstract class GenerateDeeplinkSpecsTask : DefaultTask() {
                 .addProperty(deeplinkProperty)
                 .build().writeTo(outputFile)
 
-            logger.quiet("$LOG_TAG generated Deeplink spec at : ${packageName}.${fileName}")
+            log("$LOG_TAG generated Deeplink spec at : ${packageName}.${fileName}")
         }
 
         FileSpec.builder(packageName, moduleProcessorName)

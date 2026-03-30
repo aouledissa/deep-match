@@ -24,6 +24,7 @@ import com.aouledissa.deepmatch.gradle.internal.capitalize
 import com.aouledissa.deepmatch.gradle.internal.deserializeDeeplinkConfigs
 import com.aouledissa.deepmatch.gradle.internal.model.DeeplinkConfig
 import com.aouledissa.deepmatch.gradle.internal.toCamelCase
+import com.aouledissa.deepmatch.gradle.internal.verboseLog
 import com.charleskorn.kaml.Yaml
 import com.charleskorn.kaml.YamlConfiguration
 import kotlinx.serialization.Serializable
@@ -34,31 +35,42 @@ import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.ListProperty
 import org.gradle.api.provider.Property
+import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.OutputFile
+import org.gradle.api.tasks.PathSensitive
+import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
+import java.io.File
 
+@CacheableTask
 internal abstract class GenerateDeeplinkReportTask : DefaultTask() {
 
     @get:InputFile
+    @get:PathSensitive(PathSensitivity.RELATIVE)
     abstract val specsFileProperty: RegularFileProperty
 
     @get:Input
     abstract val moduleNameProperty: Property<String>
 
     @get:InputFiles
+    @get:PathSensitive(PathSensitivity.RELATIVE)
     abstract val additionalSpecsFilesProperty: ConfigurableFileCollection
 
     @get:Input
     abstract val additionalModuleSourcesProperty: ListProperty<String>
+
+    @get:Input
+    abstract val verboseProperty: Property<Boolean>
 
     @get:OutputFile
     abstract val outputFile: RegularFileProperty
 
     @TaskAction
     fun generate() {
+        val log = verboseLog(verboseProperty)
         val yamlSerializer = Yaml(configuration = YamlConfiguration(strictMode = false))
         val jsonSerializer = Json { prettyPrint = false }
         val specsJson = buildSpecsJson(yamlSerializer, jsonSerializer)
@@ -76,7 +88,7 @@ internal abstract class GenerateDeeplinkReportTask : DefaultTask() {
         destination.parentFile.mkdirs()
         destination.writeText(html)
 
-        logger.quiet("$LOG_TAG generated deeplink report at ${destination.path}")
+        log("$LOG_TAG generated deeplink report at ${destination.path}")
     }
 
     private fun buildSpecsJson(yamlSerializer: Yaml, jsonSerializer: Json): String {
@@ -97,7 +109,7 @@ internal abstract class GenerateDeeplinkReportTask : DefaultTask() {
                 sources = sourcePaths
                     .distinct()
                     .map { sourcePath ->
-                        val sourceFile = project.file(sourcePath)
+                        val sourceFile = File(sourcePath)
                         val sourceConfigs = if (sourceFile.exists()) {
                             yamlSerializer.deserializeDeeplinkConfigs(sourceFile)
                         } else {

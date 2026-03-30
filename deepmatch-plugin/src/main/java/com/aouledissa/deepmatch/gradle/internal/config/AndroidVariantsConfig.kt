@@ -55,6 +55,8 @@ internal fun configureAndroidVariants(project: Project, config: DeepMatchPluginC
             variantName = variant.name
         )
 
+        val verbose = config.verbose.getOrElse(true)
+
         val generateVariantDeeplinkSpecsTask = registerDeeplinkSpecsSourcesTask(
             project = project,
             variant = variant,
@@ -62,7 +64,8 @@ internal fun configureAndroidVariants(project: Project, config: DeepMatchPluginC
             additionalSpecsFiles = additionalSpecsFiles,
             compositeProcessors = composedDependencyProjects
                 .mapNotNull(::toGeneratedProcessorFqcnOrNull)
-                .sorted()
+                .sorted(),
+            verbose = verbose
         )
 
         registerValidateDeeplinksTask(
@@ -78,14 +81,16 @@ internal fun configureAndroidVariants(project: Project, config: DeepMatchPluginC
             enabled = config.report.enabled.getOrElse(false),
             outputFileProvider = config.report.output.orElse(
                 project.layout.buildDirectory.file("reports/deepmatch/deeplinks-catalogue.html")
-            )
+            ),
+            verbose = verbose
         )
 
         registerCompositeSpecsCollisionTask(
             project = project,
             variant = variant,
             generateVariantDeeplinkSpecsTask = generateVariantDeeplinkSpecsTask,
-            composedDependencyProjects = composedDependencyProjects
+            composedDependencyProjects = composedDependencyProjects,
+            verbose = verbose
         )
 
         registerDeeplinkManifestTask(
@@ -95,7 +100,8 @@ internal fun configureAndroidVariants(project: Project, config: DeepMatchPluginC
             additionalSpecsFiles = additionalSpecsFiles,
             compileSdk = compileSdk,
             generateManifestFiles = config.generateManifestFiles.getOrElse(false),
-            manifestSyncViolation = config.manifestSyncViolation.getOrElse(ManifestSyncViolation.WARN)
+            manifestSyncViolation = config.manifestSyncViolation.getOrElse(ManifestSyncViolation.WARN),
+            verbose = verbose
         )
     }
 }
@@ -172,7 +178,8 @@ private fun registerDeeplinkSpecsSourcesTask(
     variant: Variant,
     specsFile: RegularFile,
     additionalSpecsFiles: List<RegularFile>,
-    compositeProcessors: List<String>
+    compositeProcessors: List<String>,
+    verbose: Boolean
 ): TaskProvider<GenerateDeeplinkSpecsTask> {
     val variantName = variant.name.capitalize()
     val variantPackageName = variant.namespace
@@ -192,6 +199,7 @@ private fun registerDeeplinkSpecsSourcesTask(
         it.variantNameProperty.set(variant.name)
         it.metadataOutputFile.set(deeplinkSpecsMetadataFile(project, variant.name))
         it.compositeProcessorsProperty.set(compositeProcessors)
+        it.verboseProperty.set(verbose)
         it.group = "deepmatch"
         it.description =
             "Generates deeplink specs, params, and processor for the ${variant.name} variant."
@@ -217,7 +225,8 @@ private fun registerCompositeSpecsCollisionTask(
     project: Project,
     variant: Variant,
     generateVariantDeeplinkSpecsTask: TaskProvider<GenerateDeeplinkSpecsTask>,
-    composedDependencyProjects: List<Project>
+    composedDependencyProjects: List<Project>,
+    verbose: Boolean
 ) {
     val variantName = variant.name
     val capitalizedVariantName = variantName.capitalize()
@@ -228,6 +237,7 @@ private fun registerCompositeSpecsCollisionTask(
         ValidateCompositeSpecsCollisionsTask::class.java
     ) {
         it.variantNameProperty.set(variantName)
+        it.verboseProperty.set(verbose)
         it.metadataFiles.from(deeplinkSpecsMetadataFile(project, variantName))
         composedDependencyProjects.forEach { dependencyProject ->
             it.metadataFiles.from(deeplinkSpecsMetadataFile(dependencyProject, variantName))
@@ -285,7 +295,8 @@ private fun registerDeeplinkReportTask(
     moduleName: String,
     composedDependencyProjects: List<Project>,
     enabled: Boolean,
-    outputFileProvider: Provider<RegularFile>
+    outputFileProvider: Provider<RegularFile>,
+    verbose: Boolean
 ) {
     if (!enabled || project.tasks.findByName("generateDeeplinkReport") != null) return
 
@@ -313,6 +324,7 @@ private fun registerDeeplinkReportTask(
         it.moduleNameProperty.set(moduleName)
         it.additionalSpecsFilesProperty.setFrom(additionalSpecFiles)
         it.additionalModuleSourcesProperty.set(moduleSourceEntries)
+        it.verboseProperty.set(verbose)
         it.outputFile.set(outputFileProvider)
         it.group = "deepmatch"
         it.description =
@@ -331,7 +343,8 @@ private fun registerDeeplinkManifestTask(
     specsFile: RegularFile,
     additionalSpecsFiles: List<RegularFile>,
     compileSdk: Int,
-    manifestSyncViolation: ManifestSyncViolation
+    manifestSyncViolation: ManifestSyncViolation,
+    verbose: Boolean
 ) {
     val variantName = variant.name.capitalize()
     val taskName = "generate${variantName}DeeplinksManifest"
@@ -345,6 +358,7 @@ private fun registerDeeplinkManifestTask(
             it.outputFile.set(project.layout.buildDirectory.file("generated/manifests/${taskName}/AndroidManifest.xml"))
             it.outputDir.set(project.layout.buildDirectory.dir("generated/manifests/$taskName"))
             it.compileSdkProperty.set(compileSdk)
+            it.verboseProperty.set(verbose)
             it.group = "deepmatch"
             it.description =
                 "Generates deeplink intent-filter manifest entries for the ${variant.name} variant."

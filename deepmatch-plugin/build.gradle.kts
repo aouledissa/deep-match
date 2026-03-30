@@ -1,3 +1,4 @@
+import org.gradle.plugin.compatibility.compatibility
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
@@ -6,6 +7,7 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.gradle.plugin)
     alias(libs.plugins.gradle.publish)
+    signing
 }
 
 java {
@@ -45,13 +47,17 @@ dependencies {
     // specified by the agp.version system property, allowing multi-version testing.
 }
 
-val deepMatchVersion = providers.environmentVariable("DEEP_MATCH_VERSION")
+val deepMatchVersion: String? = providers.environmentVariable("DEEP_MATCH_VERSION")
     .orElse(providers.gradleProperty("deep.match.version"))
     .getOrElse("0.0.0-SNAPSHOT")
 
 val localMavenRepo = "${System.getProperty("user.home")}/.m2/repository"
 
-fun registerIntegrationTestTask(taskName: String, agpVersion: String, gradleVersion: String? = null) =
+fun registerIntegrationTestTask(
+    taskName: String,
+    agpVersion: String,
+    gradleVersion: String? = null
+) =
     tasks.register<Test>(taskName) {
         description = "Runs GradleRunner integration tests against AGP $agpVersion."
         group = LifecycleBasePlugin.VERIFICATION_GROUP
@@ -74,7 +80,11 @@ fun registerIntegrationTestTask(taskName: String, agpVersion: String, gradleVers
     }
 
 registerIntegrationTestTask("integrationTestAgp9", libs.versions.agp.get())
-registerIntegrationTestTask("integrationTestAgp8", libs.versions.agp8.get(), libs.versions.gradle8.get())
+registerIntegrationTestTask(
+    "integrationTestAgp8",
+    libs.versions.agp8.get(),
+    libs.versions.gradle8.get()
+)
 
 tasks.register("integrationTest") {
     description = "Runs GradleRunner integration tests against all supported AGP versions."
@@ -92,6 +102,23 @@ gradlePlugin {
             displayName = "DeepMatch Gradle Plugin"
             description = "Codegen and specs parser for Deeplink auto handling Library: DeepMatch"
             tags = listOf("android", "deeplink", "codegen", "deepmatch")
+
+            compatibility {
+                features {
+                    configurationCache = true
+                }
+            }
         }
+    }
+}
+
+signing {
+    val signingKeyId: String? by project
+    val signingKey: String? by project
+    val signingPassword: String? by project
+    isRequired = signingKey != null // disable signing for local builds and test
+    if (signingKey != null) {
+        useInMemoryPgpKeys(signingKeyId, signingKey, signingPassword)
+        sign(publishing.publications)
     }
 }

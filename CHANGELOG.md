@@ -4,8 +4,8 @@
 
 ### Security
 
-- **Important:** The primary artifact signing key has been compromised and revoked. It must no
-  longer be trusted.
+- **Important:** The primary artifact signing key has been compromised and revoked. **It must no
+  longer be trusted**.
   Revoked key fingerprint: `5283 67B0 1C0B 54E0 55A6  96E0 4D0B DAAD C6F8 86DB`
   All artifacts from this release onwards are signed with the new key. Update your keyring before
   verifying signatures.

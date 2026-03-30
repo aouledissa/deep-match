@@ -26,23 +26,30 @@ import org.gradle.api.GradleException
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.Property
+import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.InputFiles
+import org.gradle.api.tasks.PathSensitive
+import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
 import org.w3c.dom.Element
 import org.w3c.dom.NodeList
 import javax.xml.parsers.DocumentBuilderFactory
 
+@CacheableTask
 internal abstract class WarnManifestOutOfSyncTask : DefaultTask() {
 
     @get:InputFile
+    @get:PathSensitive(PathSensitivity.RELATIVE)
     abstract val specFileProperty: RegularFileProperty
 
     @get:InputFiles
+    @get:PathSensitive(PathSensitivity.RELATIVE)
     abstract val additionalSpecsFilesProperty: ConfigurableFileCollection
 
     @get:InputFile
+    @get:PathSensitive(PathSensitivity.RELATIVE)
     abstract val mergedManifestProperty: RegularFileProperty
 
     @get:Input
@@ -59,7 +66,8 @@ internal abstract class WarnManifestOutOfSyncTask : DefaultTask() {
         val deeplinkConfigs = yamlSerializer.deserializeMergedDeeplinkConfigs(specsFiles)
 
         val expectedSignatures = deeplinkConfigs.flatMap { config ->
-            val hosts = config.host.filter { it.isNotEmpty() }.takeIf { it.isNotEmpty() } ?: listOf("")
+            val hosts =
+                config.host.filter { it.isNotEmpty() }.takeIf { it.isNotEmpty() } ?: listOf("")
             config.scheme.flatMap { scheme ->
                 hosts.map { host ->
                     IntentFilterSignature(activity = config.activity, scheme = scheme, host = host)
@@ -80,7 +88,7 @@ internal abstract class WarnManifestOutOfSyncTask : DefaultTask() {
                 }
             val message =
                 "$LOG_TAG 'generateManifestFiles' is disabled but the following deeplink intent filters " +
-                    "appear to be missing from AndroidManifest.xml:\n$details"
+                        "appear to be missing from AndroidManifest.xml:\n$details"
 
             when (violationProperty.get()) {
                 ManifestSyncViolation.WARN -> logger.warn(message)
@@ -99,7 +107,8 @@ internal abstract class WarnManifestOutOfSyncTask : DefaultTask() {
         return document.getElementsByTagName("activity")
             .elements()
             .flatMap { activity ->
-                val activityName = activity.getAttribute("android:name").takeIf { it.isNotBlank() } ?: return@flatMap emptyList()
+                val activityName = activity.getAttribute("android:name").takeIf { it.isNotBlank() }
+                    ?: return@flatMap emptyList()
                 activity.getElementsByTagName("intent-filter")
                     .elements()
                     .flatMap { signaturesFromIntentFilter(activityName, it) }
@@ -107,14 +116,29 @@ internal abstract class WarnManifestOutOfSyncTask : DefaultTask() {
             .toSet()
     }
 
-    private fun signaturesFromIntentFilter(activityName: String, intentFilter: Element): List<IntentFilterSignature> {
+    private fun signaturesFromIntentFilter(
+        activityName: String,
+        intentFilter: Element
+    ): List<IntentFilterSignature> {
         val dataElements = intentFilter.getElementsByTagName("data").elements()
-        val schemes = dataElements.mapNotNull { it.getAttribute("android:scheme").takeIf { s -> s.isNotBlank() } }
-        val hosts = dataElements.mapNotNull { it.getAttribute("android:host").takeIf { h -> h.isNotBlank() } }
+        val schemes = dataElements.mapNotNull {
+            it.getAttribute("android:scheme").takeIf { s -> s.isNotBlank() }
+        }
+        val hosts = dataElements.mapNotNull {
+            it.getAttribute("android:host").takeIf { h -> h.isNotBlank() }
+        }
 
         if (schemes.isEmpty()) return emptyList()
         val hostsToUse = hosts.takeIf { it.isNotEmpty() } ?: listOf("")
-        return schemes.flatMap { scheme -> hostsToUse.map { host -> IntentFilterSignature(activityName, scheme, host) } }
+        return schemes.flatMap { scheme ->
+            hostsToUse.map { host ->
+                IntentFilterSignature(
+                    activityName,
+                    scheme,
+                    host
+                )
+            }
+        }
     }
 
     private fun NodeList.elements(): List<Element> =

@@ -26,6 +26,7 @@ allprojects {
     configure<DetektExtension> {
         buildUponDefaultConfig = true
         parallel = true
+        config.setFrom(rootProject.files("config/detekt.yml"))
     }
 }
 

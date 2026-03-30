@@ -12,6 +12,7 @@ public abstract class com/aouledissa/deepmatch/gradle/DeepMatchPluginConfig {
 	public final fun getGenerateManifestFiles ()Lorg/gradle/api/provider/Property;
 	public final fun getManifestSyncViolation ()Lorg/gradle/api/provider/Property;
 	public final fun getReport ()Lcom/aouledissa/deepmatch/gradle/DeepMatchReportConfig;
+	public final fun getVerbose ()Lorg/gradle/api/provider/Property;
 	public final fun report (Lorg/gradle/api/Action;)V
 }
 

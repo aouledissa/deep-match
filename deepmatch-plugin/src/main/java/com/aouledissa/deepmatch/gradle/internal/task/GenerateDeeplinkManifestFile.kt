@@ -33,6 +33,7 @@ import com.aouledissa.deepmatch.gradle.internal.model.PatternPath
 import com.aouledissa.deepmatch.gradle.internal.model.Port
 import com.aouledissa.deepmatch.gradle.internal.model.PrefixPath
 import com.aouledissa.deepmatch.gradle.internal.model.Scheme
+import com.aouledissa.deepmatch.gradle.internal.verboseLog
 import com.charleskorn.kaml.Yaml
 import com.charleskorn.kaml.YamlConfiguration
 import nl.adaptivity.xmlutil.serialization.XML
@@ -41,19 +42,25 @@ import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.file.DirectoryProperty
 import org.gradle.api.file.RegularFileProperty
 import org.gradle.api.provider.Property
+import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFile
 import org.gradle.api.tasks.InputFiles
 import org.gradle.api.tasks.OutputDirectory
 import org.gradle.api.tasks.OutputFile
+import org.gradle.api.tasks.PathSensitive
+import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
 
+@CacheableTask
 internal abstract class GenerateDeeplinkManifestFile : DefaultTask() {
 
     @get:InputFile
+    @get:PathSensitive(PathSensitivity.RELATIVE)
     abstract val specFileProperty: RegularFileProperty
 
     @get:InputFiles
+    @get:PathSensitive(PathSensitivity.RELATIVE)
     abstract val additionalSpecsFilesProperty: ConfigurableFileCollection
 
     @get:OutputFile
@@ -65,11 +72,15 @@ internal abstract class GenerateDeeplinkManifestFile : DefaultTask() {
     @get:Input
     abstract val compileSdkProperty: Property<Int>
 
+    @get:Input
+    abstract val verboseProperty: Property<Boolean>
+
     private val useAdvancedPattern: Boolean
         get() = compileSdkProperty.get() >= 31
 
     @TaskAction
     fun generateDeeplinkManifest() {
+        val log = verboseLog(verboseProperty)
         val yamlSerializer = Yaml(configuration = YamlConfiguration(strictMode = false))
         val xmlSerializer = XML { indentString = " " }
         val specsFiles = buildList {
@@ -77,7 +88,7 @@ internal abstract class GenerateDeeplinkManifestFile : DefaultTask() {
             addAll(additionalSpecsFilesProperty.files.sortedBy { it.absolutePath })
         }
 
-        logger.quiet(
+        log(
             "$LOG_TAG generating Android manifest file for deeplink specs in ${
                 specsFiles.joinToString { it.path }
             }"

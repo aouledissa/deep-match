@@ -75,6 +75,7 @@ class GenerateDeeplinkReportTaskTest {
         task.specsFileProperty.set(project.layout.file(project.provider { specsFile }))
         task.moduleNameProperty.set("app")
         task.additionalModuleSourcesProperty.set(emptyList())
+        task.verboseProperty.set(false)
         task.outputFile.set(project.layout.file(project.provider { outputFile }))
 
         task.generate()
@@ -151,6 +152,7 @@ class GenerateDeeplinkReportTaskTest {
         task.specsFileProperty.set(project.layout.file(project.provider { specsFile }))
         task.moduleNameProperty.set("app")
         task.additionalModuleSourcesProperty.set(emptyList())
+        task.verboseProperty.set(false)
         task.outputFile.set(project.layout.file(project.provider { outputFile }))
 
         task.generate()
@@ -191,6 +193,7 @@ class GenerateDeeplinkReportTaskTest {
         task.specsFileProperty.set(project.layout.file(project.provider { specsFile }))
         task.moduleNameProperty.set("sample")
         task.additionalModuleSourcesProperty.set(emptyList())
+        task.verboseProperty.set(false)
         task.outputFile.set(project.layout.file(project.provider { outputFile }))
 
         task.generate()
@@ -239,6 +242,7 @@ class GenerateDeeplinkReportTaskTest {
         task.additionalModuleSourcesProperty.set(
             listOf("feature::${featureSpecsFile.absolutePath}")
         )
+        task.verboseProperty.set(false)
         task.outputFile.set(project.layout.file(project.provider { outputFile }))
 
         task.generate()

@@ -19,6 +19,8 @@ package com.aouledissa.deepmatch.gradle.internal
 import com.aouledissa.deepmatch.gradle.internal.model.DeeplinkConfig
 import com.aouledissa.deepmatch.gradle.internal.model.Specs
 import com.charleskorn.kaml.Yaml
+import org.gradle.api.Task
+import org.gradle.api.provider.Property
 import java.io.File
 import java.util.Locale
 
@@ -83,6 +85,9 @@ internal fun generatedModuleProcessorName(moduleName: String): String {
         .removeSuffix("DeeplinkParams")
     return "${prefix}DeeplinkProcessor"
 }
+
+internal fun Task.verboseLog(verboseProperty: Property<Boolean>): (String) -> Unit =
+    if (verboseProperty.get()) logger::quiet else logger::info
 
 internal fun Yaml.deserializeDeeplinkConfigs(file: File): List<DeeplinkConfig> {
     val content = file.readText()

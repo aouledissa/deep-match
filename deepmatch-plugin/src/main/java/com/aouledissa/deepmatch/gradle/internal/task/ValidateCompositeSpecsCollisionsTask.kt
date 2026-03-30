@@ -18,32 +18,42 @@ package com.aouledissa.deepmatch.gradle.internal.task
 
 import com.aouledissa.deepmatch.gradle.LOG_TAG
 import com.aouledissa.deepmatch.gradle.internal.model.CompositeSpecsMetadata
+import com.aouledissa.deepmatch.gradle.internal.verboseLog
 import kotlinx.serialization.json.Json
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.file.ConfigurableFileCollection
 import org.gradle.api.provider.Property
+import org.gradle.api.tasks.CacheableTask
 import org.gradle.api.tasks.Input
 import org.gradle.api.tasks.InputFiles
+import org.gradle.api.tasks.PathSensitive
+import org.gradle.api.tasks.PathSensitivity
 import org.gradle.api.tasks.TaskAction
 
+@CacheableTask
 internal abstract class ValidateCompositeSpecsCollisionsTask : DefaultTask() {
 
     @get:InputFiles
+    @get:PathSensitive(PathSensitivity.RELATIVE)
     abstract val metadataFiles: ConfigurableFileCollection
 
     @get:Input
     abstract val variantNameProperty: Property<String>
 
+    @get:Input
+    abstract val verboseProperty: Property<Boolean>
+
     @TaskAction
     fun validate() {
+        val log = verboseLog(verboseProperty)
         val jsonSerializer = Json { ignoreUnknownKeys = true }
         val existingMetadataFiles = metadataFiles.files
             .filter { it.exists() }
             .sortedBy { it.path }
 
         if (existingMetadataFiles.isEmpty()) {
-            logger.quiet("$LOG_TAG no deeplink metadata files found for variant '${variantNameProperty.get()}'")
+            log("$LOG_TAG no deeplink metadata files found for variant '${variantNameProperty.get()}'")
             return
         }
 

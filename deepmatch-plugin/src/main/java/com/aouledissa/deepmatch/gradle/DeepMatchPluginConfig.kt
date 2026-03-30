@@ -31,10 +31,12 @@ abstract class DeepMatchPluginConfig @Inject constructor(objects: ObjectFactory)
 
     val generateManifestFiles: Property<Boolean> = objects.property(Boolean::class.java)
     val manifestSyncViolation: Property<ManifestSyncViolation> = objects.property(ManifestSyncViolation::class.java)
+    val verbose: Property<Boolean> = objects.property(Boolean::class.java)
     val report: DeepMatchReportConfig = objects.newInstance(DeepMatchReportConfig::class.java)
 
     init {
         manifestSyncViolation.convention(ManifestSyncViolation.WARN)
+        verbose.convention(false)
     }
 
     fun report(action: Action<in DeepMatchReportConfig>) {

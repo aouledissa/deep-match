@@ -1,7 +1,10 @@
+> [!IMPORTANT]
 > **Security notice:** The primary artifact signing key has been compromised and revoked
-> (`5283 67B0 1C0B 54E0 55A6  96E0 4D0B DAAD C6F8 86DB`). Do not trust it.
-> All releases from 1.1.0 onwards are signed with the new key
+> (`5283 67B0 1C0B 54E0 55A6  96E0 4D0B DAAD C6F8 86DB`). **It must no longer be trusted.**.
+> 
+> All releases from **1.1.0 onwards** are signed with the new key
 > (`80D0 DA79 427D A034 593F  2F35 0F14 8D47 0842 C013`).
+> 
 > See [CHANGELOG](CHANGELOG.md#110---2026-03-29) for details.
 
 ![Build](https://img.shields.io/github/actions/workflow/status/aouledissa/deep-match/test.yml?branch=main)
@@ -135,7 +138,9 @@ No string extraction. No manual casting. No runtime surprises.
 
 ```kotlin
 deepMatch {
-    generateManifestFiles = true   // default: true
+    generateManifestFiles = true                          // default: false
+    manifestSyncViolation = ManifestSyncViolation.WARN    // default: WARN — use FAIL to break the build
+    verbose = true                                        // default: false — set to true to enable build logs
     report {
         enabled = true             // default: false
         // output = layout.buildDirectory.file("reports/deeplinks.html")
