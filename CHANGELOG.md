@@ -1,5 +1,28 @@
 # Changelog
 
+## [1.2.0] - 2026-03-30
+
+### Added
+
+- `verbose` option on the `deepMatch { }` extension to control plugin build log output. When `false`
+  (default), progress messages are routed to Gradle's `--info` level and silenced in normal builds.
+  Set `verbose = true` to restore the previous always-on behaviour.
+
+### Fixed
+
+- Fixed Gradle configuration cache violation in `GenerateDeeplinkReportTask` caused by accessing
+  `project.file()` at execution time. Paths are now resolved as absolute `File` references at
+  configuration time.
+- Fixed missing `@PathSensitive` normalization strategy on all `@InputFiles` task properties, which
+  would cause spurious up-to-date misses when the project was moved or checked out at a different
+  absolute path.
+
+### Changed
+
+- All code-generation and manifest tasks are now declared `@CacheableTask`, enabling Gradle build
+  cache participation in addition to configuration cache compatibility.
+- Upgraded Android Gradle Plugin (AGP), Kotlin, and Gradle Publish Plugin to latest compatible versions.
+
 ## [1.1.0] - 2026-03-29
 
 ### Security
