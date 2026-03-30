@@ -12,6 +12,8 @@ env:
 jobs:
   test:
     uses: ./.github/workflows/test.yml
+    permissions:
+      contents: read
 
   publish-artifacts:
     runs-on: ubuntu-latest
