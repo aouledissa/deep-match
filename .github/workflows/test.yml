@@ -43,7 +43,7 @@ jobs:
         uses: gradle/actions/setup-gradle@50e97c2cd7a37755bbfafc9c5b7cafaece252f6e # v6.1.0
 
       - name: Cache configuration cache
-        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5
+        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v5
         with:
           path: .gradle/configuration-cache
           key: configuration-cache-${{ hashFiles('**/*.gradle.kts', 'gradle.properties', 'gradle/libs.versions.toml') }}
