@@ -53,6 +53,7 @@ import com.aouledissa.deepmatch.sample.deeplinks.OpenProfileSpotlightDeeplinkPar
 import com.aouledissa.deepmatch.sample.deeplinks.OpenProfileTimelineDeeplinkParams
 import com.aouledissa.deepmatch.sample.deeplinks.OpenSeriesDeeplinkParams
 import com.aouledissa.deepmatch.sample.deeplinks.OpenUserPostsDeeplinkParams
+import com.aouledissa.deepmatch.sample.deeplinks.PlayEpisodeDeeplinkParams
 import kotlin.Boolean
 import kotlin.OptIn
 import kotlin.Pair
@@ -354,6 +355,10 @@ private enum class DemoUri(
     UserPosts(label = "User Posts", uri = "app://sample.deepmatch.dev/users/42/posts"),
     Hostless(label = "Hostless", uri = "app:///profile/123"),
     Series(label = "Series", uri = "app://sample.deepmatch.dev/series/42?ref=home"),
+    PlayEpisode(
+        label = "Play Episode",
+        uri = "https://www.sample.com/play/breaking-bad/s01e01-pilot?origin=%2Fseries%2Fbreaking-bad"
+    ),
     NoMatch(label = "No Match", uri = "app://sample.deepmatch.dev/unknown");
 }
 
@@ -370,6 +375,7 @@ private fun detectDemoUri(uri: Uri): DemoUri {
         is OpenUserPostsDeeplinkParams -> DemoUri.UserPosts
         is OpenHostlessProfileDeeplinkParams -> DemoUri.Hostless
         is OpenSeriesDeeplinkParams -> DemoUri.Series
+        is PlayEpisodeDeeplinkParams -> DemoUri.PlayEpisode
         null -> DemoUri.NoMatch
     }
 }

@@ -651,10 +651,13 @@
 const reportData = /* __SPECS_JSON__ */;
 const modules = reportData.modules || [];
 const specs = reportData.specs || [];
+// Kept in sync with ParamType regexes in DeeplinkSpec.kt. `string` is validated
+// against the decoded query value, so it accepts the RFC 3986 character set and
+// rejects characters the grammar forbids raw (e.g. a decoded '<' from %3C).
 const TYPE_PATTERNS = {
   numeric: /^[0-9]+$/,
   alphanumeric: /^[a-zA-Z0-9._~-]+$/,
-  string: /^[a-zA-Z._~-]+$/
+  string: /^[A-Za-z0-9._~:\/?#\[\]@!$&'()*+,;=%-]+$/
 };
 
 const titleEl = document.getElementById("title");
@@ -1138,6 +1141,8 @@ function parseUri(raw) {
     scheme: scheme,
     host: decodeSafe(host),
     port: port,
+    encodedPath: rawPath,
+    encodedFragment: rawFragment || null,
     pathSegments: pathSegments,
     queryParams: queryParams,
     fragment: rawFragment ? decodeSafe(rawFragment) : null
@@ -1145,8 +1150,10 @@ function parseUri(raw) {
 }
 
 function toStructuralUri(uri) {
-  const path = uri.pathSegments.length ? "/" + uri.pathSegments.join("/") : "";
-  const fragment = uri.fragment ? "#" + uri.fragment : "";
+  // Match on the encoded path/fragment (mirrors DeeplinkProcessor.matchTarget) so
+  // that a percent-encoded delimiter such as %2F cannot masquerade as a separator.
+  const path = (uri.encodedPath || "").replace(/\/+$/, "");
+  const fragment = uri.encodedFragment ? "#" + uri.encodedFragment : "";
   const port = uri.port ? ":" + uri.port : "";
   return uri.scheme + "://" + uri.host + port + path + fragment;
 }

@@ -34,10 +34,10 @@ open class DeeplinkProcessor(
      */
     open fun match(deeplink: Uri): DeeplinkParams? {
         return try {
-            val decoded = deeplink.decoded() ?: return null
+            val matchTarget = deeplink.matchTarget() ?: return null
 
             for (spec in specs) {
-                val regexMatch = spec.matcher.matches(decoded)
+                val regexMatch = spec.matcher.matches(matchTarget)
                 if (!regexMatch) {
                     continue
                 }
@@ -56,19 +56,24 @@ open class DeeplinkProcessor(
             }
 
             null
-        } catch (error: Exception) {
+        } catch (_: Exception) {
             null
         }
     }
 
-    private fun Uri.decoded(): String? {
-        val decodedScheme = scheme ?: return null
-        val decodedPathSegments = pathSegments.joinToString("/")
-            .trimEnd('/')
-            .let { if (pathSegments.isNullOrEmpty().not()) "/$it" else it }
-        val decodedFragment = fragment?.let { "#$it" }.orEmpty()
-        val decodedPort = if (port >= 0) ":$port" else ""
-        return "$decodedScheme://${host.orEmpty()}$decodedPort$decodedPathSegments$decodedFragment"
+    /**
+     * Builds the string used for structural matching from the URI's **encoded**
+     * components. Matching on the encoded form keeps percent-encoded delimiters
+     * (e.g. `%2F`, `%23`) distinct from real delimiters, so a single encoded
+     * segment cannot masquerade as multiple path segments. Individual param
+     * values are decoded later, only when they are extracted.
+     */
+    private fun Uri.matchTarget(): String? {
+        val scheme = scheme ?: return null
+        val path = encodedPath.orEmpty().trimEnd('/')
+        val fragment = encodedFragment?.let { "#$it" }.orEmpty()
+        val port = if (port >= 0) ":$port" else ""
+        return "$scheme://${host.orEmpty()}$port$path$fragment"
     }
 
     private fun buildDeeplinkParams(

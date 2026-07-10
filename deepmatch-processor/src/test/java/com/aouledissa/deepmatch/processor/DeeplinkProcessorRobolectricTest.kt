@@ -324,6 +324,71 @@ class DeeplinkProcessorRobolectricTest {
     }
 
     @Test
+    fun encodedReservedCharsInOptionalQueryParam_matchesAndDecodesValue() {
+        val spec = DeeplinkSpec(
+            name = "play clips",
+            scheme = setOf("https"),
+            host = setOf("www.sample.com"),
+            pathParams = listOf(
+                Param(name = "play"),
+                Param(name = "clip"),
+                Param(name = "clipSlug", type = ParamType.ALPHANUMERIC)
+            ),
+            queryParams = setOf(Param(name = "from", type = ParamType.STRING, required = false)),
+            fragment = null,
+            paramsFactory = ::clipFactory
+        )
+        val processor = DeeplinkProcessor(specs = setOf(spec))
+
+        // RFC 3986 valid: reserved characters in the `from` value are percent-encoded.
+        val url = "https://www.sample.com/play/clip/s20e24-mit-gebaerdensprache-halbfinale" +
+            "?from=%2Fserien%2Fgermanys-next-topmodel%23clips"
+        val params = processor.match(Uri.parse(url)) as ClipParams?
+
+        assertThat(params?.clipSlug).isEqualTo("s20e24-mit-gebaerdensprache-halbfinale")
+        assertThat(params?.from).isEqualTo("/serien/germanys-next-topmodel#clips")
+    }
+
+    @Test
+    fun encodedScriptPayloadInStringQueryParam_doesNotMatch() {
+        val spec = DeeplinkSpec(
+            name = "play clips",
+            scheme = setOf("https"),
+            host = setOf("www.sample.com"),
+            pathParams = listOf(
+                Param(name = "play"),
+                Param(name = "clip"),
+                Param(name = "clipSlug", type = ParamType.ALPHANUMERIC)
+            ),
+            queryParams = setOf(Param(name = "from", type = ParamType.STRING, required = false)),
+            fragment = null,
+            paramsFactory = ::clipFactory
+        )
+        val processor = DeeplinkProcessor(specs = setOf(spec))
+
+        // %3Cscript%3E decodes to <script>; '<' and '>' are outside the RFC grammar.
+        val url = "https://www.sample.com/play/clip/s20e24-halbfinale?from=%3Cscript%3Ealert(1)%3C%2Fscript%3E"
+        assertThat(processor.match(Uri.parse(url))).isNull()
+    }
+
+    @Test
+    fun encodedSlashInSingleSegment_doesNotMatchTwoLiteralSegments() {
+        val spec = DeeplinkSpec(
+            name = "two segments",
+            scheme = setOf("app"),
+            host = setOf("example.com"),
+            pathParams = listOf(Param(name = "one"), Param(name = "two")),
+            queryParams = emptySet(),
+            fragment = null,
+            paramsFactory = { HomeParams() }
+        )
+        val processor = DeeplinkProcessor(specs = setOf(spec))
+
+        // "one%2Ftwo" is a single path segment containing an encoded slash, not two segments.
+        assertThat(processor.match(Uri.parse("app://example.com/one%2Ftwo"))).isNull()
+    }
+
+    @Test
     fun malformedNumericValue_returnsNullWithoutCrash() {
         val spec = DeeplinkSpec(
             name = "open series",
@@ -382,13 +447,18 @@ class DeeplinkProcessorRobolectricTest {
         val profileId: Int
     ) : DeeplinkParams
 
+    data class ClipParams(
+        val clipSlug: String,
+        val from: String?
+    ) : DeeplinkParams
+
     private fun seriesFactory(params: Map<String, String?>): DeeplinkParams? = try {
         SeriesParams(
             seriesId = params["seriesid"]!!.toInt(),
             ref = params["ref"],
             fragment = params["fragment"]
         )
-    } catch (e: Exception) {
+    } catch (_: Exception) {
         null
     }
 
@@ -398,13 +468,13 @@ class DeeplinkProcessorRobolectricTest {
             ref = params["ref"],
             page = params["page"]?.toInt()
         )
-    } catch (e: Exception) {
+    } catch (_: Exception) {
         null
     }
 
     private fun seriesOnlyFactory(params: Map<String, String?>): DeeplinkParams? = try {
         SeriesOnlyParams(seriesId = params["seriesid"]!!.toInt())
-    } catch (e: Exception) {
+    } catch (_: Exception) {
         null
     }
 
@@ -413,7 +483,7 @@ class DeeplinkProcessorRobolectricTest {
             seriesId = params["seriesid"]!!.toInt(),
             ref = params["ref"]
         )
-    } catch (e: Exception) {
+    } catch (_: Exception) {
         null
     }
 
@@ -422,25 +492,34 @@ class DeeplinkProcessorRobolectricTest {
             seriesId = params["seriesid"]!!.toInt(),
             ref = params["ref"]!!
         )
-    } catch (e: Exception) {
+    } catch (_: Exception) {
         null
     }
 
     private fun profileFactory(params: Map<String, String?>): DeeplinkParams? = try {
         ProfileParams(userId = params["userid"]!!)
-    } catch (e: Exception) {
+    } catch (_: Exception) {
         null
     }
 
     private fun numericProfileFactory(params: Map<String, String?>): DeeplinkParams? = try {
         NumericProfileParams(userId = params["userid"]!!.toInt())
-    } catch (e: Exception) {
+    } catch (_: Exception) {
         null
     }
 
     private fun hostlessProfileFactory(params: Map<String, String?>): DeeplinkParams? = try {
         HostlessProfileParams(profileId = params["profileid"]!!.toInt())
-    } catch (e: Exception) {
+    } catch (_: Exception) {
+        null
+    }
+
+    private fun clipFactory(params: Map<String, String?>): DeeplinkParams? = try {
+        ClipParams(
+            clipSlug = params["clipslug"]!!,
+            from = params["from"]
+        )
+    } catch (_: Exception) {
         null
     }
 }

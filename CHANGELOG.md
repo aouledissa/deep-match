@@ -1,5 +1,27 @@
 # Changelog
 
+## [1.2.1] - 2026-07-10
+
+### Fixed
+
+- URI matching now runs against the encoded path and fragment. Previously the path was
+  percent-decoded before matching, so a single segment containing an encoded delimiter (e.g.
+  `%2F`) could masquerade as multiple path segments and produce incorrect matches. Path param
+  values are still decoded when they are extracted.
+- The `string` param type now accepts the full set of characters RFC 3986 permits in a URI,
+  instead of only `[a-zA-Z._~-]`. Deeplinks whose values legitimately contain reserved
+  characters — for example an encoded path carried in a query parameter — now match as expected.
+- The generated deeplink report's live URI validator now mirrors runtime matching (encoded-path
+  structural matching and the updated `string` type), so results shown in the browser agree with
+  on-device behavior.
+
+### Changed
+
+- `string` validation runs against the decoded value, so a payload smuggled through
+  percent-encoding that decodes to a character the grammar forbids raw (e.g. `%3C` → `<`) is
+  rejected. `numeric` and `alphanumeric` are unchanged. Specs that relied on `string` rejecting
+  digits or reserved characters should declare those params as `alphanumeric` instead.
+
 ## [1.2.0] - 2026-03-30
 
 ### Added
