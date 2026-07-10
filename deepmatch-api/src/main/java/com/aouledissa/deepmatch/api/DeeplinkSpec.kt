@@ -80,6 +80,10 @@ data class DeeplinkSpec(
         return pathParams.joinToString(separator = "/") { param ->
             when (param.type) {
                 null -> Regex.escape(param.name)
+                // Path segments are matched against the encoded path, so a string
+                // path param must stay within a single segment (RFC 3986 pchar)
+                // rather than use the query-oriented regex that permits '/'.
+                ParamType.STRING -> STRING_PATH_SEGMENT_PATTERN
                 else -> param.type.regex.pattern
             }
         }.let {
@@ -97,7 +101,24 @@ data class DeeplinkSpec(
 
 private val alphaNumericRegex = "[a-zA-Z0-9._~-]+".toRegex()
 private val numericRegex = "[0-9]+".toRegex()
-private val stringRegex = "[a-zA-Z._~-]+".toRegex()
+
+/**
+ * `string` accepts any value made up of characters that RFC 3986 allows to
+ * appear in a URI: unreserved, gen-delims, sub-delims and `%`. It is matched
+ * against the **decoded** value, so a payload smuggled through percent-encoding
+ * (e.g. `%3Cscript%3E`) is rejected once it decodes to characters the grammar
+ * forbids raw (`<`, `>`, `"`, whitespace, control characters, non-ASCII, ...).
+ */
+private val stringRegex = "[A-Za-z0-9._~:/?#\\[\\]@!\$&'()*+,;=%-]+".toRegex()
+
+/**
+ * Path-segment form of [stringRegex]. The matcher runs against the encoded path,
+ * so a `string` path param is constrained to a single RFC 3986 segment: `pchar`
+ * = unreserved / sub-delims / `:` / `@` / percent-encoded. Notably it excludes
+ * `/`, `?` and `#`, so a typed segment can never span a separator.
+ */
+private const val STRING_PATH_SEGMENT_PATTERN =
+    "(?:[A-Za-z0-9._~!\$&'()*+,;=:@-]|%[0-9A-Fa-f]{2})+"
 
 /**
  * Definition of a single path or query parameter declared in a deeplink

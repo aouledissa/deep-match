@@ -49,7 +49,9 @@ class DeeplinkProcessorTest {
         every { uri.host } returns "example.com"
         every { uri.port } returns -1
         every { uri.pathSegments } returns listOf("series", "42")
+        every { uri.encodedPath } returns "/series/42"
         every { uri.fragment } returns "trailer-tab"
+        every { uri.encodedFragment } returns "trailer-tab"
         every { uri.getQueryParameter("ref") } returns "promo"
         every { uri.getQueryParameter(any()) } answers {
             if (firstArg<String>() == "ref") "promo" else null
@@ -81,7 +83,9 @@ class DeeplinkProcessorTest {
         every { uri.host } returns "other.com"
         every { uri.port } returns -1
         every { uri.pathSegments } returns emptyList()
+        every { uri.encodedPath } returns null
         every { uri.fragment } returns null
+        every { uri.encodedFragment } returns null
         every { uri.getQueryParameter(any()) } returns null
 
         val processor = DeeplinkProcessor(specs = setOf(spec))
@@ -109,7 +113,9 @@ class DeeplinkProcessorTest {
         every { uri.host } returns "example.com"
         every { uri.port } returns -1
         every { uri.pathSegments } returns listOf("profile")
+        every { uri.encodedPath } returns "/profile"
         every { uri.fragment } returns null
+        every { uri.encodedFragment } returns null
         every { uri.getQueryParameter(any()) } returns null
 
         val processor = DeeplinkProcessor(specs = setOf(spec))
@@ -132,8 +138,10 @@ class DeeplinkProcessorTest {
         every { uri.scheme } returns "app"
         every { uri.host } returns "example.com"
         every { uri.port } returns -1
+        every { uri.encodedPath } returns "/home"
         every { uri.pathSegments } throws IllegalStateException("boom")
         every { uri.fragment } returns null
+        every { uri.encodedFragment } returns null
         every { uri.getQueryParameter(any()) } returns null
 
         val processor = DeeplinkProcessor(specs = setOf(spec))
@@ -163,19 +171,13 @@ class DeeplinkProcessorTest {
             ref = params["ref"],
             fragment = params["fragment"]
         )
-    } catch (e: Exception) {
-        null
-    }
-
-    private fun profileFactory(params: Map<String, String?>): DeeplinkParams? = try {
-        ProfileParams(userId = params["userid"]!!)
-    } catch (e: Exception) {
+    } catch (_: Exception) {
         null
     }
 
     private fun numericProfileFactory(params: Map<String, String?>): DeeplinkParams? = try {
         NumericProfileParams(userId = params["userid"]!!.toInt())
-    } catch (e: Exception) {
+    } catch (_: Exception) {
         null
     }
 }

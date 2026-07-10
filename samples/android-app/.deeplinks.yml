@@ -55,3 +55,20 @@ deeplinkSpecs:
       - name: userId
         type: numeric
       - name: posts
+
+  - name: "play episode"
+    description: "play episode from url"
+    activity: com.aouledissa.deepmatch.sample.MainActivity
+    categories: [DEFAULT, BROWSABLE]
+    scheme: [https]
+    host: ["www.sample.com"]
+    pathParams:
+      - name: play
+      - name: series
+        type: alphanumeric
+      - name: episodeSlug
+        type: alphanumeric
+    queryParams:
+      - name: origin
+        type: string
+        required: false
